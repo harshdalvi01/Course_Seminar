@@ -16,11 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.http import HttpResponse
+from django.shortcuts import render
 
-# Temporary placeholder view for home
 def home_view(request):
-    return HttpResponse("<h1>Welcome to AI-Native SDLC Prototype</h1><a href='/projects/'>Projects</a>")
+    return render(request, 'home.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -4,8 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AI-Native SDLC Prototype{% endblock %}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        :root {
+            --bg-color: #F8FAFC;
+            --surface-color: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-primary: #0F172A;
+            --text-secondary: #64748B;
+            --accent-primary: #4F46E5;
+            --accent-hover: #4338CA;
+            --success-bg: #ECFDF5;
+            --success-text: #065F46;
+            --error-bg: #FEF2F2;
+            --error-text: #991B1B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        header {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+            margin: 0;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-user {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .alert-success { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #A7F3D0; }
+        .alert-error { background-color: var(--error-bg); color: var(--error-text); border: 1px solid #FECACA; }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-top: 4rem;
+        }
+        
+        {% block extra_css %}{% endblock %}
+    </style>
 </head>
 <body>
     <header>
@@ -15,11 +123,16 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/projects/">Projects</a></li>
                 {% if user.is_authenticated %}
-                    <li>Welcome, {{ user.username }}</li>
-                    <li><a href="/auth/logout/">Logout</a></li>
+                    <li class="nav-user">Welcome, <strong>{{ user.username }}</strong></li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-btn">Logout</button>
+                        </form>
+                    </li>
                 {% else %}
-                    <li><a href="/auth/login/">Login</a></li>
-                    <li><a href="/auth/register/">Register</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -42,7 +155,13 @@
         <p>&copy; AI-Native Software Engineering Prototype</p>
     </footer>
     
-    <script src="{% static 'js/main.js' %}"></script>
-    {% block extra_js %}{% endblock %}
+    <script>
+        // Main Javascript file
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("AI-Native SDLC Prototype initialized.");
+        });
+        
+        {% block extra_js %}{% endblock %}
+    </script>
 </body>
 </html>

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - AI-Native SDLC{% endblock %}
+
+{% block extra_css %}
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.pipeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface-color);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 2rem;
+    position: relative;
+}
+.pipeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 2rem;
+    right: 2rem;
+    height: 2px;
+    background: var(--border-color);
+    z-index: 1;
+}
+.stage-node {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+.stage-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface-color);
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.stage-node.completed .stage-dot {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+.stage-node.current .stage-dot {
+    border-color: var(--accent-primary);
+    border-width: 4px;
+}
+.stage-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+.stage-node.current .stage-label {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+.btn-primary {
+    background-color: var(--accent-primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+}
+.btn-secondary {
+    background-color: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+}
+.btn-danger {
+    color: var(--error-text);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.section {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:1rem;">
+    <a href="{% url 'dashboard' %}" style="color:var(--text-secondary); text-decoration:none; font-size:0.875rem;">&larr; Back to Dashboard</a>
+</div>
+
+<div class="detail-header">
+    <div>
+        <h1 style="margin:0 0 0.5rem 0;">{{ project.name }}</h1>
+        <span style="font-size:0.875rem; color:var(--text-secondary);">Created: {{ project.created_at|date:"M d, Y" }} | Status: {{ project.get_status_display }}</span>
+    </div>
+    <div style="display:flex; gap:1rem; align-items:center;">
+        <a href="{% url 'project_update' project.pk %}" class="btn-secondary">Edit Details</a>
+        <a href="{% url 'project_delete' project.pk %}" class="btn-danger">Delete</a>
+    </div>
+</div>
+
+<div class="pipeline">
+    {% for stage in stages %}
+        <a href="{% url 'stage_detail' project.pk stage %}" style="text-decoration:none;" class="stage-node {% if forloop.counter0 < current_index %}completed{% elif forloop.counter0 == current_index %}current{% endif %}">
+            <div class="stage-dot">
+                {% if forloop.counter0 < current_index %}
+                    <span style="color:white; font-size:10px;">✓</span>
+                {% endif %}
+            </div>
+            <span class="stage-label">{{ stage }}</span>
+        </a>
+    {% endfor %}
+</div>
+
+<div class="section">
+    <h3 style="margin-top:0;">Project Idea</h3>
+    <p style="white-space:pre-wrap; margin-bottom:0;">{{ project.description }}</p>
+</div>
+
+<div class="section" style="text-align:center;">
+    <h3 style="margin-top:0;">Current Stage: {{ project.get_current_stage_display }}</h3>
+    <p style="color:var(--text-secondary); font-size:0.875rem;">AI functionality is disabled in this phase of the prototype.</p>
+</div>
+{% endblock %}

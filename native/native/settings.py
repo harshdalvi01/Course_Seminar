@@ -119,7 +119,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Environment Variables Configuration
 import os
@@ -130,3 +129,7 @@ load_dotenv(BASE_DIR / '.env')
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
 JEV_API_KEY = os.getenv('JEV_API_KEY', '')
+
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/projects/'
+LOGOUT_REDIRECT_URL = '/'

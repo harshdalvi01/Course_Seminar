@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Artifact - AI-Native SDLC{% endblock %}
+
+{% block extra_css %}
+.form-container {
+    background: var(--surface-color);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 2rem;
+}
+.form-group {
+    margin-bottom: 1.5rem;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+.form-control {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+.btn-primary {
+    background-color: var(--accent-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+.btn-secondary {
+    background-color: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+}
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:1rem;">
+    <a href="{% url 'stage_detail' artifact.project.pk artifact.stage %}" style="color:var(--text-secondary); text-decoration:none; font-size:0.875rem;">&larr; Cancel and go back</a>
+</div>
+
+<div class="form-container">
+    <h2 style="margin-top:0;">Edit Artifact Manually</h2>
+    <p style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:2rem;">
+        You are editing <strong>{{ artifact.project.name }} - {{ artifact.get_stage_display }}</strong> (currently v{{ artifact.version }}).<br>
+        Saving will create a new version (v{{ artifact.version|add:"1" }}) and preserve the history.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.content }}
+        </div>
+        <div style="display:flex; gap:1rem; margin-top:2rem;">
+            <button type="submit" class="btn-primary">Save as New Version</button>
+            <a href="{% url 'stage_detail' artifact.project.pk artifact.stage %}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
