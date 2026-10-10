@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 
 class Project(models.Model):
     STAGE_CHOICES = [
-        ('IDEA', 'Idea'),
         ('REQUIREMENTS', 'Requirements'),
         ('DESIGN', 'Design'),
         ('CODE', 'Code'),
@@ -21,7 +20,7 @@ class Project(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
     name = models.CharField(max_length=255)
     description = models.TextField()
-    current_stage = models.CharField(max_length=20, choices=STAGE_CHOICES, default='IDEA')
+    current_stage = models.CharField(max_length=20, choices=STAGE_CHOICES, default='REQUIREMENTS')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ACTIVE')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

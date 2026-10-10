@@ -16,6 +16,7 @@ class Artifact(models.Model):
     source_type = models.CharField(max_length=10, choices=SOURCE_CHOICES, default='AI')
     is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    validation_meta = models.JSONField(null=True, blank=True)
 
     class Meta:
         unique_together = ('project', 'stage', 'version')

@@ -141,7 +141,76 @@
             {% if latest_artifact.created_by %}by {{ latest_artifact.created_by.username }}{% endif %}
         </div>
         
-        <div class="artifact-content">{{ latest_artifact.content }}</div>
+        {% if code_files %}
+            <div style="margin-top: 1.5rem; display:flex; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; height: 600px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <!-- File Tree Left Sidebar -->
+                <div style="width: 280px; background: #f8fafc; border-right: 1px solid var(--border-color); display: flex; flex-direction: column;">
+                    <div style="padding: 0.75rem 1rem; background: #e2e8f0; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                        <span>Project Files ({{ code_files|length }})</span>
+                        <span style="font-size: 0.75rem; background: #cbd5e1; padding: 2px 6px; border-radius: 4px; font-weight: 500;">CODE</span>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1;">
+                        {% for f in code_files %}
+                            <li class="file-tree-item" id="file-btn-{{ forloop.counter0 }}" onclick="showFile({{ forloop.counter0 }})" style="padding: 0.65rem 1rem; cursor: pointer; border-bottom: 1px solid #edf2f7; font-size: 0.85rem; font-family: monospace; display: flex; align-items: center; gap: 0.5rem; color: #334155; {% if forloop.first %}background: #e2e8f0; font-weight: bold;{% endif %}">
+                                <span>📄</span>
+                                <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ f.path }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <!-- Main Code Viewer Right Pane -->
+                <div style="flex: 1; display: flex; flex-direction: column; background: #0f172a; color: #f8fafc;">
+                    <div style="padding: 0.75rem 1.25rem; background: #1e293b; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+                        <span id="activeFilePath" style="font-family: monospace; font-weight: 600; font-size: 0.9rem; color: #38bdf8;">{{ code_files.0.path }}</span>
+                        <span id="activeFilePurpose" style="font-size: 0.8rem; color: #94a3b8; max-width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ code_files.0.purpose }}</span>
+                    </div>
+                    <div style="flex: 1; overflow: auto; position: relative;">
+                        {% for f in code_files %}
+                            <pre id="code-content-{{ forloop.counter0 }}" class="file-code-block" style="margin: 0; padding: 1.25rem; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 0.875rem; line-height: 1.5; white-space: pre; color: #e2e8f0; {% if not forloop.first %}display: none;{% endif %}"><code>{{ f.content }}</code></pre>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <script>
+            function showFile(index) {
+                // Hide all code panes
+                const panes = document.querySelectorAll('.file-code-block');
+                panes.forEach(function(pane) { pane.style.display = 'none'; });
+                
+                // Unhighlight all file items
+                const items = document.querySelectorAll('.file-tree-item');
+                items.forEach(function(item) {
+                    item.style.background = 'transparent';
+                    item.style.fontWeight = 'normal';
+                });
+                
+                // Show selected pane
+                const targetPane = document.getElementById('code-content-' + index);
+                if (targetPane) {
+                    targetPane.style.display = 'block';
+                }
+                
+                // Highlight selected item
+                const targetItem = document.getElementById('file-btn-' + index);
+                if (targetItem) {
+                    targetItem.style.background = '#e2e8f0';
+                    targetItem.style.fontWeight = 'bold';
+                }
+                
+                // Update header info
+                const filePaths = [{% for f in code_files %}"{{ f.path|escapejs }}",{% endfor %}];
+                const filePurposes = [{% for f in code_files %}"{{ f.purpose|escapejs }}",{% endfor %}];
+                
+                if (filePaths[index]) {
+                    document.getElementById('activeFilePath').textContent = filePaths[index];
+                    document.getElementById('activeFilePurpose').textContent = filePurposes[index];
+                }
+            }
+            </script>
+        {% else %}
+            <div class="artifact-content">{{ latest_artifact.content }}</div>
+        {% endif %}
     </div>
 
     {% if not latest_artifact.is_approved %}
@@ -239,4 +308,6 @@
         </form>
     </div>
 {% endif %}
+
 {% endblock %}
+
