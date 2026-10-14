@@ -19,7 +19,25 @@ from django.urls import path, include
 from django.shortcuts import render
 
 def home_view(request):
-    return render(request, 'home.html')
+    try:
+        from projects.models import Project
+        from workflow.models import Artifact, Review
+        total_projects = Project.objects.count()
+        total_artifacts = Artifact.objects.count()
+        total_reviews = Review.objects.count()
+        recent_projects = list(Project.objects.order_by('-created_at')[:4])
+    except Exception:
+        total_projects = 0
+        total_artifacts = 0
+        total_reviews = 0
+        recent_projects = []
+        
+    return render(request, 'home.html', {
+        'total_projects': total_projects,
+        'total_artifacts': total_artifacts,
+        'total_reviews': total_reviews,
+        'recent_projects': recent_projects,
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),

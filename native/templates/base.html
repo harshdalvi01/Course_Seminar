@@ -178,11 +178,49 @@
             margin-top: 4rem;
         }
         
+        /* Jev Industrial Landing Theme overrides */
+        body.landing-page {
+            background-color: #0D0D0C;
+            color: #F8FAFC;
+        }
+
+        body.landing-page header {
+            background-color: rgba(13, 13, 12, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        body.landing-page header .logo {
+            color: #F8FAFC;
+        }
+
+        body.landing-page header .nav-links a {
+            color: #94A3B8;
+        }
+
+        body.landing-page header .nav-links a:hover {
+            color: #F8FAFC;
+        }
+
+        body.landing-page header .seminar-pill {
+            background: rgba(232, 89, 12, 0.12);
+            color: #F97316;
+            border-color: rgba(232, 89, 12, 0.35);
+        }
+
+        body.landing-page footer {
+            background-color: #0D0D0C;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: #64748B;
+            margin-top: 0;
+        }
+
         {% block extra_css %}{% endblock %}
     </style>
 </head>
-<body>
-    <header>
+<body class="{% block body_class %}{% endblock %}">
+    <header class="{% block header_class %}{% endblock %}">
         <nav>
             <a href="/" class="brand-box">
                 <span style="font-size: 1.35rem;">⚡</span>
@@ -208,7 +246,7 @@
         </nav>
     </header>
     
-    <main class="container">
+    <main class="{% block main_class %}container{% endblock %}">
         {% if messages %}
             <div class="messages">
                 {% for message in messages %}
