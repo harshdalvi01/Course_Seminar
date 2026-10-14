@@ -241,3 +241,104 @@ class HITLServiceTests(TestCase):
         
         self.project.refresh_from_db()
         self.assertEqual(self.project.current_stage, 'DEPLOYMENT')
+
+    def test_deployment_agent_fails_without_prerequisites(self):
+        # We only have approved requirements in setUp
+        hitl_service.approve_artifact(self.artifact, self.user, "Approved reqs")
+        
+        with self.assertRaisesMessage(HITLServiceError, "Approved REQUIREMENTS, DESIGN, CODE, and TESTING artifacts must exist before generating DEPLOYMENT."):
+            hitl_service.generate_initial_artifact(self.project, 'DEPLOYMENT', self.user)
+
+    @patch('ai_services.groq_service.GroqService.generate')
+    @patch('ai_services.jev_service.JevService.validate_artifact')
+    def test_deployment_agent_end_to_end_flow_and_completion(self, mock_validate, mock_generate):
+        # 1. Setup approved requirements, design, code, testing
+        hitl_service.approve_artifact(self.artifact, self.user, "Approved reqs")
+        
+        design_art = Artifact.objects.create(
+            project=self.project, stage='DESIGN', version=1, content='Design content',
+            created_by=self.user, is_approved=False
+        )
+        hitl_service.approve_artifact(design_art, self.user, "Approved design")
+        
+        code_art = Artifact.objects.create(
+            project=self.project, stage='CODE', version=1, content='Code content',
+            created_by=self.user, is_approved=False
+        )
+        hitl_service.approve_artifact(code_art, self.user, "Approved code")
+        
+        test_art = Artifact.objects.create(
+            project=self.project, stage='TESTING', version=1, content='Testing content',
+            created_by=self.user, is_approved=False
+        )
+        hitl_service.approve_artifact(test_art, self.user, "Approved testing")
+        
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.current_stage, 'DEPLOYMENT')
+        self.assertEqual(self.project.status, 'ACTIVE')
+        
+        # 2. Mock Deployment generation and Jev validation
+        deployment_output = (
+            "# 1. Deployment Strategy\nRolling static container.\n\n"
+            "# 2. Environment Requirements\nNode 20.\n\n"
+            "# 3. Required Services\nNginx.\n\n"
+            "# 4. Configuration Requirements\nPORT=80.\n\n"
+            "# 5. Database Considerations\nIndexedDB.\n\n"
+            "# 6. Security Checklist\nTLS 1.3 enforced.\n\n"
+            "# 7. CI/CD Recommendations\nGitHub Actions.\n\n"
+            "# 8. Monitoring Considerations\nUptimeRobot.\n\n"
+            "# 9. Rollback Strategy\nRevert commit.\n\n"
+            "# 10. Deployment Readiness Assessment\nReady for Go-Live."
+        )
+        mock_generate.return_value = deployment_output
+        mock_validate.return_value = {
+            'valid': True,
+            'confidence': 0.95,
+            'issues': [],
+            'warnings': [],
+            'requires_human_review': True
+        }
+        
+        # 3. Generate DEPLOYMENT artifact
+        deploy_art = hitl_service.generate_initial_artifact(self.project, 'DEPLOYMENT', self.user)
+        
+        # Verify Groq context received all 4 prerequisites
+        call_kwargs = mock_generate.call_args[1]
+        self.assertIn("Original content v1", call_kwargs['context']) # Reqs
+        self.assertIn("Design content", call_kwargs['context'])      # Design
+        self.assertIn("Code content", call_kwargs['context'])        # Code
+        self.assertIn("Testing content", call_kwargs['context'])     # Testing
+        
+        # Verify Jev validation rules were evaluated
+        val_rules = mock_validate.call_args[1]['rules']
+        self.assertTrue(any('security' in r.lower() for r in val_rules))
+        self.assertTrue(any('readiness' in r.lower() for r in val_rules))
+        
+        self.assertEqual(deploy_art.stage, 'DEPLOYMENT')
+        self.assertEqual(deploy_art.version, 1)
+        self.assertFalse(deploy_art.is_approved)
+        self.assertEqual(deploy_art.validation_meta['confidence'], 0.95)
+        
+        # 4. Human Approval of the Deployment artifact
+        hitl_service.approve_artifact(deploy_art, self.user, "Final deployment approved.")
+        
+        # 5. Verify status and stage advanced to COMPLETED
+        deploy_art.refresh_from_db()
+        self.project.refresh_from_db()
+        
+        self.assertTrue(deploy_art.is_approved)
+        self.assertEqual(self.project.current_stage, 'COMPLETED')
+        self.assertEqual(self.project.status, 'COMPLETED')
+        
+        # 6. Verify Completion Summary rendering on Project Detail view
+        self.client.force_login(self.user)
+        res = self.client.get(reverse('project_detail', kwargs={'pk': self.project.pk}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "SDLC Lifecycle Completed")
+        self.assertContains(res, "Requirements")
+        self.assertContains(res, "Deployment")
+        
+        # 7. Verify accessing COMPLETED stage in workflow redirects to project detail
+        res_completed = self.client.get(reverse('stage_detail', kwargs={'project_id': self.project.pk, 'stage': 'COMPLETED'}))
+        self.assertRedirects(res_completed, reverse('project_detail', kwargs={'pk': self.project.pk}))
+

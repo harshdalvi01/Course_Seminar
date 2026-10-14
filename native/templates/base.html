@@ -9,14 +9,24 @@
             --bg-color: #F8FAFC;
             --surface-color: #FFFFFF;
             --border-color: #E2E8F0;
+            --border-subtle: #F1F5F9;
             --text-primary: #0F172A;
             --text-secondary: #64748B;
+            --text-muted: #94A3B8;
             --accent-primary: #4F46E5;
             --accent-hover: #4338CA;
             --success-bg: #ECFDF5;
+            --success-border: #A7F3D0;
             --success-text: #065F46;
-            --error-bg: #FEF2F2;
-            --error-text: #991B1B;
+            --warning-bg: #FFFBEB;
+            --warning-border: #FDE68A;
+            --warning-text: #92400E;
+            --danger-bg: #FEF2F2;
+            --danger-border: #FECACA;
+            --danger-text: #991B1B;
+            --info-bg: #EFF6FF;
+            --info-border: #BFDBFE;
+            --info-text: #1E40AF;
         }
 
         body {
@@ -26,27 +36,51 @@
             background-color: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
         header {
             background-color: var(--surface-color);
             border-bottom: 1px solid var(--border-color);
-            padding: 0.75rem 0;
+            padding: 0.85rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 0 1rem;
+            padding: 0 1.5rem;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
         }
 
         .logo {
-            font-weight: 600;
-            font-size: 1.125rem;
+            font-weight: 700;
+            font-size: 1.15rem;
             color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .seminar-pill {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.2rem 0.55rem;
+            border-radius: 9999px;
+            background: #EEF2FF;
+            color: #4F46E5;
+            border: 1px solid #C7D2FE;
         }
 
         .nav-links {
@@ -62,6 +96,7 @@
             text-decoration: none;
             font-size: 0.875rem;
             font-weight: 500;
+            transition: color 0.15s;
         }
 
         .nav-links a:hover {
@@ -71,6 +106,9 @@
         .nav-user {
             color: var(--text-primary);
             font-size: 0.875rem;
+            background: #F1F5F9;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
         }
 
         .nav-btn {
@@ -82,33 +120,61 @@
             font-weight: 500;
             padding: 0;
             font-family: inherit;
+            transition: color 0.15s;
         }
 
         .nav-btn:hover {
-            color: var(--text-primary);
+            color: var(--danger-text);
         }
 
         .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            max-width: 1280px;
+            margin: 1.75rem auto 3rem auto;
+            padding: 0 1.5rem;
         }
 
         .alert {
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-            border-radius: 4px;
+            padding: 0.85rem 1.15rem;
+            margin-bottom: 1.25rem;
+            border-radius: 6px;
             font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
 
-        .alert-success { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #A7F3D0; }
-        .alert-error { background-color: var(--error-bg); color: var(--error-text); border: 1px solid #FECACA; }
+        .alert-success { background-color: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+        .alert-error, .alert-danger { background-color: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); }
+        .alert-warning { background-color: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
+        .alert-info { background-color: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
+
+        /* Shared Badge Styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+        .badge-ai { background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; }
+        .badge-human { background: #FDF2F8; color: #BE185D; border: 1px solid #FBCFE8; }
+        .badge-approved { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+        .badge-pending { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
+        .badge-rejected { background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); }
+        .badge-regenerated { background: #FFF7ED; color: #C2410C; border: 1px solid #FFEDD5; }
+        .badge-edited { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
 
         footer {
             text-align: center;
-            padding: 2rem 0;
+            padding: 2.5rem 0;
             color: var(--text-secondary);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--surface-color);
             margin-top: 4rem;
         }
         
@@ -118,16 +184,20 @@
 <body>
     <header>
         <nav>
-            <div class="logo">AI-Native SDLC</div>
+            <a href="/" class="brand-box">
+                <span style="font-size: 1.35rem;">⚡</span>
+                <span class="logo">AI-Native SDLC</span>
+                <span class="seminar-pill">Seminar Demo</span>
+            </a>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
-                <li><a href="/projects/">Projects</a></li>
+                <li><a href="/projects/">Projects Dashboard</a></li>
                 {% if user.is_authenticated %}
-                    <li class="nav-user">Welcome, <strong>{{ user.username }}</strong></li>
+                    <li class="nav-user">User: <strong>{{ user.username }}</strong></li>
                     <li>
                         <form method="post" action="{% url 'logout' %}" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="nav-btn">Logout</button>
+                            <button type="submit" class="nav-btn">Sign Out</button>
                         </form>
                     </li>
                 {% else %}

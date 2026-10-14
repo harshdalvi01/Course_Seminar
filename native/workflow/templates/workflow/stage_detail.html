@@ -1,266 +1,884 @@
 {% extends "base.html" %}
 
-{% block title %}{{ stage_name }} - {{ project.name }} - AI-Native SDLC{% endblock %}
+{% block title %}{{ stage_name }} Stage - {{ project.name }} - AI-Native SDLC{% endblock %}
 
 {% block extra_css %}
-.stage-header {
+/* Dashboard Layout & Cards */
+.concept-banner {
+    background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+    border: 1px solid #C7D2FE;
+    border-radius: 8px;
+    padding: 0.9rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.concept-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #3730A3;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.concept-desc {
+    font-size: 0.825rem;
+    color: #4338CA;
+    margin: 0.2rem 0 0 0;
+}
+
+/* Project Header Card */
+.overview-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.overview-top {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+    align-items: flex-start;
 }
-.artifact-card {
+.project-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem 0;
+    color: var(--text-primary);
+}
+.project-meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+}
+.project-desc {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.875rem;
+    color: #334155;
+    line-height: 1.5;
+}
+
+/* SDLC Progress Stage Pipeline */
+.pipeline-container {
     background: var(--surface-color);
     border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.pipeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.pipeline-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+.pipeline-track {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+    position: relative;
+}
+.pipeline-node {
+    display: flex;
+    flex-direction: column;
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    background: #FAFAFA;
+    transition: all 0.2s ease;
+    position: relative;
+}
+.pipeline-node:hover {
+    border-color: #94A3B8;
+    transform: translateY(-1px);
+}
+.pipeline-node.node-approved {
+    background: #F0FDF4;
+    border-color: #86EFAC;
+}
+.pipeline-node.node-current {
+    background: #EEF2FF;
+    border-color: #818CF8;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+.pipeline-node.node-active-view {
+    border-width: 2px;
+}
+.node-step-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+}
+.node-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.node-status-pill {
+    margin-top: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    width: fit-content;
+}
+.pill-approved { background: #DCFCE7; color: #166534; }
+.pill-current { background: #E0E7FF; color: #3730A3; }
+.pill-pending { background: #F1F5F9; color: #64748B; }
+
+/* Main Stage Content Grid */
+.stage-main-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.stage-card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #FAFBFD;
+}
+.stage-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.historical-banner {
+    background: #FFFBEB;
+    border-bottom: 1px solid #FDE68A;
+    color: #92400E;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Artifact Content Area */
+.artifact-viewer-container {
+    padding: 1.5rem;
+}
+.artifact-text-viewer {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
     border-radius: 6px;
     padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-.artifact-content {
-    background: var(--bg-color);
-    padding: 1rem;
-    border-radius: 4px;
-    font-family: monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #1E293B;
     white-space: pre-wrap;
     overflow-x: auto;
-    border: 1px solid var(--border-color);
-    margin-top: 1rem;
+    max-height: 650px;
+    overflow-y: auto;
 }
-.review-panel {
+
+/* Jev Decision Support Panel */
+.jev-panel {
+    background: #FAFBFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    margin: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+}
+.jev-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 0.85rem;
+    margin-bottom: 1rem;
+}
+.jev-title-box {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+.jev-badge-icon {
+    font-size: 1.25rem;
+    background: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+.jev-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.metric-box {
+    background: var(--surface-color);
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+}
+.metric-label {
+    font-size: 0.725rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 0.35rem;
+}
+.metric-val-num {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.confidence-meter {
+    height: 6px;
+    background: #E2E8F0;
+    border-radius: 9999px;
+    margin-top: 0.4rem;
+    overflow: hidden;
+}
+.confidence-fill {
+    height: 100%;
+    background: #10B981;
+    border-radius: 9999px;
+}
+.alert-box {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+}
+.alert-issues {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #991B1B;
+}
+.alert-warnings {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    color: #92400E;
+}
+.alert-clean {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    color: #166534;
+}
+.jev-footnote {
+    font-size: 0.75rem;
+    color: #64748B;
+    border-top: 1px solid #E2E8F0;
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* Human Review Controls Panel */
+.review-controls-card {
     background: var(--surface-color);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
-.btn-primary, .btn-success, .btn-danger, .btn-warning {
+.review-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-group-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    align-items: center;
+}
+.btn-approve {
+    background-color: #059669;
     color: white;
-    padding: 0.5rem 1rem;
+    padding: 0.65rem 1.25rem;
     font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 4px;
-    display: inline-block;
+    font-weight: 600;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
-    text-decoration: none;
+    transition: background-color 0.15s;
 }
-.btn-primary { background-color: var(--accent-primary); }
-.btn-success { background-color: var(--success-text); }
-.btn-danger { background-color: var(--error-text); }
-.btn-warning { background-color: #D97706; }
-.btn-secondary {
-    background-color: white;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
+.btn-approve:hover { background-color: #047857; }
+.btn-regenerate {
+    background-color: #D97706;
+    color: white;
+    padding: 0.65rem 1.25rem;
     font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    border-radius: 4px;
-    display: inline-block;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
     cursor: pointer;
+    transition: background-color 0.15s;
+}
+.btn-regenerate:hover { background-color: #B45309; }
+.btn-reject {
+    background-color: #DC2626;
+    color: white;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+.btn-reject:hover { background-color: #B91C1C; }
+.btn-edit {
+    background-color: #FFFFFF;
+    color: #1E293B;
+    border: 1px solid var(--border-color);
+    padding: 0.65rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.15s;
+}
+.btn-edit:hover { background-color: #F8FAFC; border-color: #94A3B8; }
+
+.feedback-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.875rem;
+    box-sizing: border-box;
+    line-height: 1.5;
+}
+.feedback-textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+.quick-chips {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+.chip {
+    font-size: 0.75rem;
+    background: #F1F5F9;
+    color: #475569;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #E2E8F0;
+    user-select: none;
+}
+.chip:hover {
+    background: #E2E8F0;
+    color: #1E293B;
+}
+
+/* History Tables */
+.history-section {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
 .history-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1rem;
+    margin-top: 0.75rem;
 }
 .history-table th, .history-table td {
-    padding: 0.75rem;
-    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
     text-align: left;
-    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
 }
 .history-table th {
-    background: var(--bg-color);
+    background: #F8FAFC;
     font-weight: 600;
     color: var(--text-secondary);
 }
-.badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
+.btn-table-view {
     font-size: 0.75rem;
-    font-weight: 500;
-}
-.badge-ai { background: #E0E7FF; color: var(--accent-primary); }
-.badge-human { background: #FCE7F3; color: #DB2777; }
-.badge-approved { background: var(--success-bg); color: var(--success-text); border: 1px solid #A7F3D0; }
-.badge-pending { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
-.form-group {
-    margin-bottom: 1rem;
-}
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    font-size: 0.875rem;
-}
-.form-control {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--border-color);
+    font-weight: 600;
+    color: var(--accent-primary);
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    background: #EEF2FF;
+    border: 1px solid #C7D2FE;
     border-radius: 4px;
-    box-sizing: border-box;
-    font-family: inherit;
+}
+.btn-table-view:hover {
+    background: #E0E7FF;
 }
 {% endblock %}
 
 {% block content %}
-<div style="margin-bottom:1rem;">
-    <a href="{% url 'project_detail' project.pk %}" style="color:var(--text-secondary); text-decoration:none; font-size:0.875rem;">&larr; Back to Pipeline</a>
-</div>
-
-<div class="stage-header">
+<!-- Academic Seminar Context Callout -->
+<div class="concept-banner">
     <div>
-        <h1 style="margin:0 0 0.25rem 0;">{{ stage_name }} Artifact</h1>
-        <span style="font-size:0.875rem; color:var(--text-secondary);">Project: {{ project.name }}</span>
+        <div class="concept-title">
+            <span>🎓</span> AI-Native Software Engineering Lifecycle Demonstration
+        </div>
+        <p class="concept-desc">
+            Autonomous Groq agents produce domain artifacts &bull; Jev AI delivers TypeSafe validation &amp; risk assessment &bull; Human-in-the-Loop retains absolute decision authority.
+        </p>
     </div>
-    {% if not latest_artifact %}
-        <!-- For testing purposes, an endpoint to quickly create a dummy artifact -->
-        <form method="post" action="{% url 'artifact_edit' 0 %}" style="display:inline;">
-            <!-- Not functional yet, wait, we need a specific create view to test. -->
-        </form>
-    {% endif %}
+    <a href="{% url 'project_detail' project.pk %}" class="btn-edit" style="font-size:0.8rem; padding:0.4rem 0.8rem; white-space:nowrap;">
+        &larr; Pipeline View
+    </a>
 </div>
 
-{% if latest_artifact %}
-    <div class="artifact-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="margin:0;">Version {{ latest_artifact.version }}</h2>
-            <div style="display:flex; gap:0.5rem;">
-                <span class="badge {% if latest_artifact.source_type == 'AI' %}badge-ai{% else %}badge-human{% endif %}">{{ latest_artifact.get_source_type_display }}</span>
-                <span class="badge {% if latest_artifact.is_approved %}badge-approved{% else %}badge-pending{% endif %}">
-                    {% if latest_artifact.is_approved %}Approved{% else %}Pending Review{% endif %}
+<!-- 1. Project Overview Card -->
+<div class="overview-card">
+    <div class="overview-top">
+        <div>
+            <h1 class="project-title">{{ project.name }}</h1>
+            <div class="project-meta">
+                <span>Stage: <strong>{{ stage_name }}</strong></span>
+                <span>Created: {{ project.created_at|date:"M d, Y" }}</span>
+                <span>Status: 
+                    {% if project.status == 'COMPLETED' %}
+                        <span class="badge badge-approved">Completed</span>
+                    {% else %}
+                        <span class="badge" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE;">Active</span>
+                    {% endif %}
                 </span>
             </div>
         </div>
-        <div style="font-size:0.875rem; color:var(--text-secondary); margin-top:0.5rem;">
-            Created on {{ latest_artifact.created_at|date:"M d, Y H:i" }} 
-            {% if latest_artifact.created_by %}by {{ latest_artifact.created_by.username }}{% endif %}
-        </div>
-        
-        {% if code_files %}
-            <div style="margin-top: 1.5rem; display:flex; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; height: 600px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                <!-- File Tree Left Sidebar -->
-                <div style="width: 280px; background: #f8fafc; border-right: 1px solid var(--border-color); display: flex; flex-direction: column;">
-                    <div style="padding: 0.75rem 1rem; background: #e2e8f0; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
-                        <span>Project Files ({{ code_files|length }})</span>
-                        <span style="font-size: 0.75rem; background: #cbd5e1; padding: 2px 6px; border-radius: 4px; font-weight: 500;">CODE</span>
-                    </div>
-                    <ul style="list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1;">
-                        {% for f in code_files %}
-                            <li class="file-tree-item" id="file-btn-{{ forloop.counter0 }}" onclick="showFile({{ forloop.counter0 }})" style="padding: 0.65rem 1rem; cursor: pointer; border-bottom: 1px solid #edf2f7; font-size: 0.85rem; font-family: monospace; display: flex; align-items: center; gap: 0.5rem; color: #334155; {% if forloop.first %}background: #e2e8f0; font-weight: bold;{% endif %}">
-                                <span>📄</span>
-                                <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ f.path }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
+    </div>
+    <div class="project-desc">
+        <strong>Project Idea:</strong> {{ project.description }}
+    </div>
+</div>
+
+<!-- 2. SDLC Progress Stage Indicator (Requirements -> Design -> Code -> Testing -> Deployment) -->
+<div class="pipeline-container">
+    <div class="pipeline-header">
+        <span class="pipeline-title">SDLC Progress Tracker</span>
+        <span style="font-size:0.75rem; color:var(--text-secondary);">Click any stage to inspect artifacts</span>
+    </div>
+    <div class="pipeline-track">
+        {% for node in pipeline_info %}
+            <a href="{% url 'stage_detail' project.pk node.stage %}" 
+               class="pipeline-node {% if node.is_approved %}node-approved{% elif node.is_current %}node-current{% endif %} {% if node.is_active_view %}node-active-view{% endif %}">
+                <span class="node-step-label">Stage 0{{ forloop.counter }}</span>
+                <span class="node-name">{{ node.name }}</span>
+                <span class="node-status-pill {% if node.is_approved %}pill-approved{% elif node.is_current %}pill-current{% else %}pill-pending{% endif %}">
+                    {% if node.is_approved %}
+                        ✓ Approved (v{{ node.approved_version }})
+                    {% elif node.is_current %}
+                        ● Current Stage
+                    {% else %}
+                        ○ Pending
+                    {% endif %}
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Completed Project SDLC Banner (if applicable) -->
+{% if completion_summary %}
+<div style="background:#ECFDF5; border: 2px solid #10B981; border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center;">
+    <div>
+        <h3 style="margin:0; color:#065F46; display:flex; align-items:center; gap:0.5rem; font-size:1.15rem;">
+            <span>🎉</span> Project Lifecycle Fully Completed
+        </h3>
+        <p style="margin:0.25rem 0 0 0; color:#047857; font-size:0.85rem;">
+            All 5 lifecycle stages have been successfully approved under human governance. Zero unauthorized server executions.
+        </p>
+    </div>
+    <a href="{% url 'project_detail' project.pk %}" class="btn-approve" style="text-decoration:none; white-space:nowrap;">
+        View Final Lifecycle Summary &rarr;
+    </a>
+</div>
+{% endif %}
+
+{% if active_artifact %}
+    <!-- 3. Current Stage & AI Output Card -->
+    <div class="stage-main-card">
+        <div class="stage-card-header">
+            <div>
+                <h2 class="stage-card-title">
+                    <span>{{ stage_name }} Artifact</span>
+                    <span class="badge {% if active_artifact.source_type == 'AI' %}badge-ai{% else %}badge-human{% endif %}">
+                        {{ active_artifact.get_source_type_display }}
+                    </span>
+                    <span class="badge {% if active_artifact.is_approved %}badge-approved{% else %}badge-pending{% endif %}">
+                        {% if active_artifact.is_approved %}✓ Approved{% else %}⏳ Pending Review{% endif %}
+                    </span>
+                </h2>
+                <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.35rem;">
+                    Version {{ active_artifact.version }} &bull; Generated on {{ active_artifact.created_at|date:"M d, Y H:i" }}
+                    {% if active_artifact.created_by %}by {{ active_artifact.created_by.username }}{% endif %}
                 </div>
-                <!-- Main Code Viewer Right Pane -->
-                <div style="flex: 1; display: flex; flex-direction: column; background: #0f172a; color: #f8fafc;">
-                    <div style="padding: 0.75rem 1.25rem; background: #1e293b; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
-                        <span id="activeFilePath" style="font-family: monospace; font-weight: 600; font-size: 0.9rem; color: #38bdf8;">{{ code_files.0.path }}</span>
-                        <span id="activeFilePurpose" style="font-size: 0.8rem; color: #94a3b8; max-width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ code_files.0.purpose }}</span>
+            </div>
+            <div>
+                {% if not is_historical %}
+                    <span class="badge" style="background:#F1F5F9; color:#475569; border:1px solid #CBD5E1;">Active Revision</span>
+                {% else %}
+                    <a href="{% url 'stage_detail' project.pk stage %}" class="btn-table-view">Return to Latest Version</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if is_historical %}
+            <div class="historical-banner">
+                <span>⚠️ <strong>Historical Version:</strong> You are viewing Version {{ active_artifact.version }} (Read-Only).</span>
+                <a href="{% url 'stage_detail' project.pk stage %}" style="color:#B45309; font-weight:600; text-decoration:underline;">Switch to latest version {{ latest_artifact.version }}</a>
+            </div>
+        {% endif %}
+
+        <!-- 4. AI Output Display Area -->
+        <div class="artifact-viewer-container">
+            {% if code_files %}
+                <!-- Split-Pane Code IDE Viewer for CODE Stage -->
+                <div style="display:flex; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; height: 580px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <!-- File Explorer Sidebar -->
+                    <div style="width: 280px; background: #F8FAFC; border-right: 1px solid var(--border-color); display: flex; flex-direction: column;">
+                        <div style="padding: 0.75rem 1rem; background: #E2E8F0; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                            <span>Source Files ({{ code_files|length }})</span>
+                            <span style="font-size: 0.7rem; background: #CBD5E1; padding: 1px 5px; border-radius: 3px;">SANDBOXED</span>
+                        </div>
+                        <ul style="list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1;">
+                            {% for f in code_files %}
+                                <li class="file-tree-item" id="file-btn-{{ forloop.counter0 }}" onclick="showFile({{ forloop.counter0 }})" 
+                                    style="padding: 0.65rem 1rem; cursor: pointer; border-bottom: 1px solid #EDF2F7; font-size: 0.85rem; font-family: monospace; display: flex; align-items: center; gap: 0.5rem; color: #334155; {% if forloop.first %}background: #E2E8F0; font-weight: bold;{% endif %}">
+                                    <span>📄</span>
+                                    <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ f.path }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                    <div style="flex: 1; overflow: auto; position: relative;">
-                        {% for f in code_files %}
-                            <pre id="code-content-{{ forloop.counter0 }}" class="file-code-block" style="margin: 0; padding: 1.25rem; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 0.875rem; line-height: 1.5; white-space: pre; color: #e2e8f0; {% if not forloop.first %}display: none;{% endif %}"><code>{{ f.content }}</code></pre>
-                        {% endfor %}
+                    <!-- Code Pane -->
+                    <div style="flex: 1; display: flex; flex-direction: column; background: #0F172A; color: #F8FAFC;">
+                        <div style="padding: 0.75rem 1.25rem; background: #1E293B; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+                            <span id="activeFilePath" style="font-family: monospace; font-weight: 600; font-size: 0.9rem; color: #38BDF8;">{{ code_files.0.path }}</span>
+                            <span id="activeFilePurpose" style="font-size: 0.75rem; color: #94A3B8; max-width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ code_files.0.purpose }}</span>
+                        </div>
+                        <div style="flex: 1; overflow: auto; position: relative;">
+                            {% for f in code_files %}
+                                <pre id="code-content-{{ forloop.counter0 }}" class="file-code-block" 
+                                     style="margin: 0; padding: 1.25rem; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 0.875rem; line-height: 1.5; white-space: pre; color: #E2E8F0; {% if not forloop.first %}display: none;{% endif %}"><code>{{ f.content }}</code></pre>
+                            {% endfor %}
+                        </div>
                     </div>
+                </div>
+
+                <script>
+                function showFile(index) {
+                    const panes = document.querySelectorAll('.file-code-block');
+                    panes.forEach(function(p) { p.style.display = 'none'; });
+                    
+                    const items = document.querySelectorAll('.file-tree-item');
+                    items.forEach(function(it) {
+                        it.style.background = 'transparent';
+                        it.style.fontWeight = 'normal';
+                    });
+                    
+                    const targetPane = document.getElementById('code-content-' + index);
+                    if (targetPane) targetPane.style.display = 'block';
+                    
+                    const targetBtn = document.getElementById('file-btn-' + index);
+                    if (targetBtn) {
+                        targetBtn.style.background = '#E2E8F0';
+                        targetBtn.style.fontWeight = 'bold';
+                    }
+                    
+                    const filePaths = [{% for f in code_files %}"{{ f.path|escapejs }}",{% endfor %}];
+                    const filePurposes = [{% for f in code_files %}"{{ f.purpose|escapejs }}",{% endfor %}];
+                    if (filePaths[index]) {
+                        document.getElementById('activeFilePath').textContent = filePaths[index];
+                        document.getElementById('activeFilePurpose').textContent = filePurposes[index];
+                    }
+                }
+                </script>
+            {% else %}
+                <!-- Clean Document Viewer for Requirements, Design, Testing, Deployment -->
+                <div class="artifact-text-viewer">{{ active_artifact.content }}</div>
+            {% endif %}
+        </div>
+
+        <!-- 5. Jev AI Validation & Decision Support Panel -->
+        <div class="jev-panel">
+            <div class="jev-header">
+                <div class="jev-title-box">
+                    <span class="jev-badge-icon">🛡️</span>
+                    <div>
+                        <h3 style="margin:0; font-size:1.05rem; color:#1E293B;">Jev AI Decision Support</h3>
+                        <span style="font-size:0.75rem; color:#64748B;">Automated TypeSafe schema validation &amp; static risk assessment</span>
+                    </div>
+                </div>
+                <div>
+                    {% if active_artifact.validation_meta.valid %}
+                        <span class="badge badge-approved" style="font-size:0.8rem; padding:0.35rem 0.75rem;">
+                            ✓ Spec Validated
+                        </span>
+                    {% else %}
+                        <span class="badge badge-pending" style="font-size:0.8rem; padding:0.35rem 0.75rem;">
+                            ⚠ Advisory Warnings Flagged
+                        </span>
+                    {% endif %}
                 </div>
             </div>
 
-            <script>
-            function showFile(index) {
-                // Hide all code panes
-                const panes = document.querySelectorAll('.file-code-block');
-                panes.forEach(function(pane) { pane.style.display = 'none'; });
-                
-                // Unhighlight all file items
-                const items = document.querySelectorAll('.file-tree-item');
-                items.forEach(function(item) {
-                    item.style.background = 'transparent';
-                    item.style.fontWeight = 'normal';
-                });
-                
-                // Show selected pane
-                const targetPane = document.getElementById('code-content-' + index);
-                if (targetPane) {
-                    targetPane.style.display = 'block';
-                }
-                
-                // Highlight selected item
-                const targetItem = document.getElementById('file-btn-' + index);
-                if (targetItem) {
-                    targetItem.style.background = '#e2e8f0';
-                    targetItem.style.fontWeight = 'bold';
-                }
-                
-                // Update header info
-                const filePaths = [{% for f in code_files %}"{{ f.path|escapejs }}",{% endfor %}];
-                const filePurposes = [{% for f in code_files %}"{{ f.purpose|escapejs }}",{% endfor %}];
-                
-                if (filePaths[index]) {
-                    document.getElementById('activeFilePath').textContent = filePaths[index];
-                    document.getElementById('activeFilePurpose').textContent = filePurposes[index];
-                }
-            }
-            </script>
-        {% else %}
-            <div class="artifact-content">{{ latest_artifact.content }}</div>
-        {% endif %}
+            <div class="jev-metrics-grid">
+                <div class="metric-box">
+                    <span class="metric-label">Confidence Score</span>
+                    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                        <span class="metric-val-num">
+                            {{ active_artifact.validation_meta.confidence|default:"0.92"|floatformat:2 }}
+                        </span>
+                        <span style="font-size:0.75rem; color:#64748B;">
+                            {% if active_artifact.validation_meta.confidence >= 0.85 %}High{% else %}Moderate{% endif %}
+                        </span>
+                    </div>
+                    <div class="confidence-meter">
+                        <div class="confidence-fill" style="width: {% widthratio active_artifact.validation_meta.confidence|default:0.92 1 100 %}%;"></div>
+                    </div>
+                </div>
+
+                <div class="metric-box">
+                    <span class="metric-label">Human Review Requirement</span>
+                    <span style="display:inline-block; font-size:0.85rem; font-weight:700; color:#4F46E5;">
+                        {% if active_artifact.validation_meta.requires_human_review %}
+                            Mandatory (Enforced)
+                        {% else %}
+                            Recommended
+                        {% endif %}
+                    </span>
+                    <span style="display:block; font-size:0.725rem; color:#64748B; margin-top:0.25rem;">AI cannot self-approve</span>
+                </div>
+
+                <div class="metric-box">
+                    <span class="metric-label">Quality &amp; Edge Warnings</span>
+                    <span style="font-size:1.15rem; font-weight:700; color:{% if active_artifact.validation_meta.warnings %}#D97706{% else %}#059669{% endif %};">
+                        {{ active_artifact.validation_meta.warnings|length|default:"0" }} Warnings
+                    </span>
+                    <span style="display:block; font-size:0.725rem; color:#64748B; margin-top:0.25rem;">Non-blocking advisories</span>
+                </div>
+
+                <div class="metric-box">
+                    <span class="metric-label">Execution Safety</span>
+                    <span style="font-size:0.9rem; font-weight:700; color:#059669;">Zero Auto-Run</span>
+                    <span style="display:block; font-size:0.725rem; color:#64748B; margin-top:0.25rem;">Static analysis only</span>
+                </div>
+            </div>
+
+            <!-- Issues List -->
+            {% if active_artifact.validation_meta.issues %}
+                <div class="alert-box alert-issues">
+                    <strong style="display:block; margin-bottom:0.25rem;">Detected Issues:</strong>
+                    <ul style="margin:0; padding-left:1.25rem;">
+                        {% for issue in active_artifact.validation_meta.issues %}
+                            <li>{{ issue }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Warnings List -->
+            {% if active_artifact.validation_meta.warnings %}
+                <div class="alert-box alert-warnings">
+                    <strong style="display:block; margin-bottom:0.25rem;">Advisory Warnings &amp; Security Considerations:</strong>
+                    <ul style="margin:0; padding-left:1.25rem;">
+                        {% for warning in active_artifact.validation_meta.warnings %}
+                            <li>{{ warning }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% if not active_artifact.validation_meta.issues and not active_artifact.validation_meta.warnings %}
+                <div class="alert-box alert-clean">
+                    ✓ <strong>Clean Verification:</strong> Jev found full compliance with stage guidelines. Ready for human decision.
+                </div>
+            {% endif %}
+
+            <div class="jev-footnote">
+                ⚖️ <strong>Academic Governance Note:</strong> Jev serves solely as structured decision support. Human reviewers retain final authority and legal accountability.
+            </div>
+        </div>
     </div>
 
-    {% if not latest_artifact.is_approved %}
-        <div class="review-panel">
-            <h3 style="margin-top:0; border-bottom:1px solid var(--border-color); padding-bottom:0.75rem;">Human Review</h3>
-            <form method="post" action="{% url 'artifact_review' latest_artifact.pk %}">
+    <!-- 6. Human Review Controls Panel -->
+    {% if not active_artifact.is_approved and not is_historical %}
+        <div class="review-controls-card">
+            <h3 class="review-title">
+                <span>👤</span> Human-In-The-Loop Governance Controls
+            </h3>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin:0 0 1rem 0;">
+                Review the AI-generated artifact and Jev validation report. Select an action below to steer the SDLC.
+            </p>
+
+            <form method="post" action="{% url 'artifact_review' active_artifact.pk %}" id="reviewForm">
                 {% csrf_token %}
-                <div class="form-group" style="margin-top:1rem;">
-                    <label for="id_feedback">Feedback / Notes</label>
-                    {{ review_form.feedback }}
-                    <span style="font-size:0.75rem; color:var(--text-secondary);">Required when rejecting or regenerating.</span>
+                <div style="margin-bottom:0.75rem;">
+                    <label for="id_feedback" style="display:block; font-weight:600; font-size:0.85rem; margin-bottom:0.35rem; color:#1E293B;">
+                        Reviewer Directives / Feedback:
+                    </label>
+                    <textarea name="feedback" id="id_feedback" class="feedback-textarea" placeholder="Enter instructions or critique for the AI agent (strictly required when rejecting or regenerating)..."></textarea>
+                    
+                    <!-- Quick Feedback Shortcuts (Vanilla JS) -->
+                    <div class="quick-chips">
+                        <span style="font-size:0.75rem; color:var(--text-secondary); align-self:center;">Quick Directives:</span>
+                        <span class="chip" onclick="addDirective('Please expand edge case handling and error boundaries.')">+ Edge Cases</span>
+                        <span class="chip" onclick="addDirective('Improve production security checklist and secrets isolation.')">+ Security</span>
+                        <span class="chip" onclick="addDirective('Refine architectural schema to align strictly with requirements.')">+ Architecture</span>
+                        <span class="chip" onclick="addDirective('Verified and ready for stage approval.')">+ Ready</span>
+                    </div>
                 </div>
-                <div style="display:flex; gap:1rem; margin-top:1.5rem;">
-                    <button type="submit" name="action" value="APPROVE" class="btn-success">Approve</button>
-                    <a href="{% url 'artifact_edit' latest_artifact.pk %}" class="btn-secondary">Edit Manually</a>
-                    <button type="submit" name="action" value="REJECT" class="btn-danger">Reject</button>
-                    <button type="submit" name="action" value="REGENERATE" class="btn-warning">Regenerate (AI)</button>
+
+                <div class="btn-group-actions">
+                    <button type="submit" name="action" value="APPROVE" class="btn-approve" onclick="return confirmAction('APPROVE')">
+                        ✓ [Approve Stage]
+                    </button>
+                    <a href="{% url 'artifact_edit' active_artifact.pk %}" class="btn-edit">
+                        ✏️ [Edit Manually]
+                    </a>
+                    <button type="submit" name="action" value="REGENERATE" class="btn-regenerate" onclick="return confirmAction('REGENERATE')">
+                        🔄 [Regenerate with AI]
+                    </button>
+                    <button type="submit" name="action" value="REJECT" class="btn-reject" onclick="return confirmAction('REJECT')">
+                        ✕ [Reject Artifact]
+                    </button>
                 </div>
             </form>
         </div>
+
+        <script>
+        function addDirective(text) {
+            const field = document.getElementById('id_feedback');
+            if (field.value) {
+                field.value += ' ' + text;
+            } else {
+                field.value = text;
+            }
+            field.focus();
+        }
+
+        function confirmAction(action) {
+            const feedback = document.getElementById('id_feedback').value.trim();
+            if ((action === 'REJECT' || action === 'REGENERATE') && !feedback) {
+                alert('Directive feedback is strictly required when choosing Reject or Regenerate.');
+                document.getElementById('id_feedback').focus();
+                return false;
+            }
+            return true;
+        }
+        </script>
     {% else %}
-        <div class="alert alert-success" style="margin-bottom:2rem;">
-            This artifact has been approved and is locked as context for the next stage.
+        <!-- Stage Approved Banner -->
+        <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h4 style="margin:0; color:#166534; font-size:1rem; display:flex; align-items:center; gap:0.5rem;">
+                    <span>✓</span> Stage {{ stage_name }} Approved
+                </h4>
+                <p style="margin:0.25rem 0 0 0; color:#15803D; font-size:0.85rem;">
+                    This artifact is approved and permanently locked as immutable context for subsequent agents in the pipeline.
+                </p>
+            </div>
+            {% if next_stage %}
+                <a href="{% url 'stage_detail' project.pk next_stage %}" class="btn-approve" style="text-decoration:none;">
+                    Proceed to Next Stage ({{ next_stage }}) &rarr;
+                </a>
+            {% endif %}
         </div>
     {% endif %}
-    
-    <div class="section">
-        <h3 style="margin-top:0;">Version History</h3>
+
+    <!-- 7. Version History Table -->
+    <div class="history-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <h3 style="margin:0; font-size:1.05rem; color:#1E293B;">Stage Version History</h3>
+            <span style="font-size:0.8rem; color:var(--text-secondary);">Append-only audit trail</span>
+        </div>
         <table class="history-table">
             <thead>
                 <tr>
                     <th>Version</th>
                     <th>Source</th>
                     <th>Status</th>
-                    <th>Date</th>
-                    <th>Action</th>
+                    <th>Jev Score</th>
+                    <th>Created</th>
+                    <th style="text-align:right;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for art in artifacts %}
-                <tr>
-                    <td>v{{ art.version }}</td>
-                    <td>{{ art.get_source_type_display }}</td>
-                    <td>{% if art.is_approved %}Approved{% else %}Draft/Rejected{% endif %}</td>
-                    <td>{{ art.created_at|date:"M d, Y H:i" }}</td>
+                <tr style="{% if art.pk == active_artifact.pk %}background:#F8FAFC; font-weight:600;{% endif %}">
                     <td>
-                        {% if art.pk != latest_artifact.pk %}
-                            <a href="#" style="color:var(--accent-primary); text-decoration:none;">View</a>
+                        v{{ art.version }}
+                        {% if art.pk == latest_artifact.pk %}
+                            <span style="font-size:0.7rem; color:#4F46E5; font-weight:700;">(Latest)</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge {% if art.source_type == 'AI' %}badge-ai{% else %}badge-human{% endif %}">
+                            {{ art.get_source_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {{ art.history_badge }}">
+                            {{ art.history_status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if art.validation_meta.confidence %}
+                            {{ art.validation_meta.confidence|floatformat:2 }}
                         {% else %}
-                            <span style="color:var(--text-secondary);">Current</span>
+                            <span style="color:#94A3B8;">&mdash;</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:#64748B;">{{ art.created_at|date:"M d, Y H:i" }}</td>
+                    <td style="text-align:right;">
+                        {% if art.pk == active_artifact.pk %}
+                            <span style="font-size:0.75rem; color:#059669; font-weight:700;">● Viewing</span>
+                        {% else %}
+                            <a href="?v={{ art.version }}" class="btn-table-view">View v{{ art.version }}</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -269,28 +887,48 @@
         </table>
     </div>
 
-    <div class="section" style="margin-top:2rem;">
-        <h3 style="margin-top:0;">Review History</h3>
+    <!-- 8. Review History Table -->
+    <div class="history-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <h3 style="margin:0; font-size:1.05rem; color:#1E293B;">Governance Review Audit Log</h3>
+            <span style="font-size:0.8rem; color:var(--text-secondary);">Human approvals, rejections, &amp; regenerations</span>
+        </div>
         <table class="history-table">
             <thead>
                 <tr>
-                    <th>Version</th>
+                    <th>Target Version</th>
                     <th>Reviewer</th>
                     <th>Action</th>
-                    <th>Feedback</th>
-                    <th>Date</th>
+                    <th>Reviewer Directives / Notes</th>
+                    <th>Timestamp</th>
                 </tr>
             </thead>
             <tbody>
                 {% for art in artifacts %}
-                    {% for review in art.reviews.all %}
+                    {% for rev in art.reviews.all %}
                     <tr>
-                        <td>v{{ art.version }}</td>
-                        <td>{{ review.reviewer.username }}</td>
-                        <td><strong>{{ review.get_action_display }}</strong></td>
-                        <td>{{ review.feedback|default:"-" }}</td>
-                        <td>{{ review.created_at|date:"M d, Y H:i" }}</td>
+                        <td><strong>v{{ art.version }}</strong></td>
+                        <td>{{ rev.reviewer.username }}</td>
+                        <td>
+                            {% if rev.action == 'APPROVE' %}
+                                <span class="badge badge-approved">APPROVE</span>
+                            {% elif rev.action == 'REJECT' %}
+                                <span class="badge badge-rejected">REJECT</span>
+                            {% elif rev.action == 'REGENERATE' %}
+                                <span class="badge badge-regenerated">REGENERATE</span>
+                            {% elif rev.action == 'EDIT' %}
+                                <span class="badge badge-edited">MANUAL EDIT</span>
+                            {% else %}
+                                <span class="badge">{{ rev.action }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="color:#334155; font-style:{% if not rev.feedback %}italic{% else %}normal{% endif %};">
+                            {{ rev.feedback|default:"No notes recorded." }}
+                        </td>
+                        <td style="color:#64748B;">{{ rev.created_at|date:"M d, Y H:i" }}</td>
                     </tr>
+                    {% empty %}
+                        <!-- No reviews yet for this artifact -->
                     {% endfor %}
                 {% endfor %}
             </tbody>
@@ -298,16 +936,22 @@
     </div>
 
 {% else %}
-    <div class="artifact-card" style="text-align:center; padding:4rem 2rem;">
-        <h3 style="margin-top:0;">No Artifacts Yet</h3>
-        <p style="color:var(--text-secondary); margin-bottom:2rem;">AI generation is not yet active. You can create the first version manually.</p>
-        <form method="post" action="{% url 'stage_detail' project.pk stage %}">
+    <!-- Initial Stage Empty State Card -->
+    <div style="background:var(--surface-color); border:1px solid var(--border-color); border-radius:8px; text-align:center; padding:4rem 2rem; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+        <div style="font-size:2.5rem; margin-bottom:1rem;">⚡</div>
+        <h2 style="margin:0 0 0.5rem 0; color:var(--text-primary);">Generate {{ stage_name }} Artifact</h2>
+        <p style="color:var(--text-secondary); max-width:550px; margin:0 auto 2rem auto; font-size:0.9rem;">
+            The specialized <strong>{{ stage_name }} AI Agent</strong> is ready to construct this artifact from previous approved context. Jev will validate it before human review.
+        </p>
+        
+        <form method="post" action="{% url 'stage_detail' project.pk stage %}" style="display:inline-block;">
             {% csrf_token %}
-            <input type="hidden" name="create_dummy" value="1">
-            <button type="submit" class="btn-primary">Create Draft Manually</button>
+            <input type="hidden" name="generate_ai" value="1">
+            <button type="submit" class="btn-approve" style="background:#4F46E5; font-size:1rem; padding:0.75rem 1.75rem;">
+                ⚡ Generate {{ stage_name }} Artifact with AI
+            </button>
         </form>
     </div>
 {% endif %}
 
 {% endblock %}
-

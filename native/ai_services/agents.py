@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Dict, Any, Optional
 from .groq_service import groq_service
@@ -6,6 +7,79 @@ from workflow.models import Artifact
 from projects.models import Project
 
 logger = logging.getLogger(__name__)
+
+def condense_text(text: Optional[str], max_chars: int = 3000) -> str:
+    """
+    Safely limits text size while keeping beginning and ending context.
+    If the text is already concise, it is returned untouched.
+    """
+    if not text:
+        return ""
+    if len(text) <= max_chars:
+        return text
+    half = max_chars // 2
+    omitted = len(text) - max_chars
+    return (
+        f"{text[:half]}\n\n"
+        f"... [Summary: {omitted} characters condensed for token economy] ...\n\n"
+        f"{text[-half:]}"
+    )
+
+def condense_code_artifact(code_str: Optional[str], max_file_chars: int = 600) -> str:
+    """
+    Parses a code artifact (JSON array of files or Markdown) and generates
+    a concise architectural summary and manifest for downstream agents.
+    If the code is already concise (or a short test string), it is preserved.
+    """
+    if not code_str:
+        return ""
+        
+    if len(code_str) <= 1500:
+        return code_str
+
+    clean_str = code_str.strip()
+    if clean_str.startswith("```json"):
+        clean_str = clean_str[7:]
+    elif clean_str.startswith("```"):
+        clean_str = clean_str[3:]
+    if clean_str.endswith("```"):
+        clean_str = clean_str[:-3]
+    clean_str = clean_str.strip()
+
+    parsed_files = None
+    try:
+        data = json.loads(clean_str)
+        if isinstance(data, list):
+            parsed_files = data
+    except Exception:
+        pass
+
+    if parsed_files:
+        manifest_lines = [
+            "### Codebase Architectural Manifest & Key Excerpts:",
+            f"Total files: {len(parsed_files)}"
+        ]
+        for f in parsed_files:
+            path = f.get('path', 'unknown')
+            purpose = f.get('purpose', 'N/A')
+            content = f.get('content', '')
+            
+            # Key configuration / setup files retain more content
+            is_config = any(path.endswith(cfg) for cfg in ['package.json', 'requirements.txt', 'Dockerfile', 'docker-compose.yml', 'tsconfig.json'])
+            char_limit = max_file_chars * 2 if is_config else max_file_chars
+            
+            if len(content) > char_limit:
+                truncated_content = content[:char_limit] + f"\n... [Truncated {len(content) - char_limit} chars for token economy]"
+            else:
+                truncated_content = content
+                
+            manifest_lines.append(f"\n- **File `{path}`** ({purpose}):\n```\n{truncated_content}\n```")
+            
+        return "\n".join(manifest_lines)
+
+    # Fallback for non-JSON code artifacts (e.g. plain text or markdown)
+    return condense_text(code_str, max_chars=3500)
+
 
 class BaseAgent:
     """
@@ -112,7 +186,7 @@ class DesignAgent(BaseAgent):
         req = self._get_approved_artifact_content(project, 'REQUIREMENTS')
         if not req:
             raise ValueError("An approved REQUIREMENTS artifact must exist before generating DESIGN.")
-        return f"Project Idea:\n{project.description}\n\nApproved Requirements:\n{req}"
+        return f"Project Idea:\n{project.description}\n\nApproved Requirements:\n{condense_text(req, max_chars=3500)}"
 
     def get_system_prompt(self) -> str:
         return (
@@ -152,8 +226,8 @@ class CodingAgent(BaseAgent):
             
         return (
             f"Project Idea:\n{project.description}\n\n"
-            f"Approved Requirements:\n{req}\n\n"
-            f"Approved Design:\n{design}"
+            f"Approved Requirements:\n{condense_text(req, max_chars=3000)}\n\n"
+            f"Approved Design:\n{condense_text(design, max_chars=3000)}"
         )
 
     def get_system_prompt(self) -> str:
@@ -198,9 +272,9 @@ class TestingAgent(BaseAgent):
             raise ValueError("Approved REQUIREMENTS, DESIGN, and CODE artifacts must exist before generating TESTING.")
             
         return (
-            f"Approved Requirements:\n{req}\n\n"
-            f"Approved Design:\n{design}\n\n"
-            f"Approved Code:\n{code}"
+            f"Approved Requirements:\n{condense_text(req, max_chars=2500)}\n\n"
+            f"Approved Design:\n{condense_text(design, max_chars=2500)}\n\n"
+            f"Approved Code:\n{condense_code_artifact(code, max_file_chars=500)}"
         )
 
     def get_system_prompt(self) -> str:
@@ -240,9 +314,62 @@ class TestingAgent(BaseAgent):
 
 class DeploymentAgent(BaseAgent):
     stage_name = 'DEPLOYMENT'
+    
     def build_context(self, project: Project) -> str:
-        req = self._get_approved_artifact_content(project, 'REQUIREMENTS') or "[Missing]"
-        design = self._get_approved_artifact_content(project, 'DESIGN') or "[Missing]"
-        code = self._get_approved_artifact_content(project, 'CODE') or "[Missing]"
-        tests = self._get_approved_artifact_content(project, 'TESTING') or "[Missing]"
-        return f"Requirements:\n{req}\n\nDesign:\n{design}\n\nCode:\n{code}\n\nTests:\n{tests}"
+        req = self._get_approved_artifact_content(project, 'REQUIREMENTS')
+        design = self._get_approved_artifact_content(project, 'DESIGN')
+        code = self._get_approved_artifact_content(project, 'CODE')
+        testing = self._get_approved_artifact_content(project, 'TESTING')
+        
+        if not req or not design or not code or not testing:
+            raise ValueError("Approved REQUIREMENTS, DESIGN, CODE, and TESTING artifacts must exist before generating DEPLOYMENT.")
+            
+        return (
+            f"Project Idea:\n{project.description}\n\n"
+            f"Approved Requirements:\n{condense_text(req, max_chars=2000)}\n\n"
+            f"Approved Design:\n{condense_text(design, max_chars=2000)}\n\n"
+            f"Approved Code:\n{condense_code_artifact(code, max_file_chars=400)}\n\n"
+            f"Approved Testing Strategy & Report:\n{condense_text(testing, max_chars=2000)}"
+        )
+
+    def get_system_prompt(self) -> str:
+        return (
+            "You are the expert DevOps, Cloud Architect, and Release Engineer.\n"
+            "Based on the approved requirements, system design, source code, and testing reports, "
+            "generate a comprehensive deployment plan and readiness assessment.\n\n"
+            "CRITICAL SAFETY INSTRUCTION:\n"
+            "Do NOT attempt to execute deployment commands, install packages, or provision infrastructure. "
+            "This agent creates an architectural release specification and static deployment readiness report.\n\n"
+            "Your output MUST be in structured Markdown format containing the following 10 numbered sections:\n\n"
+            "# 1. Deployment Strategy\n"
+            "Define the chosen strategy (e.g., Blue/Green, Canary, Rolling, or Containerized Static Host) and rationale.\n\n"
+            "# 2. Environment Requirements\n"
+            "Specify operating system, runtime versions (e.g., Node.js / Python), CPU/RAM recommendations, and network requirements.\n\n"
+            "# 3. Required Services\n"
+            "Detail external services, web servers (e.g., Nginx, Caddy), background workers, CDN, or cache layers.\n\n"
+            "# 4. Configuration Requirements\n"
+            "List environment variables, configuration files, secrets management, and port bindings.\n\n"
+            "# 5. Database Considerations\n"
+            "Outline data persistence, migration procedures, indexing, backup routines, and storage requirements.\n\n"
+            "# 6. Security Checklist\n"
+            "Provide production hardening steps: SSL/TLS enforcement, headers, CORS policy, secret isolation, and least-privilege permissions.\n\n"
+            "# 7. CI/CD Recommendations\n"
+            "Recommend automated build, lint, test, and release verification stages for continuous integration.\n\n"
+            "# 8. Monitoring Considerations\n"
+            "Detail health check endpoints, logging aggregation, uptime monitoring, error tracking, and alerting thresholds.\n\n"
+            "# 9. Rollback Strategy\n"
+            "Define concrete steps to rapidly revert to the previous stable release in case of critical deployment failure.\n\n"
+            "# 10. Deployment Readiness Assessment\n"
+            "Provide an objective Go / No-Go readiness summary, risk rating, and prerequisite checklist for human authorization."
+        )
+
+    def validate(self, output: str, project: Project) -> Dict[str, Any]:
+        rules = [
+            "Identify missing deployment requirements, environment configurations, or unaccounted dependencies.",
+            "Identify critical security concerns (e.g., insecure defaults, exposed secrets, unencrypted communications).",
+            "Verify consistency with the project's approved design, code, and test artifacts.",
+            "Evaluate overall deployment readiness (Go / No-Go clarity and risk assessment).",
+            "Flag whether human review is required."
+        ]
+        return self.jev.validate_artifact(content=output, stage=self.stage_name, rules=rules)
+

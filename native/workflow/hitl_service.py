@@ -65,7 +65,15 @@ class HITLService:
             stage_idx = stages.index(artifact.stage)
             # Only advance if we are approving the currently active stage
             if current_idx == stage_idx and current_idx < len(stages) - 1:
-                artifact.project.current_stage = stages[current_idx + 1]
+                next_stage = stages[current_idx + 1]
+                artifact.project.current_stage = next_stage
+                if next_stage == 'COMPLETED' or artifact.stage == 'DEPLOYMENT':
+                    artifact.project.status = 'COMPLETED'
+                    artifact.project.current_stage = 'COMPLETED'
+                artifact.project.save()
+            elif artifact.stage == 'DEPLOYMENT':
+                artifact.project.current_stage = 'COMPLETED'
+                artifact.project.status = 'COMPLETED'
                 artifact.project.save()
         except ValueError:
             pass

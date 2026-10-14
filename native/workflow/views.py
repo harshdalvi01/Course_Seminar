@@ -14,6 +14,9 @@ def stage_detail_view(request, project_id, stage):
     if stage not in valid_stages:
         return redirect('project_detail', pk=project.pk)
         
+    if stage == 'COMPLETED':
+        return redirect('project_detail', pk=project.pk)
+        
     # Generate new AI artifact from scratch (Initial Generation)
     if request.method == 'POST' and request.POST.get('generate_ai'):
         try:
@@ -29,12 +32,76 @@ def stage_detail_view(request, project_id, stage):
     artifacts = Artifact.objects.filter(project=project, stage=stage).order_by('-version')
     latest_artifact = artifacts.first() if artifacts.exists() else None
     
+    # Support viewing historical versions (Read-Only)
+    version_param = request.GET.get('v')
+    if version_param and version_param.isdigit():
+        active_artifact = artifacts.filter(version=int(version_param)).first() or latest_artifact
+    else:
+        active_artifact = latest_artifact
+        
+    is_historical = bool(active_artifact and latest_artifact and active_artifact.pk != latest_artifact.pk)
+    
+    # Annotate artifact history with status and badge classes
+    for art in artifacts:
+        reviews = list(art.reviews.all())
+        actions = [r.action for r in reviews]
+        if art.is_approved:
+            art.history_status = "Approved"
+            art.history_badge = "badge-approved"
+        elif 'REJECT' in actions:
+            art.history_status = "Rejected"
+            art.history_badge = "badge-rejected"
+        elif 'REGENERATE' in actions:
+            art.history_status = "Regenerated"
+            art.history_badge = "badge-regenerated"
+        elif 'EDIT' in actions:
+            art.history_status = "Edited"
+            art.history_badge = "badge-edited"
+        else:
+            art.history_status = "Pending Review"
+            art.history_badge = "badge-pending"
+
     review_form = ReviewForm()
     
+    # Build complete SDLC pipeline status
+    sdlc_stages = ['REQUIREMENTS', 'DESIGN', 'CODE', 'TESTING', 'DEPLOYMENT']
+    stage_display_names = dict(Project.STAGE_CHOICES)
+    pipeline_info = []
+    for s in sdlc_stages:
+        approved_art = project.artifacts.filter(stage=s, is_approved=True).order_by('-version').first()
+        has_any_art = project.artifacts.filter(stage=s).exists()
+        pipeline_info.append({
+            'stage': s,
+            'name': stage_display_names.get(s, s),
+            'is_approved': approved_art is not None,
+            'approved_version': approved_art.version if approved_art else None,
+            'is_current': (project.current_stage == s and project.status != 'COMPLETED'),
+            'is_active_view': (stage == s),
+            'has_artifacts': has_any_art,
+        })
+        
+    curr_stage_idx = sdlc_stages.index(stage) if stage in sdlc_stages else -1
+    next_stage = sdlc_stages[curr_stage_idx + 1] if 0 <= curr_stage_idx < len(sdlc_stages) - 1 else None
+    
     code_files = []
-    if stage == 'CODE' and latest_artifact:
+    if stage == 'CODE' and active_artifact:
         from .utils import parse_code_files
-        code_files = parse_code_files(latest_artifact.content)
+        code_files = parse_code_files(active_artifact.content)
+        
+    completion_summary = None
+    if project.status == 'COMPLETED' or (stage == 'DEPLOYMENT' and latest_artifact and latest_artifact.is_approved):
+        summary_artifacts = []
+        for s_key in sdlc_stages:
+            appr = project.artifacts.filter(stage=s_key, is_approved=True).order_by('-version').first()
+            summary_artifacts.append({
+                'stage': s_key,
+                'stage_name': stage_display_names.get(s_key, s_key),
+                'artifact': appr,
+            })
+        completion_summary = {
+            'is_completed': True,
+            'artifacts': summary_artifacts,
+        }
     
     context = {
         'project': project,
@@ -42,8 +109,14 @@ def stage_detail_view(request, project_id, stage):
         'stage_name': valid_stages[stage],
         'artifacts': artifacts,
         'latest_artifact': latest_artifact,
+        'active_artifact': active_artifact,
+        'is_historical': is_historical,
         'review_form': review_form,
         'code_files': code_files,
+        'completion_summary': completion_summary,
+        'pipeline_info': pipeline_info,
+        'next_stage': next_stage,
+        'sdlc_stages': sdlc_stages,
     }
     return render(request, 'workflow/stage_detail.html', context)
 

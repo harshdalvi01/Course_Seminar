@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Artifact - AI-Native SDLC{% endblock %}
+{% block title %}Edit {{ artifact.get_stage_display }} Artifact - AI-Native SDLC{% endblock %}
 
 {% block extra_css %}
 .form-container {
     background: var(--surface-color);
     padding: 2rem;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 8px;
     margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
 .form-group {
     margin-bottom: 1.5rem;
@@ -16,30 +17,43 @@
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 0.875rem;
+    color: var(--text-primary);
 }
-.form-control {
+.form-control, textarea {
     width: 100%;
-    padding: 1rem;
+    min-height: 400px;
+    padding: 1.25rem;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: 6px;
     box-sizing: border-box;
-    font-family: monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.875rem;
     line-height: 1.5;
+    background: #F8FAFC;
+    color: #1E293B;
+}
+.form-control:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
 }
 .btn-primary {
     background-color: var(--accent-primary);
     color: white;
     padding: 0.75rem 1.5rem;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: 6px;
     display: inline-block;
     border: none;
     cursor: pointer;
+    transition: background-color 0.15s;
+}
+.btn-primary:hover {
+    background-color: var(--accent-hover);
 }
 .btn-secondary {
     background-color: white;
@@ -47,32 +61,46 @@
     border: 1px solid var(--border-color);
     padding: 0.75rem 1.5rem;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: 6px;
     display: inline-block;
+    transition: background-color 0.15s;
+}
+.btn-secondary:hover {
+    background-color: #F8FAFC;
 }
 {% endblock %}
 
 {% block content %}
-<div style="margin-bottom:1rem;">
-    <a href="{% url 'stage_detail' artifact.project.pk artifact.stage %}" style="color:var(--text-secondary); text-decoration:none; font-size:0.875rem;">&larr; Cancel and go back</a>
+<div style="margin-bottom:1.25rem;">
+    <a href="{% url 'stage_detail' artifact.project.pk artifact.stage %}" style="color:var(--text-secondary); text-decoration:none; font-size:0.875rem; font-weight:500;">
+        &larr; Cancel and return to stage workspace
+    </a>
 </div>
 
 <div class="form-container">
-    <h2 style="margin-top:0;">Edit Artifact Manually</h2>
-    <p style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:2rem;">
-        You are editing <strong>{{ artifact.project.name }} - {{ artifact.get_stage_display }}</strong> (currently v{{ artifact.version }}).<br>
-        Saving will create a new version (v{{ artifact.version|add:"1" }}) and preserve the history.
-    </p>
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1.5rem;">
+        <div>
+            <h2 style="margin:0; font-size:1.35rem; font-weight:700;">Manual Revision &bull; {{ artifact.get_stage_display }}</h2>
+            <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.25rem 0 0 0;">
+                Project: <strong>{{ artifact.project.name }}</strong> | Editing version v{{ artifact.version }}
+            </p>
+        </div>
+        <span class="badge badge-human">Human Author</span>
+    </div>
+
+    <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:6px; padding:0.85rem 1.25rem; margin-bottom:1.5rem; font-size:0.85rem; color:#1E40AF;">
+        ℹ️ <strong>Append-Only Governance Rule:</strong> Submitting this edit will not overwrite Version {{ artifact.version }}. A new version (<strong>v{{ artifact.version|add:"1" }}</strong>) will be created with source marked as <strong>Human Edited</strong>, and a review log trace will be permanently appended.
+    </div>
 
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
             {{ form.content }}
         </div>
-        <div style="display:flex; gap:1rem; margin-top:2rem;">
-            <button type="submit" class="btn-primary">Save as New Version</button>
+        <div style="display:flex; gap:1rem; margin-top:1.5rem; align-items:center;">
+            <button type="submit" class="btn-primary">Save as New Version (v{{ artifact.version|add:"1" }})</button>
             <a href="{% url 'stage_detail' artifact.project.pk artifact.stage %}" class="btn-secondary">Cancel</a>
         </div>
     </form>

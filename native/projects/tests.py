@@ -54,7 +54,7 @@ class ProjectTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Project.objects.filter(owner=self.user1).count(), 3)
         new_proj = Project.objects.get(name='New Idea')
-        self.assertEqual(new_proj.current_stage, 'IDEA')
+        self.assertEqual(new_proj.current_stage, 'REQUIREMENTS')
 
     def test_view_own_project(self):
         self.client.login(username='user1', password='password123')

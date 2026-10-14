@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--dev#puhm3vfd*29lzxbe-&i#jgeu9gp6vp+7x29xx73me@^=1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 
 # Application definition
@@ -130,6 +130,9 @@ load_dotenv(BASE_DIR / '.env')
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
 JEV_API_KEY = os.getenv('JEV_API_KEY', '')
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/projects/'
 LOGOUT_REDIRECT_URL = '/'
+

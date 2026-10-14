@@ -44,6 +44,7 @@ class JevServiceTests(TestCase):
     def setUp(self):
         self.service = JevService()
         self.service.api_key = "test_jev_key"
+        self.service.api_url = "https://mock.jev.test/v1/validate"
 
     @patch('ai_services.jev_service.requests.post')
     def test_successful_validation_and_normalization(self, mock_post):

@@ -62,10 +62,42 @@ def project_detail_view(request, pk):
     stages = [s[0] for s in Project.STAGE_CHOICES]
     current_index = stages.index(project.current_stage) if project.current_stage in stages else 0
     
+    completion_summary = None
+    if project.status == 'COMPLETED' or project.current_stage == 'COMPLETED':
+        summary_artifacts = []
+        for s_key, s_name in [('REQUIREMENTS', 'Requirements'), ('DESIGN', 'Design'), ('CODE', 'Code'), ('TESTING', 'Testing'), ('DEPLOYMENT', 'Deployment')]:
+            appr = project.artifacts.filter(stage=s_key, is_approved=True).order_by('-version').first()
+            summary_artifacts.append({
+                'stage': s_key,
+                'stage_name': s_name,
+                'artifact': appr,
+            })
+        completion_summary = {
+            'is_completed': True,
+            'artifacts': summary_artifacts,
+        }
+        
+    sdlc_stages = ['REQUIREMENTS', 'DESIGN', 'CODE', 'TESTING', 'DEPLOYMENT']
+    stage_display_names = dict(Project.STAGE_CHOICES)
+    pipeline_info = []
+    for s in sdlc_stages:
+        approved_art = project.artifacts.filter(stage=s, is_approved=True).order_by('-version').first()
+        has_any_art = project.artifacts.filter(stage=s).exists()
+        pipeline_info.append({
+            'stage': s,
+            'name': stage_display_names.get(s, s),
+            'is_approved': approved_art is not None,
+            'approved_version': approved_art.version if approved_art else None,
+            'is_current': (project.current_stage == s and project.status != 'COMPLETED'),
+            'has_artifacts': has_any_art,
+        })
+        
     context = {
         'project': project,
         'stages': stages,
         'current_index': current_index,
+        'completion_summary': completion_summary,
+        'pipeline_info': pipeline_info,
     }
     return render(request, 'projects/project_detail.html', context)
 
