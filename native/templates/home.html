@@ -1,1409 +1,1637 @@
 {% extends "base.html" %}
-{% block title %}AI-Native Software Engineering — Dual-Engine SDLC Lifecycle with Groq & Jev AI{% endblock %}
+{% block title %}AI-Native SDLC — Groq × Jev Validation Prototype{% endblock %}
 {% block body_class %}landing-page{% endblock %}
-{% block main_class %}landing-main-wrapper{% endblock %}
+{% block main_class %}{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Root Reset & Design Tokens for Jev Industrial Theme */
-    .landing-main-wrapper {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-        background-color: #0D0D0C;
-        color: #F8FAFC;
-        overflow-x: hidden;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    /* Ambient Background Flare */
-    .landing-hero-bg {
-        position: relative;
-        overflow: hidden;
-        background-color: #0D0D0C;
-        background-image: 
-            radial-gradient(ellipse at 50% -20%, rgba(232, 89, 12, 0.16) 0%, transparent 65%),
-            radial-gradient(circle at 10% 25%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
-            radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-        background-size: 100% 100%, 100% 100%, 28px 28px;
-        padding: 4.5rem 1.5rem 5rem 1.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    }
-
-    .landing-container {
-        max-width: 1240px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
-
-    /* Micro Caps Tag */
-    .label-caps {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-    }
-
-    /* Live Pulsing Signal Pill */
-    .live-signal-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.6rem;
-        padding: 0.35rem 0.85rem;
-        background: rgba(22, 22, 21, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 9999px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.72rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: #F8FAFC;
-        margin-bottom: 1.75rem;
-        backdrop-filter: blur(8px);
-    }
-
-    .signal-dot-wrapper {
-        position: relative;
-        display: flex;
-        width: 8px;
-        height: 8px;
-    }
-
-    .signal-ping {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        border-radius: 9999px;
-        background-color: #E8590C;
-        opacity: 0.75;
-        animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
-
-    .signal-dot {
-        position: relative;
-        width: 8px;
-        height: 8px;
-        border-radius: 9999px;
-        background-color: #E8590C;
-    }
-
-    @keyframes ping {
-        75%, 100% {
-            transform: scale(2.2);
-            opacity: 0;
-        }
-    }
-
-    /* Hero Headline & Typography */
-    .hero-grid {
-        display: grid;
-        grid-template-columns: 1fr 1.1fr;
-        gap: 3.5rem;
-        align-items: center;
-    }
-
-    @media (max-width: 1024px) {
-        .hero-grid {
-            grid-template-columns: 1fr;
-            gap: 2.5rem;
-        }
-    }
-
-    .hero-title {
-        font-size: 3.4rem;
-        font-weight: 700;
-        line-height: 1.05;
-        letter-spacing: -0.035em;
-        color: #FFFFFF;
-        margin: 0 0 1.25rem 0;
-    }
-
-    @media (max-width: 640px) {
-        .hero-title {
-            font-size: 2.4rem;
-        }
-    }
-
-    .hero-title .highlight-orange {
-        background: linear-gradient(135deg, #FF8A4C 0%, #E8590C 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .hero-subtitle {
-        font-size: 1.05rem;
-        color: #94A3B8;
-        line-height: 1.65;
-        margin: 0 0 2rem 0;
-        max-width: 560px;
-    }
-
-    /* Hero Action Buttons */
-    .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.85rem;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .btn-jev-primary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.6rem;
-        background: #E8590C;
-        color: #FFFFFF;
-        font-size: 0.875rem;
-        font-weight: 600;
-        padding: 0.75rem 1.6rem;
-        border-radius: 6px;
-        text-decoration: none;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        box-shadow: 0 0 24px rgba(232, 89, 12, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    .btn-jev-primary:hover {
-        background: #F97316;
-        box-shadow: 0 0 32px rgba(249, 115, 22, 0.6);
-        transform: translateY(-1px);
-        color: #FFFFFF;
-    }
-
-    .btn-jev-ghost {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        background: rgba(255, 255, 255, 0.04);
-        color: #E2E8F0;
-        font-size: 0.875rem;
-        font-weight: 500;
-        padding: 0.75rem 1.4rem;
-        border-radius: 6px;
-        text-decoration: none;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        transition: all 0.2s;
-    }
-
-    .btn-jev-ghost:hover {
-        background: rgba(255, 255, 255, 0.09);
-        border-color: rgba(255, 255, 255, 0.25);
-        color: #FFFFFF;
-    }
-
-    /* Hero Metrics Strip */
-    .hero-badges-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        padding: 0;
-        list-style: none;
-        margin: 0;
-    }
-
-    .badge-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.25rem 0.65rem;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        color: #94A3B8;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    }
-
-    /* Right Column: Signature Jev Interactive Preview Card */
-    .preview-card-wrapper {
-        background: rgba(20, 20, 19, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.35rem;
-        backdrop-filter: blur(16px);
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.2);
-    }
-
-    /* Segmented Tabs */
-    .preview-tab-row {
-        display: flex;
-        gap: 0.4rem;
-        overflow-x: auto;
-        padding-bottom: 0.4rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 1.1rem;
-    }
-
-    .preview-tab-btn {
-        background: transparent;
-        border: 1px solid transparent;
-        color: #94A3B8;
-        font-size: 0.75rem;
-        font-weight: 500;
-        padding: 0.35rem 0.75rem;
-        border-radius: 6px;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: all 0.15s;
-    }
-
-    .preview-tab-btn.active {
-        background: #FFFFFF;
-        color: #0D0D0C;
-        font-weight: 600;
-    }
-
-    .preview-tab-btn:hover:not(.active) {
-        color: #FFFFFF;
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    /* Inbound Prompt / Code Context */
-    .inbound-context-box {
-        background: #111110;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 0.85rem 1rem;
-        margin-bottom: 0.85rem;
-    }
-
-    .inbound-context-text {
-        font-size: 0.82rem;
-        line-height: 1.55;
-        color: #E2E8F0;
-        margin: 0.3rem 0 0 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    /* Connecting Arrow & Runtime Latency */
-    .connector-banner {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        margin: 0.85rem 0;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.7rem;
-        color: #94A3B8;
-    }
-
-    .connector-banner span.pulse-text {
-        color: #E8590C;
-        font-weight: 600;
-    }
-
-    /* Decision Grid */
-    .decision-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.65rem;
-        margin-bottom: 1rem;
-    }
-
-    @media (max-width: 640px) {
-        .decision-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .decision-tile {
-        background: #111110;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 0.75rem 0.85rem;
-    }
-
-    .decision-tile-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.35rem;
-    }
-
-    .tile-tag-choice {
-        background: rgba(56, 189, 248, 0.12);
-        color: #38BDF8;
-        padding: 0.15rem 0.4rem;
-        border-radius: 4px;
-    }
-
-    .tile-tag-yesno {
-        background: rgba(16, 185, 129, 0.12);
-        color: #10B981;
-        padding: 0.15rem 0.4rem;
-        border-radius: 4px;
-    }
-
-    .tile-tag-score {
-        background: rgba(232, 89, 12, 0.15);
-        color: #FB923C;
-        padding: 0.15rem 0.4rem;
-        border-radius: 4px;
-    }
-
-    .tile-question {
-        font-size: 0.72rem;
-        color: #94A3B8;
-        line-height: 1.35;
-        margin: 0.3rem 0;
-    }
-
-    .tile-answer {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: #F8FAFC;
-        margin: 0.4rem 0 0.5rem 0;
-    }
-
-    .tile-meter {
-        width: 100%;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 9999px;
-        overflow: hidden;
-    }
-
-    .tile-meter-fill {
-        height: 100%;
-        border-radius: 9999px;
-        background: #E8590C;
-        transition: width 0.4s ease;
-    }
-
-    /* Human Governance Callout at Card Bottom */
-    .hitl-status-strip {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.65rem 0.85rem;
-        background: rgba(16, 185, 129, 0.08);
-        border: 1px solid rgba(16, 185, 129, 0.25);
-        border-radius: 6px;
-        font-size: 0.75rem;
-    }
-
-    .hitl-status-text {
-        color: #A7F3D0;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-    /* Section Headers */
-    .landing-section {
-        padding: 5rem 1.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    }
-
-    .section-eyebrow {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: #E8590C;
-        margin-bottom: 0.65rem;
-    }
-
-    .section-title {
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: #FFFFFF;
-        letter-spacing: -0.025em;
-        margin: 0 0 0.85rem 0;
-        line-height: 1.15;
-    }
-
-    .section-desc {
-        color: #94A3B8;
-        font-size: 1rem;
-        max-width: 640px;
-        line-height: 1.6;
-        margin: 0 0 3rem 0;
-    }
-
-    /* 4 Pillars Grid */
-    .pillars-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.25rem;
-    }
-
-    @media (max-width: 1024px) {
-        .pillars-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 640px) {
-        .pillars-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .pillar-card {
-        background: rgba(20, 20, 19, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 1.5rem;
-        transition: all 0.2s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .pillar-card:hover {
-        background: rgba(26, 26, 24, 0.85);
-        border-color: rgba(232, 89, 12, 0.4);
-        transform: translateY(-2px);
-    }
-
-    .pillar-icon-box {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        margin-bottom: 1.1rem;
-    }
-
-    .pillar-title {
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: #F8FAFC;
-        margin: 0 0 0.5rem 0;
-    }
-
-    .pillar-text {
-        font-size: 0.84rem;
-        color: #94A3B8;
-        line-height: 1.55;
-        margin: 0;
-    }
-
-    /* Comparison Table */
-    .comparison-wrapper {
-        background: rgba(18, 18, 17, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        overflow: hidden;
-    }
-
-    .comparison-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.875rem;
-        text-align: left;
-    }
-
-    .comparison-table th {
-        background: #141413;
-        padding: 1rem 1.25rem;
-        color: #94A3B8;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.75rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .comparison-table td {
-        padding: 1.15rem 1.25rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        color: #E2E8F0;
-        vertical-align: top;
-    }
-
-    .comparison-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .comparison-table .feature-name {
-        font-weight: 600;
-        color: #F8FAFC;
-        width: 28%;
-    }
-
-    .comparison-table .col-traditional {
-        color: #94A3B8;
-        width: 36%;
-    }
-
-    .comparison-table .col-native {
-        background: rgba(232, 89, 12, 0.03);
-        color: #F8FAFC;
-        width: 36%;
-        border-left: 1px solid rgba(232, 89, 12, 0.2);
-    }
-
-    /* Interactive Live SDLC Playground */
-    .playground-box {
-        background: rgba(18, 18, 17, 0.9);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 14px;
-        padding: 1.75rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    }
-
-    .stage-pill-nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 1.75rem;
-    }
-
-    .stage-pill-btn {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        color: #94A3B8;
-        padding: 0.5rem 1rem;
-        border-radius: 9999px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.15s;
-    }
-
-    .stage-pill-btn.active {
-        background: #E8590C;
-        border-color: #E8590C;
-        color: #FFFFFF;
-        font-weight: 600;
-        box-shadow: 0 0 16px rgba(232, 89, 12, 0.35);
-    }
-
-    .playground-cols {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-    }
-
-    @media (max-width: 900px) {
-        .playground-cols {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .playground-pane {
-        background: #121211;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 1.25rem;
-    }
-
-    .pane-title-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.85rem;
-    }
-
-    .pane-title {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #F8FAFC;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .pane-textarea {
-        width: 100%;
-        box-sizing: border-box;
-        background: #0D0D0C;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #E2E8F0;
-        border-radius: 6px;
-        padding: 0.75rem;
-        font-size: 0.82rem;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        line-height: 1.5;
-        resize: none;
-        height: 160px;
-        margin-bottom: 0.85rem;
-    }
-
-    .pane-textarea:focus {
-        outline: none;
-        border-color: #E8590C;
-    }
-
-    .sample-chips-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.4rem;
-        margin-bottom: 1rem;
-    }
-
-    .sample-chip {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        color: #CBD5E1;
-        font-size: 0.72rem;
-        padding: 0.25rem 0.55rem;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background 0.15s;
-    }
-
-    .sample-chip:hover {
-        background: rgba(255, 255, 255, 0.12);
-        color: #FFFFFF;
-    }
-
-    /* Live Output Pane */
-    .output-preview-box {
-        background: #0D0D0C;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        padding: 1rem;
-        font-size: 0.82rem;
-        line-height: 1.55;
-        color: #CBD5E1;
-        max-height: 190px;
-        overflow-y: auto;
-        margin-bottom: 1rem;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    }
-
-    /* HITL Control Bar */
-    .hitl-bar {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-
-    .btn-hitl-approve {
-        flex: 2;
-        background: #10B981;
-        color: white;
-        border: none;
-        padding: 0.6rem 1rem;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.15s;
-    }
-
-    .btn-hitl-approve:hover { background: #059669; }
-
-    .btn-hitl-edit {
-        flex: 1;
-        background: rgba(255, 255, 255, 0.06);
-        color: #E2E8F0;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        padding: 0.6rem 0.8rem;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-    .btn-hitl-edit:hover { background: rgba(255, 255, 255, 0.12); }
-
-    .btn-hitl-reject {
-        flex: 1;
-        background: rgba(239, 68, 68, 0.12);
-        color: #FCA5A5;
-        border: 1px solid rgba(239, 68, 68, 0.25);
-        padding: 0.6rem 0.8rem;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-    .btn-hitl-reject:hover { background: rgba(239, 68, 68, 0.22); }
-
-    /* Live Database Activity Strip */
-    .db-stats-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-        margin-top: 2.5rem;
-    }
-
-    @media (max-width: 640px) {
-        .db-stats-row {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .db-stat-card {
-        background: #141413;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 1.25rem;
-        text-align: center;
-    }
-
-    .db-stat-num {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #FFFFFF;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        margin-bottom: 0.25rem;
-    }
-
-    .db-stat-label {
-        font-size: 0.78rem;
-        color: #94A3B8;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-    }
-
-    /* Terminal Code Box */
-    .code-terminal {
-        background: #090909;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        overflow: hidden;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.82rem;
-        line-height: 1.55;
-    }
-
-    .terminal-header {
-        background: #141413;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 0.6rem 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .terminal-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .terminal-content {
-        padding: 1.25rem;
-        color: #E2E8F0;
-        overflow-x: auto;
-    }
-
-    .kw-orange { color: #F97316; }
-    .kw-blue { color: #38BDF8; }
-    .kw-green { color: #10B981; }
-    .kw-gray { color: #64748B; }
-
-    /* Final CTA Banner */
-    .cta-banner {
-        background: linear-gradient(180deg, rgba(232, 89, 12, 0.12) 0%, rgba(20, 20, 19, 0.8) 100%);
-        border: 1px solid rgba(232, 89, 12, 0.3);
-        border-radius: 16px;
-        padding: 3.5rem 2rem;
-        text-align: center;
-        margin: 4rem 0 2rem 0;
-    }
+  /* ============================================================
+   JEV-INSPIRED LANDING PAGE — Light Industrial Theme
+   Color: #f7f5f4 bg, #0d0d0c text, #e8590c accent/signal
+   Font: system-ui stack, monospace for caps/values
+   ============================================================ */
+
+  /* Override base dark overrides for this page */
+  html {
+    scroll-behavior: smooth !important;
+  }
+
+  body.landing-page {
+    background-color: #f7f5f4 !important;
+    color: #0d0d0c !important;
+  }
+
+  /* Smooth scroll offsets for sections so sticky navbar never overlaps titles */
+  section[id], div[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  /* Custom Jev Header */
+  .lp-header {
+    background-color: #F7F5F4 !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #E8E4E1 !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 0.85rem 0;
+  }
+
+  .lp-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .lp-header-left {
+    display: flex;
+    align-items: center;
+    gap: 2.25rem;
+  }
+
+  .lp-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    color: #0D0D0C !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.025em;
+  }
+
+  .lp-brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #E8590C;
+    color: #FFFFFF;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    box-shadow: 0 1px 3px rgba(232, 89, 12, 0.3);
+  }
+
+  .lp-brand-name {
+    color: #0D0D0C !important;
+    font-weight: 700;
+  }
+
+  .lp-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 860px) {
+    .lp-nav {
+      display: none;
+    }
+  }
+
+  .lp-nav a {
+    color: #666260 !important;
+    font-size: 0.72rem !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    transition: color 0.15s !important;
+  }
+
+  .lp-nav a:hover {
+    color: #0D0D0C !important;
+  }
+
+  .lp-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .lp-header-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF !important;
+    color: #0D0D0C !important;
+    border: 1px solid #CBC7C3 !important;
+    padding: 0.42rem 0.95rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+
+  .lp-header-btn-outline:hover {
+    background: #F0ECE8 !important;
+    border-color: #B8B4B0 !important;
+    color: #0D0D0C !important;
+  }
+
+  .lp-header-btn-black {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #0D0D0C !important;
+    color: #F7F5F4 !important;
+    border: 1px solid #0D0D0C !important;
+    padding: 0.42rem 1rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+
+  .lp-header-btn-black:hover {
+    background: #262624 !important;
+    color: #F7F5F4 !important;
+  }
+
+  body.landing-page footer {
+    background-color: #f7f5f4 !important;
+    border-top: 1px solid #e8e4e1 !important;
+    color: #9d9996 !important;
+    margin-top: 0 !important;
+  }
+
+  /* === MAIN WRAPPER === */
+  .lp-wrap {
+    background: #f7f5f4;
+    color: #0d0d0c;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* === GLOBAL CONTAINERS === */
+  .lp-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* === SMALL CAPS LABEL === */
+  .lp-caps {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* ============================================================
+   HERO SECTION
+   ============================================================ */
+  .lp-hero {
+    padding: 5rem 1.5rem 4.5rem;
+    background: #f7f5f4;
+  }
+
+  .lp-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: center;
+    gap: 4rem;
+  }
+
+  @media (max-width: 900px) {
+    .lp-hero-grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  /* Live Signal Pill */
+  .lp-live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border: 1px solid #d8d4d0;
+    background: #fff;
+    padding: 0.3rem 0.75rem 0.3rem 0.55rem;
+    border-radius: 9999px;
+    margin-bottom: 1.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #0d0d0c;
+  }
+
+  .lp-signal-ring {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+  }
+
+  .lp-signal-ring-ping {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #e8590c;
+    opacity: 0.6;
+    animation: lp-ping 1.6s ease-out infinite;
+  }
+
+  @keyframes lp-ping {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+
+    75%,
+    100% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+
+  .lp-signal-ring-dot {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e8590c;
+  }
+
+  .lp-live-muted {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #9d9996;
+  }
+
+  /* Hero Headline */
+  .lp-h1 {
+    font-size: clamp(2.8rem, 5vw, 4.4rem);
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -0.038em;
+    color: #0d0d0c;
+    margin: 0 0 1.2rem 0;
+    text-wrap: balance;
+  }
+
+  /* Hero Body Text */
+  .lp-hero-body {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #5c5956;
+    max-width: 440px;
+    margin: 0 0 1.75rem 0;
+  }
+
+  .lp-hero-body a,
+  .lp-hero-body strong {
+    color: #e8590c;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* CTA Buttons */
+  .lp-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .lp-btn-black {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #0d0d0c;
+    color: #f7f5f4;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.65rem 1.35rem;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .lp-btn-black:hover {
+    background: #1a1a18;
+    color: #f7f5f4;
+  }
+
+  .lp-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: #0d0d0c;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.65rem 1.25rem;
+    border-radius: 6px;
+    text-decoration: none;
+    border: 1px solid #cbc7c3;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .lp-btn-outline:hover {
+    background: #f0ece8;
+    border-color: #b8b4b0;
+    color: #0d0d0c;
+  }
+
+  /* Badge chip row */
+  .lp-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .lp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.22rem 0.6rem;
+    background: #f0ece8;
+    border: 1px solid #e0dbd6;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    color: #5c5956;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  /* ============================================================
+   HERO DECISION CARD (right column — exact Jev clone)
+   ============================================================ */
+  .lp-card {
+    background: #fff;
+    border: 1px solid #d8d4d0;
+    border-radius: 10px;
+    padding: 1.1rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Tab Row */
+  .lp-card-tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .lp-card-tab {
+    padding: 0.35rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #d8d4d0;
+    background: transparent;
+    color: #9d9996;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+
+  .lp-card-tab:hover {
+    color: #0d0d0c;
+    border-color: #a0a09c;
+  }
+
+  .lp-card-tab.active {
+    background: #0d0d0c;
+    color: #f7f5f4;
+    border-color: #0d0d0c;
+    font-weight: 600;
+  }
+
+  /* Inbound ticket box */
+  .lp-inbound-box {
+    background: #faf9f8;
+    border: 1px solid #e8e4e1;
+    border-radius: 6px;
+    padding: 0.75rem 0.9rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .lp-inbound-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: #9d9996;
+  }
+
+  .lp-inbound-text {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: #0d0d0c;
+    margin: 0;
+    min-height: 3.5rem;
+    font-style: normal;
+  }
+
+  /* Connector row */
+  .lp-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    color: #9d9996;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    margin: 0.6rem 0;
+  }
+
+  /* Decision tile grid */
+  .lp-tile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .lp-tile {
+    background: #faf9f8;
+    border: 1px solid #e8e4e1;
+    border-radius: 6px;
+    padding: 0.7rem 0.75rem;
+  }
+
+  .lp-tile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.45rem;
+  }
+
+  .lp-tile-tag {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9d9996;
+  }
+
+  .lp-tile-pct {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    color: #9d9996;
+  }
+
+  .lp-tile-q {
+    font-size: 0.72rem;
+    color: #9d9996;
+    line-height: 1.3;
+    margin: 0 0 0.4rem 0;
+  }
+
+  .lp-tile-answer {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #0d0d0c;
+    margin: 0 0 0.4rem 0;
+  }
+
+  /* Orange progress bar */
+  .lp-bar {
+    height: 3px;
+    background: #ede9e5;
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .lp-bar-fill {
+    height: 100%;
+    background: #e8590c;
+    border-radius: 9999px;
+    transition: width 0.35s ease;
+  }
+
+  /* ============================================================
+   HOW IT WORKS SECTION — Stage Cards
+   ============================================================ */
+  .lp-section {
+    padding: 5rem 1.5rem;
+    border-top: 1px solid #e8e4e1;
+    background: #f7f5f4;
+  }
+
+  .lp-section-center {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .lp-section-eyebrow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #e8590c;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .lp-section-h2 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.028em;
+    color: #0d0d0c;
+    line-height: 1.1;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .lp-section-desc {
+    font-size: 0.9rem;
+    color: #9d9996;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Stage cards grid */
+  .lp-stages-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 1100px) {
+    .lp-stages-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .lp-stages-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .lp-stage-card {
+    background: #fff;
+    border: 1px solid #e0dbd6;
+    border-radius: 8px;
+    padding: 1.25rem;
+    position: relative;
+    transition: all 0.18s;
+  }
+
+  .lp-stage-card:hover {
+    border-color: #c0bcb8;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .lp-stage-num {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #e8590c;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .lp-stage-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .lp-stage-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0d0d0c;
+    margin: 0 0 0.4rem 0;
+  }
+
+  .lp-stage-desc {
+    font-size: 0.78rem;
+    color: #9d9996;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ============================================================
+   DUAL ENGINE SECTION
+   ============================================================ */
+  .lp-engines-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 700px) {
+    .lp-engines-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .lp-engine-card {
+    background: #fff;
+    border: 1px solid #e0dbd6;
+    border-radius: 10px;
+    padding: 1.75rem;
+  }
+
+  .lp-engine-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .lp-engine-logo.groq {
+    background: #0d0d0c;
+    color: #f7f5f4;
+  }
+
+  .lp-engine-logo.jev {
+    background: #e8590c;
+    color: #fff;
+  }
+
+  .lp-engine-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0d0d0c;
+    margin: 0 0 0.3rem 0;
+  }
+
+  .lp-engine-sub {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #e8590c;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .lp-engine-desc {
+    font-size: 0.87rem;
+    color: #5c5956;
+    line-height: 1.65;
+    margin: 0 0 1.25rem 0;
+  }
+
+  .lp-engine-feats {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .lp-engine-feats li {
+    font-size: 0.8rem;
+    color: #5c5956;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .lp-engine-feats li::before {
+    content: "→";
+    color: #e8590c;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+
+
+  /* ============================================================
+   PILLARS SECTION  (Feature list)
+   ============================================================ */
+  .lp-pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 900px) {
+    .lp-pillars-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 500px) {
+    .lp-pillars-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .lp-pillar {
+    padding: 1.25rem;
+    border: 1px solid #e0dbd6;
+    border-radius: 8px;
+    background: #fff;
+    transition: box-shadow 0.15s;
+  }
+
+  .lp-pillar:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+
+  .lp-pillar-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .lp-pillar-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0d0d0c;
+    margin: 0 0 0.4rem 0;
+  }
+
+  .lp-pillar-text {
+    font-size: 0.8rem;
+    color: #9d9996;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* ============================================================
+   CTA SECTION
+   ============================================================ */
+  .lp-cta-section {
+    padding: 5rem 1.5rem;
+    border-top: 1px solid #e8e4e1;
+    text-align: center;
+    background: #f7f5f4;
+  }
+
+  .lp-cta-h2 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #0d0d0c;
+    line-height: 1.1;
+    margin: 0 0 1rem 0;
+  }
+
+  .lp-cta-sub {
+    font-size: 0.92rem;
+    color: #9d9996;
+    max-width: 500px;
+    margin: 0 auto 2rem auto;
+    line-height: 1.6;
+  }
+
+  /* ============================================================
+   INTERACTIVE PLAYGROUND SECTION
+   ============================================================ */
+  .lp-playground-box {
+    background: #fff;
+    border: 1px solid #e0dbd6;
+    border-radius: 10px;
+    padding: 1.75rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  .lp-play-stage-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e8e4e1;
+    padding-bottom: 0.9rem;
+  }
+
+  .lp-play-stage-btn {
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: 1px solid #d8d4d0;
+    background: transparent;
+    color: #9d9996;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .lp-play-stage-btn.active {
+    background: #0d0d0c;
+    border-color: #0d0d0c;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .lp-play-stage-btn:hover:not(.active) {
+    border-color: #a0a09c;
+    color: #0d0d0c;
+  }
+
+  .lp-play-cols {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 800px) {
+    .lp-play-cols {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .lp-play-pane {
+    background: #faf9f8;
+    border: 1px solid #e8e4e1;
+    border-radius: 8px;
+    padding: 1.1rem;
+  }
+
+  .lp-play-pane-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #0d0d0c;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .lp-play-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e0dbd6;
+    background: #fff;
+    color: #0d0d0c;
+    border-radius: 6px;
+    padding: 0.7rem 0.8rem;
+    font-size: 0.8rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    line-height: 1.55;
+    resize: none;
+    height: 120px;
+    margin-bottom: 0.75rem;
+    transition: border-color 0.15s;
+  }
+
+  .lp-play-textarea:focus {
+    outline: none;
+    border-color: #0d0d0c;
+  }
+
+  .lp-sample-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .lp-sample-chip {
+    padding: 0.2rem 0.55rem;
+    background: #f0ece8;
+    border: 1px solid #d8d4d0;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    color: #5c5956;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: inherit;
+  }
+
+  .lp-sample-chip:hover {
+    background: #e8e4e0;
+    color: #0d0d0c;
+  }
+
+  .lp-play-output-box {
+    background: #fff;
+    border: 1px solid #e0dbd6;
+    border-radius: 6px;
+    padding: 0.85rem;
+    font-size: 0.78rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: #5c5956;
+    line-height: 1.55;
+    height: 140px;
+    overflow-y: auto;
+    margin-bottom: 0.85rem;
+    white-space: pre-wrap;
+  }
+
+  /* Confidence row */
+  .lp-conf-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #9d9996;
+    margin-bottom: 0.35rem;
+  }
+
+  .lp-conf-val {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: #0d0d0c;
+  }
+
+  /* HITL buttons */
+  .lp-hitl-row {
+    display: flex;
+    gap: 0.45rem;
+    margin-top: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .lp-hitl-approve {
+    flex: 2 1 auto;
+    padding: 0.55rem 0.8rem;
+    background: #0d0d0c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+
+  .lp-hitl-approve:hover {
+    background: #1a1a18;
+  }
+
+  .lp-hitl-btn {
+    flex: 1 1 auto;
+    padding: 0.55rem 0.7rem;
+    background: transparent;
+    color: #5c5956;
+    border: 1px solid #d8d4d0;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.12s;
+  }
+
+  .lp-hitl-btn:hover {
+    background: #f0ece8;
+    color: #0d0d0c;
+  }
+
+  .lp-hitl-btn.danger {
+    color: #b91c1c;
+    border-color: #fca5a5;
+    background: #fef2f2;
+  }
+
+  .lp-hitl-btn.danger:hover {
+    background: #fee2e2;
+  }
 </style>
 {% endblock %}
 
+{% block header %}
+<header class="lp-header">
+  <div class="lp-container lp-header-inner">
+    <div class="lp-header-left">
+      <a href="/" class="lp-brand">
+        <span class="lp-brand-logo">⚡</span>
+        <span class="lp-brand-name">AI-Native SDLC</span>
+      </a>
+      <nav class="lp-nav">
+        <a href="#playground">Playground</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#principles">Principles</a>
+        <a href="{% url 'dashboard' %}">Projects</a>
+      </nav>
+    </div>
+    <div class="lp-header-right">
+      <!-- <span class="lp-chip" style="font-size: 0.72rem; padding: 0.25rem 0.65rem; background: #FFFFFF; border: 1px solid #D8D4D0; color: #5C5956;">5 Stages</span> -->
+      {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="lp-header-btn-black">Dashboard</a>
+      <form method="post" action="{% url 'logout' %}" style="display:inline; margin: 0;">
+        {% csrf_token %}
+        <button type="submit" class="lp-header-btn-outline">Sign Out</button>
+      </form>
+      {% else %}
+      <a href="{% url 'login' %}" class="lp-header-btn-outline">Log In</a>
+      <a href="{% url 'register' %}" class="lp-header-btn-black">Register</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+{% endblock header %}
+
 {% block content %}
-<div class="landing-main-wrapper">
+<div class="lp-wrap">
 
-    <!-- 1. HERO SECTION -->
-    <section class="landing-hero-bg">
-        <div class="landing-container">
-            <div class="hero-grid">
-                
-                <!-- Left: Hero Copy -->
-                <div>
-                    <div class="live-signal-pill">
-                        <span class="signal-dot-wrapper">
-                            <span class="signal-ping"></span>
-                            <span class="signal-dot"></span>
-                        </span>
-                        <span>LIVE SDLC RUNTIME &middot; GROQ &times; JEV SYSTEM ONE</span>
-                    </div>
+  <!-- ═══════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════ -->
+  <section class="lp-hero">
+    <div class="lp-container">
+      <div class="lp-hero-grid">
 
-                    <h1 class="hero-title">
-                        Typed AI Decisions for <span class="highlight-orange">Autonomous</span> Software Engineering.
-                    </h1>
+        <!-- LEFT: Copy -->
+        <div>
+          <!-- Live signal pill -->
+          <div class="lp-live-pill">
+            <span class="lp-signal-ring">
+              <span class="lp-signal-ring-ping"></span>
+              <span class="lp-signal-ring-dot"></span>
+            </span>
+            <span>Live</span>
+            <span class="lp-live-muted">Groq + Jev decisions running here now</span>
+          </div>
 
-                    <p class="hero-subtitle">
-                        A strict, sequential lifecycle where specialized Groq agents draft specifications, source code, and test suites, while Jev validates every artifact with calibrated probabilities. Humans retain absolute governance.
-                    </p>
+          <h1 class="lp-h1">AI-Native SDLC<br>Prototype</h1>
 
-                    <div class="hero-actions">
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'dashboard' %}" class="btn-jev-primary">
-                                <span>Go to Dashboard</span>
-                                <span>&rarr;</span>
-                            </a>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn-jev-primary">
-                                <span>Launch SDLC Dashboard</span>
-                                <span>&rarr;</span>
-                            </a>
-                            <a href="{% url 'register' %}" class="btn-jev-ghost">
-                                <span>Create Account</span>
-                            </a>
-                        {% endif %}
-                        <a href="#playground" class="btn-jev-ghost">
-                            <span>Test Live Simulator &darr;</span>
-                        </a>
-                    </div>
+          <p class="lp-hero-body">
+            A structured academic prototype demonstrating an <strong>AI-native</strong>
+            software lifecycle where <a>specialized Groq agents</a> draft every artifact,
+            <a>Jev TypeSafe AI</a> validates with typed probabilities and scores, and
+            humans retain absolute governance. Try the live simulator below, then launch
+            the same pipeline.
+          </p>
 
-                    <ul class="hero-badges-row">
-                        <li class="badge-chip"><span>⚡</span> Groq Llama 3.3 Engine</li>
-                        <li class="badge-chip"><span>🛡️</span> 0.22s Jev Model Latency</li>
-                        <li class="badge-chip"><span>🔒</span> Zero Autonomous Deployments</li>
-                        <li class="badge-chip"><span>📜</span> Append-Only Audit Trail</li>
-                    </ul>
-                </div>
+          <div class="lp-cta-row">
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="lp-btn-black">
+              ✦ Go to Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="lp-btn-black">
+              ✦ Launch Dashboard
+            </a>
+            <a href="{% url 'register' %}" class="lp-btn-outline">
+              &lt;/&gt; Create Account
+            </a>
+            {% endif %}
+            <a href="#pipeline" class="lp-btn-outline">
+              See the Pipeline ↓
+            </a>
+          </div>
 
-                <!-- Right: Signature Jev Decision Showcase Card -->
-                <div class="preview-card-wrapper">
-                    <!-- Stage Switcher Tabs -->
-                    <div class="preview-tab-row" id="heroTabRow">
-                        <button type="button" class="preview-tab-btn active" data-stage="req">1. Requirements</button>
-                        <button type="button" class="preview-tab-btn" data-stage="design">2. Design</button>
-                        <button type="button" class="preview-tab-btn" data-stage="code">3. Codebase</button>
-                        <button type="button" class="preview-tab-btn" data-stage="testing">4. QA Testing</button>
-                        <button type="button" class="preview-tab-btn" data-stage="deploy">5. Deployment</button>
-                    </div>
-
-                    <!-- Inbound Artifact Prompt -->
-                    <div class="inbound-context-box">
-                        <span class="label-caps" style="color: #94A3B8;">Project Artifact Input</span>
-                        <p class="inbound-context-text" id="heroArtifactText">
-                            “Build a lightweight, offline-first Expense Manager web application featuring IndexedDB client persistence, category breakdowns, and exportable CSV ledgers.”
-                        </p>
-                    </div>
-
-                    <!-- Downward Decision Stream Indicator -->
-                    <div class="connector-banner">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-                        <span>Jev 1.13 Decision Model &middot; <span class="pulse-text">0.18s real output</span></span>
-                    </div>
-
-                    <!-- 3 Calibrated Decision Tiles (Choice, Yes/No, Score) -->
-                    <div class="decision-grid" id="heroDecisionGrid">
-                        <!-- Tile 1: Choice -->
-                        <div class="decision-tile">
-                            <div class="decision-tile-header">
-                                <span class="label-caps tile-tag-choice">Choice</span>
-                                <span class="label-caps" style="color: #64748B;" id="heroTile1Prob">100%</span>
-                            </div>
-                            <p class="tile-question" id="heroTile1Question">Architectural Model</p>
-                            <p class="tile-answer" id="heroTile1Answer">Client-Side SPA + IndexedDB</p>
-                            <div class="tile-meter"><div class="tile-meter-fill" id="heroTile1Meter" style="width: 100%;"></div></div>
-                        </div>
-
-                        <!-- Tile 2: Yes/No -->
-                        <div class="decision-tile">
-                            <div class="decision-tile-header">
-                                <span class="label-caps tile-tag-yesno">Yes / No</span>
-                                <span class="label-caps" style="color: #64748B;" id="heroTile2Prob">98%</span>
-                            </div>
-                            <p class="tile-question" id="heroTile2Question">Specification Completeness</p>
-                            <p class="tile-answer" id="heroTile2Answer">98% Yes (Grounded)</p>
-                            <div class="tile-meter"><div class="tile-meter-fill" id="heroTile2Meter" style="width: 98%;"></div></div>
-                        </div>
-
-                        <!-- Tile 3: Score -->
-                        <div class="decision-tile">
-                            <div class="decision-tile-header">
-                                <span class="label-caps tile-tag-score">Score</span>
-                                <span class="label-caps" style="color: #64748B;" id="heroTile3Prob">0.96</span>
-                            </div>
-                            <p class="tile-question" id="heroTile3Question">Confidence Rating</p>
-                            <p class="tile-answer" id="heroTile3Answer">4.8 / 5.0 (Ready)</p>
-                            <div class="tile-meter"><div class="tile-meter-fill" id="heroTile3Meter" style="width: 96%;"></div></div>
-                        </div>
-                    </div>
-
-                    <!-- Human Governance Gate Strip -->
-                    <div class="hitl-status-strip">
-                        <div class="hitl-status-text">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-                            <span id="heroHitlText">Human Decision Gate: Ready for Engineer Approval</span>
-                        </div>
-                        <span class="label-caps" style="color: #10B981; border: 1px solid rgba(16,185,129,0.3); padding: 0.1rem 0.4rem; border-radius: 4px;">HITL Required</span>
-                    </div>
-                </div>
-
-            </div>
+          <ul class="lp-chip-row">
+            <li class="lp-chip">5 welcome credits</li>
+            <li class="lp-chip">0.22 s median Jev answer</li>
+            <li class="lp-chip">Yes/No · Choice · Score</li>
+            <li class="lp-chip">Append-only audit trail</li>
+          </ul>
         </div>
-    </section>
 
-    <!-- 2. INTERACTIVE SDLC PLAYGROUND SECTION -->
-    <section class="landing-section" id="playground">
-        <div class="landing-container">
-            <div style="text-align: center; margin-bottom: 2.5rem;">
-                <div class="section-eyebrow">Interactive Simulator</div>
-                <h2 class="section-title">Test the Dual-Engine Decision Pipeline</h2>
-                <p class="section-desc" style="margin: 0 auto;">
-                    Select an engineering stage below. See how Groq generates structured artifacts and Jev returns typed validation metrics before requesting your explicit human review.
-                </p>
+        <!-- RIGHT: Jev Decision Card (mirrors jev-ai.org hero) -->
+        <div class="lp-card">
+          <!-- Stage tabs -->
+          <div class="lp-card-tabs" id="heroCardTabs">
+            <button class="lp-card-tab active" data-stage="req">Requirements</button>
+            <button class="lp-card-tab" data-stage="design">Design</button>
+            <button class="lp-card-tab" data-stage="code">Code</button>
+            <button class="lp-card-tab" data-stage="testing">Testing</button>
+            <button class="lp-card-tab" data-stage="deploy">Deployment</button>
+          </div>
+
+          <!-- Artifact context -->
+          <div class="lp-inbound-box">
+            <span class="lp-caps lp-inbound-label">Project Artifact</span>
+            <p class="lp-inbound-text" id="heroArtifactText">
+              "Build a lightweight, offline-first Expense Manager with IndexedDB persistence, category breakdowns, and
+              exportable CSV ledgers."
+            </p>
+          </div>
+
+          <!-- Connector -->
+          <div class="lp-connector">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round">
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
+            <span>Jev 1.13 · real output · <strong>0.18 s</strong></span>
+          </div>
+
+          <!-- Three decision tiles -->
+          <div class="lp-tile-grid">
+            <!-- Tile 1 -->
+            <div class="lp-tile">
+              <div class="lp-tile-header">
+                <span class="lp-tile-tag">Choice</span>
+                <span class="lp-tile-pct" id="ht1pct">100%</span>
+              </div>
+              <p class="lp-tile-q" id="ht1q">Architecture pattern?</p>
+              <p class="lp-tile-answer" id="ht1a">Client-SPA + IndexedDB</p>
+              <div class="lp-bar">
+                <div class="lp-bar-fill" id="ht1bar" style="width:100%"></div>
+              </div>
             </div>
-
-            <div class="playground-box">
-                <!-- Stage Pills -->
-                <div class="stage-pill-nav" id="playStageNav">
-                    <button type="button" class="stage-pill-btn active" data-stage="REQUIREMENTS">1. Requirements Spec</button>
-                    <button type="button" class="stage-pill-btn" data-stage="DESIGN">2. Software Design</button>
-                    <button type="button" class="stage-pill-btn" data-stage="CODE">3. Code Generation</button>
-                    <button type="button" class="stage-pill-btn" data-stage="TESTING">4. QA & Verification</button>
-                    <button type="button" class="stage-pill-btn" data-stage="DEPLOYMENT">5. Deployment Readiness</button>
-                </div>
-
-                <div class="playground-cols">
-                    <!-- Left: Inbound Artifact & Rules -->
-                    <div class="playground-pane">
-                        <div class="pane-title-row">
-                            <div class="pane-title">
-                                <span style="color: #E8590C;">&bull;</span>
-                                <span id="playStageName">Requirements Stage</span>
-                            </div>
-                            <span class="label-caps" style="color: #64748B;">Groq Generative Input</span>
-                        </div>
-
-                        <!-- Sample Idea Chips -->
-                        <div class="sample-chips-row">
-                            <span class="sample-chip" onclick="loadSample(1)">Expense Manager</span>
-                            <span class="sample-chip" onclick="loadSample(2)">AI Code Reviewer</span>
-                            <span class="sample-chip" onclick="loadSample(3)">Real-Time Chat</span>
-                        </div>
-
-                        <textarea class="pane-textarea" id="playInputArea" placeholder="Enter software description or prompt..."></textarea>
-
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
-                            <span class="label-caps" style="color: #64748B;">TypeSafe Jev Rules: Active</span>
-                            <button type="button" class="btn-jev-primary" style="padding: 0.45rem 1rem; font-size: 0.78rem;" onclick="simulateRun()">
-                                <span>Simulate Generation & Validation</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Right: Jev Calibrated Validation & Decision -->
-                    <div class="playground-pane">
-                        <div class="pane-title-row">
-                            <div class="pane-title">
-                                <span style="color: #10B981;">&bull;</span>
-                                <span>Jev Validation & Decision Support</span>
-                            </div>
-                            <span class="label-caps" style="color: #10B981;" id="playScoreLabel">94% Confidence</span>
-                        </div>
-
-                        <div class="output-preview-box" id="playOutputArea">
-                            # Software Requirement Specification
-1. Functional Requirements:
-   - FR-01: Offline-first data caching with IndexedDB.
-   - FR-02: Instant ledger reconciliation and category breakdown.
-2. Non-Functional Requirements:
-   - Strict client-side data isolation. Zero plaintext credentials.
-3. Acceptance Criteria:
-   - 100% test pass on offline state transitions.
-                        </div>
-
-                        <!-- Jev Confidence Bar -->
-                        <div>
-                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #94A3B8; margin-bottom: 0.35rem;">
-                                <span>Specification Calibrated Score</span>
-                                <span id="playScoreVal" style="color: #F8FAFC; font-weight: 600;">0.94 / 1.00</span>
-                            </div>
-                            <div class="tile-meter" style="height: 6px;"><div class="tile-meter-fill" id="playMeterFill" style="width: 94%; background: #10B981;"></div></div>
-                        </div>
-
-                        <!-- Human Governance Review Controls -->
-                        <div class="hitl-bar">
-                            <button type="button" class="btn-hitl-approve" onclick="handleHitlAction('APPROVE')">&check; Approve Stage</button>
-                            <button type="button" class="btn-hitl-edit" onclick="handleHitlAction('EDIT')">Edit</button>
-                            <button type="button" class="btn-hitl-edit" onclick="handleHitlAction('REGENERATE')">Regenerate</button>
-                            <button type="button" class="btn-hitl-reject" onclick="handleHitlAction('REJECT')">Reject</button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Tile 2 -->
+            <div class="lp-tile">
+              <div class="lp-tile-header">
+                <span class="lp-tile-tag">Yes / No</span>
+                <span class="lp-tile-pct" id="ht2pct"></span>
+              </div>
+              <p class="lp-tile-q" id="ht2q">Spec complete & grounded?</p>
+              <p class="lp-tile-answer" id="ht2a">98% yes</p>
+              <div class="lp-bar">
+                <div class="lp-bar-fill" id="ht2bar" style="width:98%"></div>
+              </div>
             </div>
-
-            <!-- Database Stats Row -->
-            <div class="db-stats-row">
-                <div class="db-stat-card">
-                    <div class="db-stat-num">{{ total_projects|default:"1" }}</div>
-                    <div class="db-stat-label">Active SDLC Projects</div>
-                </div>
-                <div class="db-stat-card">
-                    <div class="db-stat-num">{{ total_artifacts|default:"6" }}</div>
-                    <div class="db-stat-label">Versioned Artifacts Logged</div>
-                </div>
-                <div class="db-stat-card">
-                    <div class="db-stat-num">{{ total_reviews|default:"5" }}</div>
-                    <div class="db-stat-label">Human Review Decisions Recorded</div>
-                </div>
+            <!-- Tile 3 -->
+            <div class="lp-tile">
+              <div class="lp-tile-header">
+                <span class="lp-tile-tag">Score</span>
+                <span class="lp-tile-pct" id="ht3pct">100% sure</span>
+              </div>
+              <p class="lp-tile-q" id="ht3q">Confidence rating</p>
+              <p class="lp-tile-answer" id="ht3a">4.8 · Ready for approval</p>
+              <div class="lp-bar">
+                <div class="lp-bar-fill" id="ht3bar" style="width:96%"></div>
+              </div>
             </div>
+          </div>
         </div>
-    </section>
 
-    <!-- 3. THE 4 ARCHITECTURAL PILLARS -->
-    <section class="landing-section">
-        <div class="landing-container">
-            <div style="text-align: center; margin-bottom: 2.5rem;">
-                <div class="section-eyebrow">Academic Architecture</div>
-                <h2 class="section-title">The Four Pillars of AI-Native Engineering</h2>
-                <p class="section-desc" style="margin: 0 auto;">
-                    Moving beyond casual chatbot prompts into an engineered, verifiable, and auditable production software factory.
-                </p>
-            </div>
+      </div><!-- /lp-hero-grid -->
+    </div>
+  </section>
 
-            <div class="pillars-grid">
-                <!-- Pillar 1 -->
-                <div class="pillar-card">
-                    <div class="pillar-icon-box">⚡</div>
-                    <h3 class="pillar-title">1. Generative Engine</h3>
-                    <p class="pillar-text">
-                        Groq powers specialized agents that autonomously author specifications, architecture topologies, complete codebases, and test suites.
-                    </p>
-                </div>
 
-                <!-- Pillar 2 -->
-                <div class="pillar-card">
-                    <div class="pillar-icon-box" style="border-color: rgba(232, 89, 12, 0.3); background: rgba(232, 89, 12, 0.08);">🛡️</div>
-                    <h3 class="pillar-title">2. TypeSafe Decision Model</h3>
-                    <p class="pillar-text">
-                        Jev (TypeSafe AI) evaluates outputs with typed questions (Choice, Yes/No, Score) and calibrated probabilities rather than hallucinated prose.
-                    </p>
-                </div>
 
-                <!-- Pillar 3 -->
-                <div class="pillar-card">
-                    <div class="pillar-icon-box">📜</div>
-                    <h3 class="pillar-title">3. Append-Only Ledger</h3>
-                    <p class="pillar-text">
-                        Artifacts are strictly immutable. Every iteration, edit, or rejection produces a new version without ever overwriting historical state.
-                    </p>
-                </div>
+  <!-- ═══════════════════════════════════════
+       STAGE PIPELINE OVERVIEW
+  ═══════════════════════════════════════ -->
+  <section class="lp-section" id="pipeline">
+    <div class="lp-container">
+      <div class="lp-section-center">
+        <span class="lp-section-eyebrow">Sequential State Machine</span>
+        <h2 class="lp-section-h2">The 5-Stage AI-Native Pipeline</h2>
+        <p class="lp-section-desc">
+          Each stage gates the next. Unapproved artifacts are quarantined and never
+          passed as context to downstream agents.
+        </p>
+      </div>
 
-                <!-- Pillar 4 -->
-                <div class="pillar-card">
-                    <div class="pillar-icon-box">🔒</div>
-                    <h3 class="pillar-title">4. Human Sovereignty</h3>
-                    <p class="pillar-text">
-                        No runaway AI. Code execution and deployments are never automated; the human engineer must explicitly review and authorize every transition.
-                    </p>
-                </div>
-            </div>
+      <div class="lp-stages-grid">
+        <div class="lp-stage-card">
+          <span class="lp-stage-num">01</span>
+          <span class="lp-stage-icon">📋</span>
+          <h3 class="lp-stage-title">Requirements</h3>
+          <p class="lp-stage-desc">Groq drafts a structured SRS. Jev scores completeness and ambiguity.</p>
         </div>
-    </section>
-
-    <!-- 4. COMPARISON MATRIX -->
-    <section class="landing-section">
-        <div class="landing-container">
-            <div style="text-align: center; margin-bottom: 2.5rem;">
-                <div class="section-eyebrow">System Contrast</div>
-                <h2 class="section-title">Traditional Coding Assistant vs AI-Native SDLC</h2>
-                <p class="section-desc" style="margin: 0 auto;">
-                    How systematic validation and sequential state machines eliminate the perils of unconstrained LLM hallucinations.
-                </p>
-            </div>
-
-            <div class="comparison-wrapper">
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Capability</th>
-                            <th>Traditional LLM Chatbot</th>
-                            <th style="color: #E8590C;">AI-Native SDLC (Groq + Jev)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="feature-name">Output Quality Control</td>
-                            <td class="col-traditional">Unverified prose text with subjective self-evaluations prone to bias.</td>
-                            <td class="col-native"><strong>Independent Jev verification</strong> with calibrated confidence scores (0.00 – 1.00).</td>
-                        </tr>
-                        <tr>
-                            <td class="feature-name">Software Lifecycle Flow</td>
-                            <td class="col-traditional">Ad-hoc conversations lacking stage progression or artifact boundaries.</td>
-                            <td class="col-native"><strong>Strict 5-stage sequential finite state machine</strong> with mandatory entry prerequisites.</td>
-                        </tr>
-                        <tr>
-                            <td class="feature-name">Codebase Manifests</td>
-                            <td class="col-traditional">Fragmented markdown snippets copied manually into files.</td>
-                            <td class="col-native"><strong>Structured multi-file JSON trees</strong> with path, purpose, and static syntax check.</td>
-                        </tr>
-                        <tr>
-                            <td class="feature-name">Human Authority</td>
-                            <td class="col-traditional">Implicit or chaotic; user must spot subtle hallucinations in output.</td>
-                            <td class="col-native"><strong>Strict HITL governance</strong>: [Approve], [Edit], [Regenerate], [Reject] with full audit trail.</td>
-                        </tr>
-                        <tr>
-                            <td class="feature-name">History &amp; Lineage</td>
-                            <td class="col-traditional">Chat scrolls out of view; overwrites lose previous design choices.</td>
-                            <td class="col-native"><strong>Append-only versioning</strong>: Every iteration and human revision is queryable forever.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="lp-stage-card">
+          <span class="lp-stage-num">02</span>
+          <span class="lp-stage-icon">🏛️</span>
+          <h3 class="lp-stage-title">Design</h3>
+          <p class="lp-stage-desc">Architecture topology, API design, DB schema, and security model generated and
+            validated.</p>
         </div>
-    </section>
-
-    <!-- 5. BACKEND INTEGRATION TERMINAL -->
-    <section class="landing-section">
-        <div class="landing-container">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
-                <div>
-                    <div class="section-eyebrow">Backend Architecture</div>
-                    <h2 class="section-title">Orchestrated in Pure Django &amp; Python</h2>
-                    <p class="section-desc" style="margin-bottom: 1.5rem;">
-                        A monolithic, highly resilient architecture without microservice overhead. Clean separation of concerns with dedicated agent classes and decision support adapters.
-                    </p>
-                    <ul style="list-style: none; padding: 0; margin: 0; color: #94A3B8; font-size: 0.9rem; line-height: 1.8;">
-                        <li><span style="color: #E8590C;">&check;</span> Zero frontend frameworks: Pure HTML5, modern CSS, Vanilla JS.</li>
-                        <li><span style="color: #E8590C;">&check;</span> Server-side token economy with automated context condensation.</li>
-                        <li><span style="color: #E8590C;">&check;</span> Secure backend credential handling: Keys never leak to the browser.</li>
-                    </ul>
-                </div>
-
-                <div class="code-terminal">
-                    <div class="terminal-header">
-                        <span class="terminal-dot" style="background: #EF4444;"></span>
-                        <span class="terminal-dot" style="background: #F59E0B;"></span>
-                        <span class="terminal-dot" style="background: #10B981;"></span>
-                        <span style="color: #64748B; font-size: 0.72rem; margin-left: 0.5rem;">ai_services/agents.py &middot; Dual Engine Workflow</span>
-                    </div>
-                    <div class="terminal-content">
-<pre style="margin: 0;"><code><span class="kw-orange">class</span> <span class="kw-blue">BaseAgent</span>:
-    <span class="kw-orange">def</span> <span class="kw-blue">execute</span>(self, project: Project) -> Dict[str, Any]:
-        <span class="kw-gray"># 1. Groq Generative Engine</span>
-        content = self.groq.generate(
-            user_prompt=self.get_prompt(),
-            context=self.build_condensed_context(project)
-        )
-        
-        <span class="kw-gray"># 2. Jev System One Decision Validation</span>
-        validation = self.jev.validate_artifact(
-            content=content,
-            stage=self.stage_name,
-            rules=self.get_verification_rules()
-        )
-        
-        <span class="kw-gray"># 3. Return for Human Authorization</span>
-        <span class="kw-orange">return</span> {
-            <span class="kw-green">"content"</span>: content,
-            <span class="kw-green">"confidence"</span>: validation[<span class="kw-green">"confidence"</span>],
-            <span class="kw-green">"requires_human_review"</span>: <span class="kw-blue">True</span>
-        }</code></pre>
-                    </div>
-                </div>
-            </div>
+        <div class="lp-stage-card">
+          <span class="lp-stage-num">03</span>
+          <span class="lp-stage-icon">⌨️</span>
+          <h3 class="lp-stage-title">Code</h3>
+          <p class="lp-stage-desc">Full multi-file codebase output as a typed JSON manifest. Jev checks for OWASP and
+            logic gaps.</p>
         </div>
-    </section>
-
-    <!-- 6. FINAL CALL TO ACTION -->
-    <section class="landing-section" style="border-bottom: none; padding-bottom: 4rem;">
-        <div class="landing-container">
-            <div class="cta-banner">
-                <div class="section-eyebrow">Demonstration Prototype</div>
-                <h2 style="font-size: 2.4rem; font-weight: 700; color: #FFFFFF; margin: 0 0 1rem 0; letter-spacing: -0.02em;">
-                    Experience the AI-Native SDLC in Action
-                </h2>
-                <p style="color: #CBD5E1; max-width: 600px; margin: 0 auto 2rem auto; font-size: 1rem; line-height: 1.6;">
-                    Explore existing seminar projects or launch a new concept through the 5-stage human-governed pipeline.
-                </p>
-                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <a href="{% url 'dashboard' %}" class="btn-jev-primary" style="padding: 0.85rem 2rem;">
-                        <span>Launch Dashboard</span>
-                        <span>&rarr;</span>
-                    </a>
-                    <a href="{% url 'project_create' %}" class="btn-jev-ghost" style="padding: 0.85rem 1.8rem;">
-                        <span>Start New Project</span>
-                    </a>
-                </div>
-            </div>
+        <div class="lp-stage-card">
+          <span class="lp-stage-num">04</span>
+          <span class="lp-stage-icon">🧪</span>
+          <h3 class="lp-stage-title">Testing</h3>
+          <p class="lp-stage-desc">Static test plans, boundary analysis, and security review — all from approved code
+            alone.</p>
         </div>
-    </section>
+        <div class="lp-stage-card">
+          <span class="lp-stage-num">05</span>
+          <span class="lp-stage-icon">🚀</span>
+          <h3 class="lp-stage-title">Deployment</h3>
+          <p class="lp-stage-desc">Readiness report with Go/No-Go verdict, rollback strategy, and human final approval
+            gate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-</div>
+  <!-- ═══════════════════════════════════════
+       INTERACTIVE PLAYGROUND
+  ═══════════════════════════════════════ -->
+  <section class="lp-section" id="playground">
+    <div class="lp-container">
+      <div class="lp-section-center">
+        <span class="lp-section-eyebrow">Interactive Simulator</span>
+        <h2 class="lp-section-h2">Test the Decision Pipeline</h2>
+        <p class="lp-section-desc">
+          Pick a stage, select a sample project, and see how Groq generation and
+          Jev validation produce typed decisions before Human-in-the-Loop review.
+        </p>
+      </div>
+
+      <div class="lp-playground-box">
+        <!-- Stage nav -->
+        <div class="lp-play-stage-nav" id="playStageNav">
+          <button class="lp-play-stage-btn active" data-stage="REQUIREMENTS">1. Requirements</button>
+          <button class="lp-play-stage-btn" data-stage="DESIGN">2. Design</button>
+          <button class="lp-play-stage-btn" data-stage="CODE">3. Code</button>
+          <button class="lp-play-stage-btn" data-stage="TESTING">4. Testing</button>
+          <button class="lp-play-stage-btn" data-stage="DEPLOYMENT">5. Deployment</button>
+        </div>
+
+        <div class="lp-play-cols">
+          <!-- Left: Groq input -->
+          <div class="lp-play-pane">
+            <div class="lp-play-pane-title">
+              <span style="color:#e8590c">●</span>
+              <span id="playPaneTitleL">Requirements — Groq Generative Input</span>
+            </div>
+
+            <div class="lp-sample-chips">
+              <button class="lp-sample-chip" onclick="loadSample(0)">Expense Manager</button>
+              <button class="lp-sample-chip" onclick="loadSample(1)">AI Code Reviewer</button>
+              <button class="lp-sample-chip" onclick="loadSample(2)">Real-Time Chat</button>
+            </div>
+
+            <textarea class="lp-play-textarea" id="playInput"
+              placeholder="Describe your software project..."></textarea>
+
+            <div style="display:flex; justify-content:flex-end">
+              <button class="lp-btn-black" style="font-size:0.78rem; padding:0.5rem 1.1rem;" onclick="simulateRun()">
+                ✦ Simulate Generation &amp; Validation
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Jev validation -->
+          <div class="lp-play-pane">
+            <div class="lp-play-pane-title">
+              <span style="color:#22c55e">●</span>
+              <span>Jev Validation &amp; Decision Support</span>
+              <span
+                style="margin-left:auto; font-family:ui-monospace,monospace; font-size:0.72rem; color:#22c55e; font-weight:700;"
+                id="playConfLabel">94% Confidence</span>
+            </div>
+
+            <div class="lp-play-output-box" id="playOutput"># Software Requirement Specification
+              1. Functional Requirements:
+              - FR-01: Offline data caching via IndexedDB.
+              - FR-02: Category breakdown and monthly charts.
+              2. Non-Functional:
+              - Zero plaintext credential exposure.
+              3. Acceptance Criteria:
+              - Offline state transitions pass 100% tests.</div>
+
+            <div class="lp-conf-row">
+              <span>Jev calibrated score</span>
+              <span class="lp-conf-val" id="playConfVal">0.94 / 1.00</span>
+            </div>
+            <div class="lp-bar" style="height:5px;">
+              <div class="lp-bar-fill" id="playConfBar" style="width:94%; background:#22c55e;"></div>
+            </div>
+
+            <div class="lp-hitl-row">
+              <button class="lp-hitl-approve" onclick="hitl('APPROVE')">✓ Approve Stage</button>
+              <button class="lp-hitl-btn" onclick="hitl('EDIT')">Edit</button>
+              <button class="lp-hitl-btn" onclick="hitl('REGENERATE')">Regenerate</button>
+              <button class="lp-hitl-btn danger" onclick="hitl('REJECT')">Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       DUAL ENGINE SECTION
+  ═══════════════════════════════════════ -->
+  <section class="lp-section" id="architecture">
+    <div class="lp-container">
+      <div class="lp-section-center">
+        <span class="lp-section-eyebrow">Dual Engine Architecture</span>
+        <h2 class="lp-section-h2">Groq Generates. Jev Decides.</h2>
+        <p class="lp-section-desc">
+          Two purpose-built AI engines with distinct, non-overlapping roles — neither
+          replaces the human engineer.
+        </p>
+      </div>
+
+      <div class="lp-engines-grid">
+        <div class="lp-engine-card">
+          <div class="lp-engine-logo groq">G</div>
+          <h3 class="lp-engine-title">Groq</h3>
+          <span class="lp-engine-sub">Generative Engine — Llama 3.3 70B</span>
+          <p class="lp-engine-desc">
+            Groq powers the specialized SDLC agents that autonomously author structured
+            specifications, architecture documents, complete multi-file codebases, and
+            QA test suites — at ultra-low latency.
+          </p>
+          <ul class="lp-engine-feats">
+            <li>RequirementAgent, DesignAgent, CodingAgent</li>
+            <li>TestingAgent, DeploymentAgent</li>
+            <li>Context-condensed prompts under 8k TPM</li>
+            <li>Structured JSON file manifests for code output</li>
+          </ul>
+        </div>
+
+        <div class="lp-engine-card">
+          <div class="lp-engine-logo jev">J</div>
+          <h3 class="lp-engine-title">Jev AI</h3>
+          <span class="lp-engine-sub">TypeSafe System One Decision Model</span>
+          <p class="lp-engine-desc">
+            Jev never writes prose — it answers typed questions (Choice, Yes/No, Score)
+            with calibrated probabilities. It objectively validates every Groq artifact
+            against verification rules before human review.
+          </p>
+          <ul class="lp-engine-feats">
+            <li>Calibrated confidence score (0.00 – 1.00)</li>
+            <li>Spec integrity & OWASP security checks</li>
+            <li>Human review requirement classification</li>
+            <li>Issues + warnings surfaced before approval</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       4 PILLARS
+  ═══════════════════════════════════════ -->
+  <section class="lp-section" id="principles">
+    <div class="lp-container">
+      <div class="lp-section-center">
+        <span class="lp-section-eyebrow">Core Principles</span>
+        <h2 class="lp-section-h2">Built on Four Non-Negotiables</h2>
+      </div>
+
+      <div class="lp-pillars-grid">
+        <div class="lp-pillar">
+          <span class="lp-pillar-icon">⚡</span>
+          <h3 class="lp-pillar-title">Typed Answers, No Hallucination</h3>
+          <p class="lp-pillar-text">Jev outputs structured types — not free prose — eliminating hallucinated validation
+            results.</p>
+        </div>
+        <div class="lp-pillar">
+          <span class="lp-pillar-icon">📜</span>
+          <h3 class="lp-pillar-title">Append-Only Audit Trail</h3>
+          <p class="lp-pillar-text">Every version, regeneration, and manual edit is preserved forever. Nothing is
+            overwritten.</p>
+        </div>
+        <div class="lp-pillar">
+          <span class="lp-pillar-icon">🔒</span>
+          <h3 class="lp-pillar-title">Human Sovereignty</h3>
+          <p class="lp-pillar-text">AI proposes. Humans authorize. Zero autonomous deployments or code execution ever
+            occur.</p>
+        </div>
+        <div class="lp-pillar">
+          <span class="lp-pillar-icon">🏗️</span>
+          <h3 class="lp-pillar-title">Sequential State Machine</h3>
+          <p class="lp-pillar-text">Each stage is a hard gate. Downstream agents only receive approved,
+            quarantine-cleared artifacts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       CTA
+  ═══════════════════════════════════════ -->
+  <section class="lp-cta-section">
+    <div class="lp-caps lp-section-eyebrow" style="display:block; margin-bottom:0.75rem;">Academic Seminar Prototype
+    </div>
+    <h2 class="lp-cta-h2">Experience the Full Pipeline</h2>
+    <p class="lp-cta-sub">
+      Start a new project or explore existing seminar runs through the
+      5-stage human-governed SDLC.
+    </p>
+    <div class="lp-cta-row" style="justify-content:center;">
+      <a href="{% url 'dashboard' %}" class="lp-btn-black" style="padding:0.75rem 1.75rem;">✦ Open Dashboard</a>
+      <a href="{% url 'project_create' %}" class="lp-btn-outline" style="padding:0.75rem 1.5rem;">Start New Project</a>
+    </div>
+  </section>
+
+</div><!-- /lp-wrap -->
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // --- 1. HERO PREVIEW TAB SWITCHER (Data Model) ---
-    const heroStageData = {
-        req: {
-            text: "“Build a lightweight, offline-first Expense Manager web application featuring IndexedDB client persistence, category breakdowns, and exportable CSV ledgers.”",
-            tile1Tag: "Choice", tile1Q: "Architectural Model", tile1A: "Client-Side SPA + IndexedDB", tile1Prob: "100%", tile1Meter: "100%",
-            tile2Tag: "Yes / No", tile2Q: "Specification Completeness", tile2A: "98% Yes (Grounded)", tile2Prob: "98%", tile2Meter: "98%",
-            tile3Tag: "Score", tile3Q: "Confidence Rating", tile3A: "4.8 / 5.0 (Ready)", tile3Prob: "0.96", tile3Meter: "96%",
-            hitl: "Human Decision Gate: Ready for Engineer Approval"
-        },
-        design: {
-            text: "“System Architecture Design: Modular React component tree, Redux offline state store, IndexedDB schema with transaction indices, and Chart.js reporting canvas.”",
-            tile1Tag: "Choice", tile1Q: "State Synchronization", tile1A: "Optimistic Offline Store", tile1Prob: "99%", tile1Meter: "99%",
-            tile2Tag: "Yes / No", tile2Q: "Security Boundaries Intact", tile2A: "100% Yes (Zero Leaks)", tile2Prob: "100%", tile2Meter: "100%",
-            tile3Tag: "Score", tile3Q: "Architecture Scalability", tile3A: "4.9 / 5.0 (Optimal)", tile3Prob: "0.98", tile3Meter: "98%",
-            hitl: "Human Decision Gate: Ready for Engineer Approval"
-        },
-        code: {
-            text: "“Lead Software Engineer output: 6 multi-file JSON components including package.json, App.tsx, db.ts, expenseSlice.ts, and Dashboard.tsx.”",
-            tile1Tag: "Choice", tile1Q: "Syntax Consistency", tile1A: "TypeScript ES2022 Strict", tile1Prob: "100%", tile1Meter: "100%",
-            tile2Tag: "Yes / No", tile2Q: "Hardcoded Secrets Present", tile2A: "0% No (Clean Code)", tile2Prob: "100%", tile2Meter: "100%",
-            tile3Tag: "Score", tile3Q: "Code Modular Coverage", tile3A: "4.7 / 5.0 (Verified)", tile3Prob: "0.94", tile3Meter: "94%",
-            hitl: "Human Decision Gate: Ready for Engineer Approval"
-        },
-        testing: {
-            text: "“QA & Verification Plan: 14 automated unit test cases, IndexedDB mock integration suite, boundary condition tests, and offline reconciliation audit.”",
-            tile1Tag: "Choice", tile1Q: "Primary QA Priority", tile1A: "Edge Case & DB Latency", tile1Prob: "95%", tile1Meter: "95%",
-            tile2Tag: "Yes / No", tile2Q: "Requirements Covered", tile2A: "96% Yes (Full Coverage)", tile2Prob: "96%", tile2Meter: "96%",
-            tile3Tag: "Score", tile3Q: "Defect Risk Score", tile3A: "1.2 / 5.0 (Low Risk)", tile3Prob: "0.92", tile3Meter: "92%",
-            hitl: "Human Decision Gate: Ready for Engineer Approval"
-        },
-        deploy: {
-            text: "“Deployment Strategy: Containerized static web host, Nginx HTTP/2 caching headers, Content Security Policy, and zero-downtime rollback procedure.”",
-            tile1Tag: "Choice", tile1Q: "Deployment Strategy", tile1A: "Static Edge + Cache-Control", tile1Prob: "100%", tile1Meter: "100%",
-            tile2Tag: "Yes / No", tile2Q: "Rollback Strategy Valid", tile2A: "100% Yes (Verified)", tile2Prob: "100%", tile2Meter: "100%",
-            tile3Tag: "Score", tile3Q: "Go-Live Readiness", tile3A: "4.9 / 5.0 (GO FOR LAUNCH)", tile3Prob: "0.98", tile3Meter: "98%",
-            hitl: "Human Decision Gate: Final Authorization for Project Completion"
-        }
+  /* ============================================================
+     HERO CARD — Stage Tab Data
+     ============================================================ */
+  const heroData = {
+    req: {
+      text: '"Build a lightweight, offline-first Expense Manager with IndexedDB persistence, category breakdowns, and exportable CSV ledgers."',
+      t1q: "Architecture pattern?", t1a: "Client-SPA + IndexedDB", t1pct: "100%", t1w: "100%",
+      t2q: "Spec complete & grounded?", t2a: "98% yes", t2pct: "", t2w: "98%",
+      t3q: "Confidence rating", t3a: "4.8 · Ready for approval", t3pct: "100% sure", t3w: "96%"
+    },
+    design: {
+      text: '"System Design: Redux offline state store, IndexedDB schema with indexed transactions, and Chart.js reporting canvas for monthly summaries."',
+      t1q: "State sync strategy?", t1a: "Optimistic + Offline Store", t1pct: "99%", t1w: "99%",
+      t2q: "Security boundaries intact?", t2a: "100% yes", t2pct: "", t2w: "100%",
+      t3q: "Architectural scalability", t3a: "4.9 · Optimal design", t3pct: "100% sure", t3w: "98%"
+    },
+    code: {
+      text: '"Lead Engineer output: 6 files including package.json, App.tsx, db.ts, expenseSlice.ts, Dashboard.tsx, and service-worker.ts."',
+      t1q: "Syntax consistency?", t1a: "TypeScript ES2022 strict", t1pct: "100%", t1w: "100%",
+      t2q: "Hardcoded secrets found?", t2a: "0% no — clean", t2pct: "", t2w: "100%",
+      t3q: "Modular coverage score", t3a: "4.7 · Verified", t3pct: "100% sure", t3w: "94%"
+    },
+    testing: {
+      text: '"QA Plan: 14 test cases covering IndexedDB mock suite, offline state transitions, boundary conditions, and CSV export validation."',
+      t1q: "Primary QA priority?", t1a: "Edge cases & DB latency", t1pct: "95%", t1w: "95%",
+      t2q: "All requirements covered?", t2a: "96% yes", t2pct: "", t2w: "96%",
+      t3q: "Defect risk score", t3a: "1.2 · Low risk", t3pct: "100% sure", t3w: "92%"
+    },
+    deploy: {
+      text: '"Deployment: Containerized static host, Nginx HTTP/2 cache headers, Content Security Policy, zero-downtime rollback on every release."',
+      t1q: "Deployment strategy?", t1a: "Static Edge + Cache-Control", t1pct: "100%", t1w: "100%",
+      t2q: "Rollback strategy valid?", t2a: "100% yes", t2pct: "", t2w: "100%",
+      t3q: "Go-live readiness score", t3a: "4.9 · GO FOR LAUNCH", t3pct: "100% sure", t3w: "98%"
+    }
+  };
+
+  function applyHeroData(d) {
+    document.getElementById('heroArtifactText').textContent = d.text;
+    document.getElementById('ht1q').textContent = d.t1q;
+    document.getElementById('ht1a').textContent = d.t1a;
+    document.getElementById('ht1pct').textContent = d.t1pct;
+    document.getElementById('ht1bar').style.width = d.t1w;
+    document.getElementById('ht2q').textContent = d.t2q;
+    document.getElementById('ht2a').textContent = d.t2a;
+    document.getElementById('ht2pct').textContent = d.t2pct;
+    document.getElementById('ht2bar').style.width = d.t2w;
+    document.getElementById('ht3q').textContent = d.t3q;
+    document.getElementById('ht3a').textContent = d.t3a;
+    document.getElementById('ht3pct').textContent = d.t3pct;
+    document.getElementById('ht3bar').style.width = d.t3w;
+  }
+
+  document.querySelectorAll('#heroCardTabs .lp-card-tab').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#heroCardTabs .lp-card-tab').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      applyHeroData(heroData[this.dataset.stage]);
+    });
+  });
+
+  /* ============================================================
+     PLAYGROUND
+     ============================================================ */
+  const samples = [
+    "Build a lightweight, client-side Expense Manager in TypeScript and React that stores data offline using IndexedDB and displays monthly budget charts.",
+    "Design an AI-assisted Static Code Analyzer that scans pull requests for OWASP Top 10 vulnerabilities, dead code paths, and missing type annotations.",
+    "Architect a Real-Time Collaborative Whiteboard with WebSockets, CRDT conflict resolution, and end-to-end encrypted room sessions."
+  ];
+
+  const stageOutputs = {
+    REQUIREMENTS: {
+      label: "Requirements — Groq Generative Input",
+      output: "# Software Requirement Specification\n1. Functional Requirements:\n   - FR-01: Offline data caching via IndexedDB.\n   - FR-02: Category breakdown and monthly charts.\n2. Non-Functional:\n   - Zero plaintext credential exposure.\n3. Acceptance Criteria:\n   - Offline state transitions pass 100% tests.",
+      conf: "94% Confidence", confVal: "0.94 / 1.00", confW: "94%"
+    },
+    DESIGN: {
+      label: "Design — Groq Architecture Output",
+      output: "# Architecture Topology\n1. State: Redux Toolkit + IndexedDB sync middleware.\n2. Visual: React Functional Components + Chart.js.\n3. Security: Strict CSP; frame-ancestors 'none'.",
+      conf: "97% Confidence", confVal: "0.97 / 1.00", confW: "97%"
+    },
+    CODE: {
+      label: "Code Generation — Groq Multi-File JSON Output",
+      output: '[\n  {\n    "path": "src/store/index.ts",\n    "purpose": "Configures Redux with offline idb middleware",\n    "content": "import { configureStore } from \'@reduxjs/toolkit\'; ..."\n  }\n]',
+      conf: "92% Confidence", confVal: "0.92 / 1.00", confW: "92%"
+    },
+    TESTING: {
+      label: "Testing — QA & Verification Suite",
+      output: "# Test Strategy\n- Unit Tests: 12 assertions covering schema validation.\n- Boundary: Negative number input rejection confirmed.\n- Security: No injection vulnerabilities identified.",
+      conf: "96% Confidence", confVal: "0.96 / 1.00", confW: "96%"
+    },
+    DEPLOYMENT: {
+      label: "Deployment — Readiness Assessment",
+      output: "# Deployment Readiness Report\n- Strategy: Static Edge + Brotli compression.\n- Security: TLS 1.3 enforced, CORS origin strict.\n- Verdict: GO FOR DEPLOYMENT (Risk: Low).",
+      conf: "98% Confidence", confVal: "0.98 / 1.00", confW: "98%"
+    }
+  };
+
+  let activeStage = 'REQUIREMENTS';
+
+  function loadSample(i) {
+    document.getElementById('playInput').value = samples[i];
+  }
+
+  loadSample(0);
+
+  function applyStage(stage) {
+    const s = stageOutputs[stage];
+    document.getElementById('playPaneTitleL').textContent = s.label;
+    document.getElementById('playOutput').textContent = s.output;
+    document.getElementById('playConfLabel').textContent = s.conf;
+    document.getElementById('playConfVal').textContent = s.confVal;
+    document.getElementById('playConfBar').style.width = s.confW;
+  }
+
+  document.querySelectorAll('#playStageNav .lp-play-stage-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#playStageNav .lp-play-stage-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      activeStage = this.dataset.stage;
+      applyStage(activeStage);
+    });
+  });
+
+  function simulateRun() {
+    const out = document.getElementById('playOutput');
+    const orig = out.textContent;
+    out.textContent = "⚡ Running Groq generation and Jev decision validation...";
+    out.style.color = "#e8590c";
+    setTimeout(() => {
+      out.textContent = stageOutputs[activeStage].output;
+      out.style.color = "";
+    }, 480);
+  }
+
+  function hitl(action) {
+    const msgs = {
+      APPROVE: "✓ Stage Approved! In the full workflow, this advances the state machine to the next sequential SDLC phase.",
+      EDIT: "✏️ Manual Edit: A new append-only version will be created — prior history is never overwritten.",
+      REGENERATE: "🔄 AI Regeneration: Groq will redraft this artifact incorporating your review feedback.",
+      REJECT: "⛔ Artifact Rejected: This version is quarantined. The pipeline will not advance until it is remediated."
     };
+    alert(msgs[action] || "");
+  }
 
-    // Hero Tab Event Listeners
-    const heroTabs = document.querySelectorAll('.preview-tab-btn');
-    heroTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            heroTabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            const stage = this.dataset.stage;
-            const data = heroStageData[stage];
-            if (!data) return;
+  // Smooth animated scrolling for all anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const targetId = this.getAttribute('href');
+      if (!targetId || targetId === '#') return;
+      
+      const target = document.querySelector(targetId);
+      if (target) {
+        e.preventDefault();
+        const headerOffset = 72;
+        const elementPosition = target.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-            document.getElementById('heroArtifactText').textContent = data.text;
-            document.getElementById('heroTile1Question').textContent = data.tile1Q;
-            document.getElementById('heroTile1Answer').textContent = data.tile1A;
-            document.getElementById('heroTile1Prob').textContent = data.tile1Prob;
-            document.getElementById('heroTile1Meter').style.width = data.tile1Meter;
-
-            document.getElementById('heroTile2Question').textContent = data.tile2Q;
-            document.getElementById('heroTile2Answer').textContent = data.tile2A;
-            document.getElementById('heroTile2Prob').textContent = data.tile2Prob;
-            document.getElementById('heroTile2Meter').style.width = data.tile2Meter;
-
-            document.getElementById('heroTile3Question').textContent = data.tile3Q;
-            document.getElementById('heroTile3Answer').textContent = data.tile3A;
-            document.getElementById('heroTile3Prob').textContent = data.tile3Prob;
-            document.getElementById('heroTile3Meter').style.width = data.tile3Meter;
-
-            document.getElementById('heroHitlText').textContent = data.hitl;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
         });
+
+        if (history.pushState) {
+          history.pushState(null, null, targetId);
+        }
+      }
+    });
+  });
+
+  // ScrollSpy for navbar link highlighting
+  const trackedSections = document.querySelectorAll('section[id]');
+  const navAnchorLinks = document.querySelectorAll('.lp-nav a[href^="#"]');
+
+  window.addEventListener('scroll', () => {
+    let activeId = '';
+    const scrollPos = window.pageYOffset;
+
+    trackedSections.forEach(sec => {
+      const top = sec.offsetTop - 130;
+      const height = sec.offsetHeight;
+      if (scrollPos >= top && scrollPos < top + height) {
+        activeId = '#' + sec.getAttribute('id');
+      }
     });
 
-    // --- 2. INTERACTIVE SIMULATOR PLAYGROUND ---
-    const sampleProjects = {
-        1: "Build a lightweight, client-side Expense Manager web application in TypeScript and React that stores data offline using IndexedDB and displays monthly budget charts.",
-        2: "Design an AI-assisted Static Code Analyzer that scans pull requests for OWASP Top 10 vulnerabilities, dead code paths, and typing issues.",
-        3: "Architect a Real-Time Collaborative Whiteboard application with WebSockets, CRDT conflict resolution, and end-to-end encrypted room sessions."
-    };
-
-    function loadSample(id) {
-        document.getElementById('playInputArea').value = sampleProjects[id] || "";
-    }
-
-    // Set initial sample
-    loadSample(1);
-
-    const playStageConfigs = {
-        REQUIREMENTS: {
-            title: "Requirements Stage",
-            output: "# Software Requirement Specification\n1. Functional Requirements:\n   - FR-01: Offline data caching with IndexedDB.\n   - FR-02: Instant ledger reconciliation.\n2. Non-Functional Requirements:\n   - Client-side data isolation, zero plaintext tokens.\n3. Acceptance Criteria:\n   - 100% test pass on offline state transitions.",
-            score: "94% Confidence",
-            scoreVal: "0.94 / 1.00",
-            meter: "94%",
-            color: "#10B981"
-        },
-        DESIGN: {
-            title: "System Architecture Design",
-            output: "# Architecture Topology\n1. State Management: Redux Toolkit + IndexedDB sync middleware.\n2. Visual Layer: React Functional Components + Chart.js canvas.\n3. Security Protocol: Strict Content-Security-Policy with frame-ancestors 'none'.",
-            score: "97% Confidence",
-            scoreVal: "0.97 / 1.00",
-            meter: "97%",
-            color: "#10B981"
-        },
-        CODE: {
-            title: "Source Code Generation",
-            output: "[\n  {\n    \"path\": \"src/store/index.ts\",\n    \"purpose\": \"Configures Redux store with offline idb middleware\",\n    \"content\": \"import { configureStore } from '@reduxjs/toolkit'; ...\"\n  }\n]",
-            score: "92% Confidence",
-            scoreVal: "0.92 / 1.00",
-            meter: "92%",
-            color: "#10B981"
-        },
-        TESTING: {
-            title: "QA & Verification Suite",
-            output: "# Test Strategy & Static Analysis Report\n- Unit Tests: 12 passing test assertions covering schema validation.\n- Boundary Conditions: Negative number input rejection confirmed.\n- Security Review: No injection vulnerabilities identified.",
-            score: "96% Confidence",
-            scoreVal: "0.96 / 1.00",
-            meter: "96%",
-            color: "#10B981"
-        },
-        DEPLOYMENT: {
-            title: "Deployment & Readiness Assessment",
-            output: "# Deployment Readiness Report\n- Environment: Static Edge Distribution with Brotli compression.\n- Security Checklist: TLS 1.3 enforced, CORS origin strict.\n- Recommendation: GO FOR DEPLOYMENT (Risk: Low).",
-            score: "98% Confidence",
-            scoreVal: "0.98 / 1.00",
-            meter: "98%",
-            color: "#10B981"
-        }
-    };
-
-    let activePlayStage = 'REQUIREMENTS';
-
-    const stageBtns = document.querySelectorAll('.stage-pill-btn');
-    stageBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            stageBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            activePlayStage = this.dataset.stage;
-            
-            const cfg = playStageConfigs[activePlayStage];
-            if (!cfg) return;
-
-            document.getElementById('playStageName').textContent = cfg.title;
-            document.getElementById('playOutputArea').textContent = cfg.output;
-            document.getElementById('playScoreLabel').textContent = cfg.score;
-            document.getElementById('playScoreVal').textContent = cfg.scoreVal;
-            document.getElementById('playMeterFill').style.width = cfg.meter;
-            document.getElementById('playMeterFill').style.backgroundColor = cfg.color;
-        });
+    navAnchorLinks.forEach(link => {
+      if (link.getAttribute('href') === activeId) {
+        link.style.color = '#0D0D0C';
+        link.style.borderBottom = '2px solid #E8590C';
+        link.style.paddingBottom = '2px';
+      } else {
+        link.style.color = '#666260';
+        link.style.borderBottom = 'none';
+        link.style.paddingBottom = '0';
+      }
     });
-
-    function simulateRun() {
-        const outArea = document.getElementById('playOutputArea');
-        const originalText = outArea.textContent;
-        outArea.textContent = "⚡ Running Groq Generation and Jev Decision Validation...";
-        outArea.style.color = "#E8590C";
-        
-        setTimeout(() => {
-            const cfg = playStageConfigs[activePlayStage];
-            outArea.textContent = cfg.output;
-            outArea.style.color = "#CBD5E1";
-        }, 500);
-    }
-
-    function handleHitlAction(action) {
-        if (action === 'APPROVE') {
-            alert("✓ Stage Approved! In the full workflow, this advances the project state machine to the next sequential SDLC phase.");
-        } else if (action === 'EDIT') {
-            alert("✏️ Manual Edit: Allows modifying the generated specification directly. A new version will be created without overwriting historical data.");
-        } else if (action === 'REGENERATE') {
-            alert("🔄 AI Regeneration: Instructs Groq to re-draft this artifact while incorporating human feedback.");
-        } else if (action === 'REJECT') {
-            alert("⛔ Artifact Rejected: Quarantines this version and requires remediation before pipeline advancement.");
-        }
-    }
+  }, { passive: true });
 </script>
 {% endblock %}
