@@ -1,291 +1,561 @@
 {% extends "base.html" %}
 
-{% block title %}{{ project.name }} - AI-Native SDLC Pipeline{% endblock %}
+{% block title %}{{ project.name }} — SDLC Pipeline Workspace{% endblock %}
 
 {% block extra_css %}
-.concept-banner {
-    background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
-    border: 1px solid #C7D2FE;
-    border-radius: 8px;
-    padding: 0.9rem 1.25rem;
-    margin-bottom: 1.5rem;
+/* ============================================================
+   JEV-INSPIRED PROJECT PIPELINE THEME
+   ============================================================ */
+
+/* Breadcrumb & Navigation */
+.project-top-nav {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-}
-.concept-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #3730A3;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    display: flex;
     align-items: center;
-    gap: 0.5rem;
-}
-.concept-desc {
-    font-size: 0.825rem;
-    color: #4338CA;
-    margin: 0.2rem 0 0 0;
+    margin-bottom: 1.25rem;
 }
 
-.detail-header {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #5C5956;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: color 0.15s;
+}
+
+.back-link:hover {
+    color: #0D0D0C;
+}
+
+/* Project Header Card */
+.detail-header-card {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
     margin-bottom: 1.75rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    gap: 1.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
-.pipeline-card {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1.75rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+.detail-header-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(232,89,12,0.05), transparent 70%);
+    pointer-events: none;
 }
-.pipeline-track {
+
+.project-title-large {
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+    color: #0D0D0C;
+    margin: 0 0 0.6rem 0;
+}
+
+.project-meta-row {
+    font-size: 0.84rem;
+    color: #5C5956;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.project-meta-row strong {
+    color: #0D0D0C;
+}
+
+/* 5-Stage Interactive Animated Pipeline Track */
+.pipeline-section {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 12px;
+    padding: 1.75rem 2rem 2rem 2rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.pipeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.75rem;
+}
+
+.pipeline-header-title {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #5C5956;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.pipeline-track-wrapper {
+    position: relative;
+    padding: 0.5rem 0;
+}
+
+/* The Animated Energy Flow Line connecting all stages */
+.pipeline-flow-bar {
+    position: absolute;
+    top: 40px;
+    left: 8%;
+    right: 8%;
+    height: 3px;
+    background: #E8E4E1;
+    z-index: 1;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.pipeline-flow-active {
+    height: 100%;
+    background: linear-gradient(90deg, #059669 0%, #E8590C 70%, #F59F00 100%);
+    background-size: 200% 100%;
+    animation: flowPulse 2.8s linear infinite;
+    border-radius: 9999px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes flowPulse {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+.pipeline-nodes-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 0.75rem;
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
 }
+
 .pipeline-node {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 10px;
+    padding: 1.25rem 1.15rem;
+    text-decoration: none;
     display: flex;
     flex-direction: column;
-    padding: 0.85rem 1rem;
-    border-radius: 6px;
-    text-decoration: none;
-    border: 1px solid var(--border-color);
-    background: #FAFAFA;
-    transition: all 0.2s ease;
+    justify-content: space-between;
+    min-height: 130px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
+
 .pipeline-node:hover {
-    border-color: #94A3B8;
-    transform: translateY(-1px);
+    border-color: #0D0D0C;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
+
 .pipeline-node.node-approved {
-    background: #F0FDF4;
-    border-color: #86EFAC;
+    background: #FAFCF9;
+    border-color: #A7F3D0;
 }
+
+.pipeline-node.node-approved:hover {
+    border-color: #059669;
+}
+
 .pipeline-node.node-current {
-    background: #EEF2FF;
-    border-color: #818CF8;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    background: #FFFBF7;
+    border-color: #E8590C;
+    box-shadow: 0 0 0 3px rgba(232,89,12,0.12), 0 4px 16px rgba(232,89,12,0.08);
 }
-.node-step-label {
+
+.node-top-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.65rem;
+}
+
+.node-idx-badge {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.2rem;
-}
-.node-name {
-    font-size: 0.9rem;
     font-weight: 700;
-    color: var(--text-primary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    background: #F4F1ED;
+    border: 1px solid #E0DBD5;
+    color: #5C5956;
 }
-.node-status-pill {
-    margin-top: 0.5rem;
-    font-size: 0.7rem;
-    font-weight: 600;
+
+.node-approved .node-idx-badge {
+    background: #ECFDF5;
+    border-color: #A7F3D0;
+    color: #065F46;
+}
+
+.node-current .node-idx-badge {
+    background: #E8590C;
+    border-color: #E8590C;
+    color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(232,89,12,0.25);
+    animation: radarPulse 2s infinite;
+}
+
+.node-arrow-hint {
+    font-size: 0.8rem;
+    color: #9D9996;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.pipeline-node:hover .node-arrow-hint {
+    color: #0D0D0C;
+    transform: translateX(3px);
+}
+
+.node-stage-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0D0D0C;
+    letter-spacing: -0.015em;
+    margin-bottom: 0.5rem;
+}
+
+.node-status-chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.15rem 0.5rem;
-    border-radius: 9999px;
+    gap: 0.35rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 600;
+    letter-spacing: 0.05em;
     width: fit-content;
 }
-.pill-approved { background: #DCFCE7; color: #166534; }
-.pill-current { background: #E0E7FF; color: #3730A3; }
-.pill-pending { background: #F1F5F9; color: #64748B; }
 
-.section-box {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
+.chip-approved {
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    color: #065F46;
+}
+
+.chip-current {
+    background: #FFF7ED;
+    border: 1px solid #FED7AA;
+    color: #C2410C;
+    font-weight: 700;
+}
+
+.chip-pending {
+    background: #F4F1ED;
+    border: 1px solid #E0DBD5;
+    color: #7D7975;
+}
+
+/* Problem Statement Box */
+.section-card {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
     margin-bottom: 1.75rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
-.btn-primary {
-    background-color: var(--accent-primary);
-    color: white;
-    padding: 0.6rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 6px;
-    display: inline-block;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.15s;
+
+.section-tag {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5C5956;
+    margin-bottom: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
 }
-.btn-primary:hover {
-    background-color: var(--accent-hover);
+
+.problem-statement-text {
+    font-size: 0.94rem;
+    line-height: 1.65;
+    color: #2D2B29;
+    white-space: pre-wrap;
+    margin: 0;
+    background: #FAFAFA;
+    border: 1px solid #E8E4E1;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
 }
-.btn-secondary {
-    background-color: white;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 0.6rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 6px;
-    display: inline-block;
-    transition: background-color 0.15s;
+
+/* Active Stage Action Card */
+.active-stage-card {
+    background: #FFFFFF;
+    border: 2px solid #E8590C;
+    border-radius: 12px;
+    padding: 2.25rem 2rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(232,89,12,0.08), 0 2px 6px rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
 }
-.btn-secondary:hover {
-    background-color: #F8FAFC;
+
+.active-stage-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #E8590C, #F59F00, #E8590C);
+    background-size: 200% 100%;
+    animation: flowPulse 3s linear infinite;
 }
-.btn-danger {
-    color: var(--danger-text);
-    background: var(--danger-bg);
-    border: 1px solid var(--danger-border);
-    padding: 0.6rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 6px;
-    display: inline-block;
+
+/* Completed Summary Card */
+.completion-card {
+    background: #FFFFFF;
+    border: 2px solid #059669;
+    border-radius: 12px;
+    padding: 2rem 2.25rem;
+    box-shadow: 0 8px 32px rgba(5,150,105,0.08);
+    position: relative;
 }
-.btn-danger:hover {
-    background: #FEE2E2;
+
+.completion-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #E8E4E1;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.completion-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.88rem;
+}
+
+.completion-table th {
+    background: #F4FBF7;
+    padding: 0.85rem 1.15rem;
+    text-align: left;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #065F46;
+    border-bottom: 1px solid #A7F3D0;
+}
+
+.completion-table td {
+    padding: 1rem 1.15rem;
+    border-bottom: 1px solid #EDE9E5;
+    color: #0D0D0C;
+}
+
+.safety-note-box {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: #F4FBF7;
+    border: 1px solid #A7F3D0;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    color: #065F46;
+    line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+    .pipeline-nodes-grid {
+        grid-template-columns: 1fr;
+    }
+    .pipeline-flow-bar {
+        display: none;
+    }
+    .detail-header-card {
+        flex-direction: column;
+    }
 }
 {% endblock %}
 
 {% block content %}
-<div class="concept-banner">
-    <div>
-        <div class="concept-title">
-            <span>🎓</span> AI-Native Software Engineering Lifecycle Demonstration
-        </div>
-        <p class="concept-desc">
-            Autonomous Groq agents produce domain artifacts &bull; Jev AI delivers TypeSafe validation &amp; risk assessment &bull; Human-in-the-Loop retains absolute decision authority.
-        </p>
-    </div>
-    <a href="{% url 'dashboard' %}" class="btn-secondary" style="font-size:0.8rem; padding:0.4rem 0.8rem; white-space:nowrap;">
-        &larr; Projects Dashboard
+<div class="project-top-nav">
+    <a href="{% url 'dashboard' %}" class="back-link">
+        <span>&larr;</span>
+        <span>Projects Dashboard</span>
     </a>
+    <div style="font-size: 0.78rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #7D7975;">
+        WORKSPACE ID // PRJ-{{ project.pk|stringformat:"04d" }}
+    </div>
 </div>
 
-<div class="detail-header">
+<!-- Project Overview Header -->
+<div class="detail-header-card">
     <div>
-        <h1 style="margin:0 0 0.4rem 0; font-size:1.5rem; font-weight:700;">{{ project.name }}</h1>
-        <div style="font-size:0.85rem; color:var(--text-secondary); display:flex; gap:1.25rem; align-items:center;">
-            <span>Created: {{ project.created_at|date:"M d, Y" }}</span>
+        <h1 class="project-title-large">{{ project.name }}</h1>
+        <div class="project-meta-row">
+            <span>Created: <strong>{{ project.created_at|date:"M d, Y" }}</strong></span>
             <span>Current Stage: <strong>{{ project.get_current_stage_display }}</strong></span>
-            <span>Status: 
+            <span>Status:
                 {% if project.status == 'COMPLETED' %}
-                    <span class="badge badge-approved">Completed</span>
+                    <span class="badge badge-approved">✓ Completed</span>
                 {% else %}
-                    <span class="badge" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE;">Active</span>
+                    <span class="badge" style="background:#FFF7ED; color:#C2410C; border:1px solid #FED7AA;">
+                        <span class="signal-dot" style="width:5px; height:5px;"></span> Active Pipeline
+                    </span>
                 {% endif %}
             </span>
         </div>
     </div>
-    <div style="display:flex; gap:0.75rem; align-items:center;">
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
         <a href="{% url 'project_update' project.pk %}" class="btn-secondary">Edit Project</a>
-        <a href="{% url 'project_delete' project.pk %}" class="btn-danger">Delete</a>
+        <a href="{% url 'project_delete' project.pk %}" class="btn-secondary" style="color:#DC2626; border-color:#FECACA;">Delete</a>
     </div>
 </div>
 
-<!-- 5-Stage Indicator: Requirements -> Design -> Code -> Testing -> Deployment -->
-<div class="pipeline-card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <span style="font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary);">
-            SDLC Stage Pipeline (Human-Governed)
-        </span>
-        <span style="font-size:0.75rem; color:var(--text-secondary);">Select any stage to inspect artifacts and reviews</span>
+<!-- 5-Stage Interactive Pipeline Tracker with Animated Flow -->
+<div class="pipeline-section">
+    <div class="pipeline-header">
+        <div class="pipeline-header-title">
+            <span class="signal-dot"></span>
+            <span>SDLC Pipeline &bull; Human-Governed Gateways</span>
+        </div>
+        <span style="font-size: 0.78rem; color: #7D7975;">Select any stage node to inspect domain artifacts &amp; validation logs</span>
     </div>
-    <div class="pipeline-track">
-        {% for node in pipeline_info %}
-            <a href="{% url 'stage_detail' project.pk node.stage %}" 
-               class="pipeline-node {% if node.is_approved %}node-approved{% elif node.is_current %}node-current{% endif %}">
-                <span class="node-step-label">Stage 0{{ forloop.counter }}</span>
-                <span class="node-name">{{ node.name }}</span>
-                <span class="node-status-pill {% if node.is_approved %}pill-approved{% elif node.is_current %}pill-current{% else %}pill-pending{% endif %}">
-                    {% if node.is_approved %}
-                        ✓ Approved (v{{ node.approved_version }})
-                    {% elif node.is_current %}
-                        ● Current Stage
-                    {% else %}
-                        ○ Pending
-                    {% endif %}
-                </span>
-            </a>
-        {% endfor %}
+
+    <div class="pipeline-track-wrapper">
+        <!-- Connecting Energy Flow Bar -->
+        <div class="pipeline-flow-bar">
+            {% if project.status == 'COMPLETED' %}
+                <div class="pipeline-flow-active" style="width: 100%;"></div>
+            {% elif project.current_stage == 'DEPLOYMENT' %}
+                <div class="pipeline-flow-active" style="width: 80%;"></div>
+            {% elif project.current_stage == 'TESTING' %}
+                <div class="pipeline-flow-active" style="width: 60%;"></div>
+            {% elif project.current_stage == 'CODE' %}
+                <div class="pipeline-flow-active" style="width: 40%;"></div>
+            {% elif project.current_stage == 'DESIGN' %}
+                <div class="pipeline-flow-active" style="width: 20%;"></div>
+            {% else %}
+                <div class="pipeline-flow-active" style="width: 10%;"></div>
+            {% endif %}
+        </div>
+
+        <!-- 5 Stage Nodes -->
+        <div class="pipeline-nodes-grid">
+            {% for node in pipeline_info %}
+                <a href="{% url 'stage_detail' project.pk node.stage %}" 
+                   class="pipeline-node {% if node.is_approved %}node-approved{% elif node.is_current %}node-current{% endif %}">
+                    <div class="node-top-strip">
+                        <span class="node-idx-badge">0{{ forloop.counter }}</span>
+                        <span class="node-arrow-hint">&rarr;</span>
+                    </div>
+                    <div>
+                        <div class="node-stage-title">{{ node.name }}</div>
+                        {% if node.is_approved %}
+                            <span class="node-status-chip chip-approved">✓ Approved (v{{ node.approved_version }})</span>
+                        {% elif node.is_current %}
+                            <span class="node-status-chip chip-current">● Current Active</span>
+                        {% else %}
+                            <span class="node-status-chip chip-pending">○ Pending</span>
+                        {% endif %}
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
-<div class="section-box">
-    <h3 style="margin-top:0; font-size:1.05rem; font-weight:700; color:var(--text-primary);">Project Problem Statement &amp; Idea</h3>
-    <p style="white-space:pre-wrap; margin-bottom:0; color:#334155; line-height:1.6; font-size:0.9rem;">{{ project.description }}</p>
+<!-- Problem Statement Card -->
+<div class="section-card">
+    <div class="section-tag">
+        <span>PHASE INPUT // INITIAL SPECIFICATION</span>
+    </div>
+    <div class="problem-statement-text">{{ project.description }}</div>
 </div>
 
 {% if completion_summary %}
-<!-- Full Completion Summary Card -->
-<div class="section-box" style="border: 2px solid #10B981; background: #ECFDF5;">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #A7F3D0; padding-bottom: 1rem; margin-bottom: 1rem;">
+<!-- End-to-End SDLC Lifecycle Completed Certificate -->
+<div class="completion-card">
+    <div class="completion-card-header">
         <div>
-            <h2 style="margin:0; color: #065F46; display:flex; align-items:center; gap:0.5rem; font-size:1.25rem;">
-                <span>🎉</span> SDLC Lifecycle Completed
+            <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.72rem; font-weight: 700; color: #059669; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.35rem;">
+                ✓ ALL GATES FORMALLY SIGNED OFF
+            </div>
+            <h2 style="margin: 0; color: #065F46; font-size: 1.5rem; letter-spacing: -0.025em;">
+                SDLC Lifecycle Completed
             </h2>
-            <p style="margin: 0.25rem 0 0 0; color: #047857; font-size: 0.875rem;">
-                All 5 SDLC stages have been successfully generated by Groq, validated by Jev, and formally approved via Human-in-the-Loop governance.
+            <p style="margin: 0.35rem 0 0 0; color: #047857; font-size: 0.88rem;">
+                All 5 stages (Requirements, Design, Code, Testing, Deployment) have been autonomously synthesized, verified with type-safety schema guarantees, and validated by human oversight.
             </p>
         </div>
-        <span class="badge" style="background:#10B981; color:white; font-size:0.875rem; padding:0.4rem 0.8rem; border-radius:9999px;">
+        <span class="badge badge-approved" style="font-size: 0.88rem; padding: 0.45rem 0.95rem;">
             Status: COMPLETED
         </span>
     </div>
 
-    <h4 style="margin: 1rem 0 0.5rem 0; color: #065F46; font-size:0.95rem;">Approved Stage Artifacts</h4>
-    <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse; background:white; border-radius:6px; overflow:hidden; border:1px solid #D1FAE5;">
+    <div style="overflow-x: auto;">
+        <table class="completion-table">
             <thead>
-                <tr style="background:#F0FDF4; border-bottom:1px solid #A7F3D0; text-align:left; font-size:0.8rem; color:#065F46;">
-                    <th style="padding:0.75rem 1rem;">Stage</th>
-                    <th style="padding:0.75rem 1rem;">Approved Version</th>
-                    <th style="padding:0.75rem 1rem;">Approved Date</th>
-                    <th style="padding:0.75rem 1rem;">Jev Validation</th>
-                    <th style="padding:0.75rem 1rem; text-align:right;">Action</th>
+                <tr>
+                    <th>Lifecycle Stage</th>
+                    <th>Approved Version</th>
+                    <th>Approval Timestamp</th>
+                    <th>Jev TypeSafe Verification</th>
+                    <th style="text-align: right;">Workspace</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in completion_summary.artifacts %}
-                <tr style="border-bottom:1px solid #E5E7EB; font-size:0.85rem;">
-                    <td style="padding:0.75rem 1rem; font-weight:600; color:#1F2937;">
+                <tr>
+                    <td style="font-weight: 700;">
                         {{ item.stage_name }}
                     </td>
-                    <td style="padding:0.75rem 1rem;">
+                    <td>
                         {% if item.artifact %}
-                            <span class="badge" style="background:#E0E7FF; color:#4338CA;">v{{ item.artifact.version }}</span>
+                            <span class="badge" style="background:#F0ECE8; color:#0D0D0C; border:1px solid #D8D4D0; font-family:ui-monospace, monospace;">v{{ item.artifact.version }}</span>
                         {% else %}
-                            <span style="color:#9CA3AF;">None</span>
+                            <span style="color:#9D9996;">None</span>
                         {% endif %}
                     </td>
-                    <td style="padding:0.75rem 1rem; color:#4B5563;">
+                    <td style="color:#5C5956;">
                         {{ item.artifact.created_at|date:"M d, Y H:i"|default:"-" }}
                     </td>
-                    <td style="padding:0.75rem 1rem;">
+                    <td>
                         {% if item.artifact.validation_meta %}
-                            <span style="color:#059669; font-weight:500;">
-                                ✓ Valid (Confidence: {{ item.artifact.validation_meta.confidence|default:"N/A" }})
+                            <span style="color:#059669; font-weight:600; display:inline-flex; align-items:center; gap:0.35rem;">
+                                ✓ Verified (Confidence: {{ item.artifact.validation_meta.confidence|default:"N/A" }})
                             </span>
                         {% else %}
-                            <span style="color:#6B7280;">Human Verified</span>
+                            <span style="color:#5C5956;">Human Sovereign Verified</span>
                         {% endif %}
                     </td>
-                    <td style="padding:0.75rem 1rem; text-align:right;">
+                    <td style="text-align: right;">
                         {% if item.artifact %}
-                            <a href="{% url 'stage_detail' project.pk item.stage %}" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.75rem;">View Artifact</a>
+                            <a href="{% url 'stage_detail' project.pk item.stage %}" class="btn-secondary" style="padding: 0.3rem 0.75rem; font-size: 0.78rem;">
+                                Inspect Artifact &rarr;
+                            </a>
                         {% endif %}
                     </td>
                 </tr>
@@ -294,19 +564,26 @@
         </table>
     </div>
 
-    <div style="margin-top:1rem; padding:0.75rem 1rem; background:#F0FDF4; border:1px solid #A7F3D0; border-radius:4px; font-size:0.8rem; color:#065F46;">
-        <strong>Safety Note:</strong> In strict accordance with prototype safety rules, no code was automatically executed on the host, and no infrastructure was provisioned. The deployment plan and readiness report are finalized and ready for manual ops review.
+    <div class="safety-note-box">
+        <strong>Academic Prototype Safety Invariant:</strong> In strict accordance with prototype safety governance, no code was automatically executed on the host, and no external infrastructure was altered. Deployment plans and verification manifests are finalized for human DevOps review.
     </div>
 </div>
 {% else %}
-<div class="section-box" style="text-align:center; padding:3rem 2rem;">
-    <h3 style="margin-top:0; font-size:1.25rem; color:var(--text-primary);">Current Active Stage: {{ project.get_current_stage_display }}</h3>
-    <p style="color:var(--text-secondary); font-size:0.9rem; max-width:550px; margin:0 auto 1.5rem auto;">
-        Inspect the generated artifact, review Jev validation scores, and use Human-in-the-Loop controls to approve, reject, edit, or regenerate.
+<!-- Active Stage Launcher -->
+<div class="active-stage-card">
+    <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.72rem; font-weight: 700; color: #E8590C; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.5rem;">
+        NEXT PHASE ACTION REQUIRED
+    </div>
+    <h3 style="margin: 0 0 0.6rem 0; font-size: 1.45rem; color: #0D0D0C; font-weight: 800; letter-spacing: -0.025em;">
+        Current Active Stage: {{ project.get_current_stage_display }}
+    </h3>
+    <p style="color: #5C5956; font-size: 0.9rem; max-width: 580px; margin: 0 auto 1.75rem auto; line-height: 1.55;">
+        Inspect the generated artifact, review Jev TypeSafe schema confidence scores, and use Human-in-the-Loop review controls to approve, reject, edit, or regenerate.
     </p>
     {% if project.current_stage != 'COMPLETED' %}
-        <a href="{% url 'stage_detail' project.pk project.current_stage %}" class="btn-primary" style="font-size:0.95rem; padding:0.75rem 1.75rem;">
-            Open {{ project.get_current_stage_display }} Stage Workspace &rarr;
+        <a href="{% url 'stage_detail' project.pk project.current_stage %}" class="btn-primary" style="font-size: 0.95rem; padding: 0.8rem 1.85rem;">
+            <span>Open {{ project.get_current_stage_display }} Stage Workspace</span>
+            <span>&rarr;</span>
         </a>
     {% endif %}
 </div>

@@ -1,97 +1,141 @@
 {% extends "base.html" %}
 
-{% block title %}Edit {{ artifact.get_stage_display }} Artifact - AI-Native SDLC{% endblock %}
+{% block title %}Manual Edit {{ artifact.get_stage_display }} — AI-Native SDLC{% endblock %}
 
 {% block extra_css %}
-.form-container {
-    background: var(--surface-color);
-    padding: 2rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+.edit-container {
+    background: #FFFFFF;
+    padding: 2rem 2.25rem;
+    border: 1px solid #D8D4D0;
+    border-radius: 12px;
     margin-bottom: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
-.form-group {
+
+.edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #EDE9E5;
+    padding-bottom: 1.25rem;
     margin-bottom: 1.5rem;
 }
+
+.edit-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #0D0D0C;
+    margin: 0;
+}
+
+.governance-rule-banner {
+    background: #FFF7ED;
+    border: 1px solid #FED7AA;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.86rem;
+    color: #9A3412;
+    line-height: 1.55;
+}
+
 .form-group label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--text-primary);
+    margin-bottom: 0.4rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5C5956;
 }
+
 .form-control, textarea {
     width: 100%;
-    min-height: 400px;
+    min-height: 440px;
     padding: 1.25rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border: 1px solid #D8D4D0;
+    border-radius: 8px;
     box-sizing: border-box;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    background: #F8FAFC;
-    color: #1E293B;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    background: #FAFAFA;
+    color: #0D0D0C;
+    transition: all 0.15s;
 }
+
 .form-control:focus, textarea:focus {
     outline: none;
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+    background: #FFFFFF;
+    border-color: #0D0D0C;
+    box-shadow: 0 0 0 3px rgba(13, 13, 12, 0.08);
 }
+
 .btn-primary {
-    background-color: var(--accent-primary);
-    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #0D0D0C;
+    color: #F7F5F4;
     padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 700;
     border-radius: 6px;
-    display: inline-block;
-    border: none;
+    border: 1px solid #0D0D0C;
     cursor: pointer;
-    transition: background-color 0.15s;
+    transition: all 0.15s ease;
 }
+
 .btn-primary:hover {
-    background-color: var(--accent-hover);
+    background-color: #262624;
+    transform: translateY(-1px);
 }
+
 .btn-secondary {
-    background-color: white;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    background-color: #FFFFFF;
+    color: #0D0D0C;
+    border: 1px solid #D8D4D0;
+    padding: 0.75rem 1.4rem;
+    font-size: 0.88rem;
     font-weight: 600;
     text-decoration: none;
     border-radius: 6px;
-    display: inline-block;
-    transition: background-color 0.15s;
+    transition: all 0.15s ease;
 }
+
 .btn-secondary:hover {
-    background-color: #F8FAFC;
+    background-color: #F4F1ED;
+    border-color: #0D0D0C;
 }
 {% endblock %}
 
 {% block content %}
 <div style="margin-bottom:1.25rem;">
-    <a href="{% url 'stage_detail' artifact.project.pk artifact.stage %}" style="color:var(--text-secondary); text-decoration:none; font-size:0.875rem; font-weight:500;">
-        &larr; Cancel and return to stage workspace
+    <a href="{% url 'stage_detail' artifact.project.pk artifact.stage %}" style="color:#5C5956; text-decoration:none; font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:0.4rem;">
+        <span>&larr;</span>
+        <span>Cancel and return to stage workspace</span>
     </a>
 </div>
 
-<div class="form-container">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1.5rem;">
+<div class="edit-container">
+    <div class="edit-header">
         <div>
-            <h2 style="margin:0; font-size:1.35rem; font-weight:700;">Manual Revision &bull; {{ artifact.get_stage_display }}</h2>
-            <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.25rem 0 0 0;">
-                Project: <strong>{{ artifact.project.name }}</strong> | Editing version v{{ artifact.version }}
+            <h1 class="edit-title">Manual Revision &bull; Stage {{ artifact.get_stage_display }}</h1>
+            <p style="color:#5C5956; font-size:0.85rem; margin:0.35rem 0 0 0;">
+                Project: <strong>{{ artifact.project.name }}</strong> | Authoring revision atop v{{ artifact.version }}
             </p>
         </div>
-        <span class="badge badge-human">Human Author</span>
+        <span class="badge" style="background:#F0ECE8; color:#0D0D0C; border:1px solid #D8D4D0; font-family:ui-monospace, monospace;">
+            👤 Human Sovereign Author
+        </span>
     </div>
 
-    <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:6px; padding:0.85rem 1.25rem; margin-bottom:1.5rem; font-size:0.85rem; color:#1E40AF;">
-        ℹ️ <strong>Append-Only Governance Rule:</strong> Submitting this edit will not overwrite Version {{ artifact.version }}. A new version (<strong>v{{ artifact.version|add:"1" }}</strong>) will be created with source marked as <strong>Human Edited</strong>, and a review log trace will be permanently appended.
+    <div class="governance-rule-banner">
+        ℹ️ <strong>Append-Only Governance Invariant:</strong> Submitting this edit will not overwrite Version {{ artifact.version }}. A new version (<strong>v{{ artifact.version|add:"1" }}</strong>) will be created with source marked as <strong>Human Edited</strong>, and a review log trace will be permanently appended.
     </div>
 
     <form method="post">
@@ -100,7 +144,10 @@
             {{ form.content }}
         </div>
         <div style="display:flex; gap:1rem; margin-top:1.5rem; align-items:center;">
-            <button type="submit" class="btn-primary">Save as New Version (v{{ artifact.version|add:"1" }})</button>
+            <button type="submit" class="btn-primary">
+                <span>Save as New Version (v{{ artifact.version|add:"1" }})</span>
+                <span>&rarr;</span>
+            </button>
             <a href="{% url 'stage_detail' artifact.project.pk artifact.stage %}" class="btn-secondary">Cancel</a>
         </div>
     </form>

@@ -1,74 +1,124 @@
 {% extends "base.html" %}
 
-{% block title %}{{ action }} Project - AI-Native SDLC{% endblock %}
+{% block title %}{{ action }} Project — AI-Native SDLC{% endblock %}
 
 {% block extra_css %}
-.form-container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: var(--surface-color);
-    padding: 2rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+.form-card {
+    max-width: 640px;
+    margin: 2rem auto;
+    background: #FFFFFF;
+    padding: 2.25rem 2.5rem;
+    border: 1px solid #D8D4D0;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.03);
 }
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #0D0D0C;
+    margin: 0 0 0.5rem 0;
+}
+
+.form-desc {
+    font-size: 0.88rem;
+    color: #5C5956;
+    margin: 0 0 1.75rem 0;
+    line-height: 1.5;
+}
+
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.35rem;
 }
+
 .form-group label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    font-size: 0.875rem;
+    margin-bottom: 0.4rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5C5956;
 }
+
 .form-control, input[type="text"], textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid #D8D4D0;
     border-radius: 6px;
     box-sizing: border-box;
     font-family: inherit;
-    font-size: 0.875rem;
+    font-size: 0.88rem;
+    background: #FAFAFA;
+    color: #0D0D0C;
+    transition: all 0.15s;
 }
+
 textarea {
-    min-height: 120px;
-    line-height: 1.5;
+    min-height: 140px;
+    line-height: 1.6;
 }
+
 .form-control:focus, input[type="text"]:focus, textarea:focus {
     outline: none;
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+    background: #FFFFFF;
+    border-color: #0D0D0C;
+    box-shadow: 0 0 0 3px rgba(13, 13, 12, 0.08);
 }
+
 .btn-primary {
-    background-color: var(--accent-primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #0D0D0C;
+    color: #F7F5F4;
+    padding: 0.65rem 1.35rem;
+    font-size: 0.88rem;
+    font-weight: 600;
     text-decoration: none;
-    border-radius: 4px;
-    display: inline-block;
-    border: none;
+    border-radius: 6px;
+    border: 1px solid #0D0D0C;
     cursor: pointer;
+    transition: all 0.15s ease;
 }
+
 .btn-primary:hover {
-    background-color: var(--accent-hover);
+    background-color: #262624;
+    transform: translateY(-1px);
 }
+
 .btn-secondary {
-    background-color: white;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    background-color: #FFFFFF;
+    color: #0D0D0C;
+    border: 1px solid #D8D4D0;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.88rem;
+    font-weight: 600;
     text-decoration: none;
-    border-radius: 4px;
-    display: inline-block;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #F4F1ED;
+    border-color: #0D0D0C;
 }
 {% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h2 style="margin-top:0; margin-bottom:1.5rem;">{{ action }} Project</h2>
+<div class="form-card">
+    <div style="font-family: ui-monospace, monospace; font-size: 0.68rem; font-weight: 700; color: #E8590C; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.35rem;">
+        WORKSPACE INITIALIZER
+    </div>
+    <h1 class="form-title">{{ action }} Project</h1>
+    <p class="form-desc">
+        Define your software engineering challenge or problem statement. The autonomous agents will analyze and decompose this specification through the 5-stage pipeline.
+    </p>
+
     <form method="post">
         {% csrf_token %}
         {% for field in form %}
@@ -76,12 +126,15 @@ textarea {
                 {{ field.label_tag }}
                 {{ field }}
                 {% if field.errors %}
-                    <div style="color:var(--error-text); font-size:0.875rem; margin-top:0.25rem;">{{ field.errors }}</div>
+                    <div style="color:#B91C1C; font-size:0.82rem; margin-top:0.35rem;">{{ field.errors }}</div>
                 {% endif %}
             </div>
         {% endfor %}
-        <div style="display:flex; gap:1rem; margin-top:2rem;">
-            <button type="submit" class="btn-primary">Save Project</button>
+        <div style="display:flex; gap:0.85rem; margin-top:2rem; align-items:center;">
+            <button type="submit" class="btn-primary">
+                <span>Save Project</span>
+                <span>&rarr;</span>
+            </button>
             <a href="{% if project %}{% url 'project_detail' project.pk %}{% else %}{% url 'dashboard' %}{% endif %}" class="btn-secondary">Cancel</a>
         </div>
     </form>

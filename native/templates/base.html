@@ -6,15 +6,16 @@
     <title>{% block title %}AI-Native SDLC Prototype{% endblock %}</title>
     <style>
         :root {
-            --bg-color: #F8FAFC;
+            --bg-color: #F7F5F4;
             --surface-color: #FFFFFF;
-            --border-color: #E2E8F0;
-            --border-subtle: #F1F5F9;
-            --text-primary: #0F172A;
-            --text-secondary: #64748B;
-            --text-muted: #94A3B8;
-            --accent-primary: #4F46E5;
-            --accent-hover: #4338CA;
+            --border-color: #D8D4D0;
+            --border-subtle: #E8E4E1;
+            --text-primary: #0D0D0C;
+            --text-secondary: #5C5956;
+            --text-muted: #9D9996;
+            --accent-primary: #0D0D0C;
+            --accent-hover: #262624;
+            --accent-signal: #E8590C;
             --success-bg: #ECFDF5;
             --success-border: #A7F3D0;
             --success-text: #065F46;
@@ -44,8 +45,10 @@
         }
 
         header {
-            background-color: var(--surface-color);
-            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(247, 245, 244, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid #E8E4E1;
             padding: 0.85rem 0;
             position: sticky;
             top: 0;
@@ -68,23 +71,56 @@
             text-decoration: none;
         }
 
+        .brand-icon-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #E8590C;
+            color: #FFFFFF;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            box-shadow: 0 1px 4px rgba(232, 89, 12, 0.35);
+        }
+
         .logo {
             font-weight: 700;
             font-size: 1.15rem;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
+            color: #0D0D0C;
+            letter-spacing: -0.025em;
         }
 
         .seminar-pill {
-            font-size: 0.7rem;
-            font-weight: 600;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 0.2rem 0.55rem;
+            letter-spacing: 0.12em;
+            padding: 0.25rem 0.65rem;
             border-radius: 9999px;
-            background: #EEF2FF;
-            color: #4F46E5;
-            border: 1px solid #C7D2FE;
+            background: #FFFFFF;
+            color: #0D0D0C;
+            border: 1px solid #D8D4D0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .signal-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #E8590C;
+            box-shadow: 0 0 0 2px rgba(232, 89, 12, 0.25);
+            animation: radarPulse 2s infinite;
+        }
+
+        @keyframes radarPulse {
+            0% { box-shadow: 0 0 0 0 rgba(232, 89, 12, 0.45); }
+            70% { box-shadow: 0 0 0 6px rgba(232, 89, 12, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(232, 89, 12, 0); }
         }
 
         .nav-links {
@@ -96,39 +132,42 @@
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: #5C5956;
             text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
             transition: color 0.15s;
         }
 
         .nav-links a:hover {
-            color: var(--text-primary);
+            color: #0D0D0C;
         }
 
         .nav-user {
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            background: #F1F5F9;
-            padding: 0.35rem 0.75rem;
+            color: #0D0D0C;
+            font-size: 0.78rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background: #FFFFFF;
+            border: 1px solid #D8D4D0;
+            padding: 0.25rem 0.7rem;
             border-radius: 6px;
+            letter-spacing: 0.04em;
         }
 
         .nav-btn {
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: #5C5956;
             cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
             padding: 0;
             font-family: inherit;
             transition: color 0.15s;
         }
 
         .nav-btn:hover {
-            color: var(--danger-text);
+            color: #DC2626;
         }
 
         .container {
@@ -228,9 +267,9 @@
     <header class="{% block header_class %}{% endblock %}">
         <nav>
             <a href="/" class="brand-box">
-                <span style="font-size: 1.35rem;">⚡</span>
+                <span class="brand-icon-box">⚡</span>
                 <span class="logo">AI-Native SDLC</span>
-                <span class="seminar-pill">Seminar Demo</span>
+                <span class="seminar-pill"><span class="signal-dot"></span> HITL Governance</span>
             </a>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
