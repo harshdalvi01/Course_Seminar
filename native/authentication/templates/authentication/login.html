@@ -1,222 +1,274 @@
 {% extends "base.html" %}
-{% block title %}Sign In — AI-Native SDLC Prototype{% endblock %}
-{% block body_class %}landing-page{% endblock %}
+{% block title %}Sign In — AI-Native SDLC{% endblock %}
+{% block body_class %}auth-combined-page{% endblock %}
 {% block main_class %}{% endblock %}
 
 {% block extra_css %}
-/* ============================================================
-   JEV AUTHENTICATION THEME — Light Industrial (#f7f5f4)
-   ============================================================ */
-header, footer {
-    display: none !important;
-}
+*, *::before, *::after { box-sizing: border-box; }
+header, footer { display: none !important; }
 
-.auth-page-wrapper {
-    background-color: #F7F5F4;
+/* body: fill viewport, cream background */
+body.auth-combined-page {
+    background: #F7F5F4;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2.5rem 1.5rem;
+    margin: 0;
+    padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
 }
 
-/* Auth Card */
-.auth-card {
-    background: #FFFFFF;
-    border: 1px solid #D8D4D0;
-    border-radius: 10px;
-    padding: 2.25rem 2rem;
+/* main: the actual direct flex child — THIS is what we center */
+body.auth-combined-page main {
     width: 100%;
-    max-width: 420px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
-}
-
-/* Live Signal Pill */
-.lp-live-pill {
-    display: inline-flex;
+    min-height: 100vh;
+    display: flex;
     align-items: center;
-    gap: 0.55rem;
-    border: 1px solid #D8D4D0;
-    background: #FFFFFF;
-    padding: 0.3rem 0.75rem 0.3rem 0.55rem;
-    border-radius: 9999px;
-    margin-bottom: 1.25rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #0D0D0C;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
 }
 
-.lp-signal-ring {
+/* ── Card ── */
+.ac-card {
     position: relative;
-    width: 8px;
-    height: 8px;
-    flex-shrink: 0;
+    width: 100%;
+    max-width: 860px;
+    height: 600px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;   /* clips everything inside */
 }
 
-.lp-signal-ring-ping {
+/* ── Static forms row — NEVER moves ── */
+.ac-forms-row {
     position: absolute;
     inset: 0;
-    border-radius: 50%;
-    background: #E8590C;
-    opacity: 0.6;
-    animation: lp-ping 1.6s ease-out infinite;
+    display: flex;
 }
 
-@keyframes lp-ping {
-    0% { transform: scale(1); opacity: 0.6; }
+.ac-form-panel {
+    width: 50%;
+    height: 100%;
+    padding: 2rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ── Dark overlay — the ONLY thing that slides ── */
+.ac-overlay {
+    position: absolute;
+    top: 0;
+    left: 50%;          /* starts covering the right (register) panel */
+    width: 50%;
+    height: 100%;
+    background: #0D0D0C;
+    z-index: 20;
+    overflow: hidden;
+    /* slides left to reveal register form, back right for login */
+    transition: transform 0.62s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Slide overlay to the LEFT when register is active */
+.ac-card[data-panel="register"] .ac-overlay {
+    transform: translateX(-100%);
+}
+
+/* Decorative grid inside overlay */
+.ac-overlay::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(232,89,12,0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232,89,12,0.12) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Blobs */
+.ac-blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(60px); opacity: 0.22; pointer-events: none; z-index: 0;
+}
+.ac-blob-1 { width: 260px; height: 260px; background: #E8590C; top: -80px; right: -60px; }
+.ac-blob-2 { width: 180px; height: 180px; background: #E8590C; bottom: -40px; left: -40px; }
+
+/* ── Overlay inner content panels — cross-fade ── */
+.ac-oc {
+    position: absolute; inset: 0; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2.5rem 2rem; text-align: center;
+    transition: opacity 0.28s ease 0.15s, transform 0.28s ease 0.15s;
+}
+
+/* login CTA: visible by default */
+.ac-oc-login  { opacity: 1; transform: translateX(0); pointer-events: auto; }
+/* register CTA: hidden by default */
+.ac-oc-register { opacity: 0; transform: translateX(24px); pointer-events: none; }
+
+/* When register panel active → swap visibility */
+.ac-card[data-panel="register"] .ac-oc-login    { opacity: 0; transform: translateX(-24px); pointer-events: none; }
+.ac-card[data-panel="register"] .ac-oc-register { opacity: 1; transform: translateX(0);     pointer-events: auto; }
+
+/* Overlay text */
+.ac-oc-logo {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    text-decoration: none; color: #F7F5F4;
+    font-weight: 700; font-size: 1.1rem; letter-spacing: -0.025em;
+    margin-bottom: 1.6rem;
+}
+.ac-oc-logo-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; background: #E8590C;
+    border-radius: 7px; font-size: 0.9rem; font-weight: 800;
+    box-shadow: 0 2px 8px rgba(232,89,12,0.4);
+}
+.ac-oc-pipeline {
+    display: flex; align-items: center; gap: 0.35rem;
+    margin-bottom: 1.35rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #6D6A67;
+}
+.ac-oc-dot  { width: 6px; height: 6px; border-radius: 50%; background: #E8590C; }
+.ac-oc-line { width: 22px; height: 1px; background: #3D3D3B; }
+
+.ac-oc h2 {
+    font-size: 1.6rem; font-weight: 700; line-height: 1.1;
+    letter-spacing: -0.03em; color: #F7F5F4; margin: 0 0 0.7rem;
+}
+.ac-oc p {
+    font-size: 0.82rem; color: #8D8986; line-height: 1.55;
+    margin: 0 0 1.65rem; max-width: 220px;
+}
+.ac-oc-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.4rem; padding: 0.6rem 1.6rem;
+    border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
+    background: transparent; color: #F7F5F4;
+    font-size: 0.83rem; font-weight: 600; cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s, border-color 0.18s;
+}
+.ac-oc-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.45); }
+
+/* ── Live Signal Pill ── */
+.ac-pill {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    border: 1px solid #E0DBD6; background: #F7F5F4;
+    padding: 0.28rem 0.7rem 0.28rem 0.5rem;
+    border-radius: 9999px; margin-bottom: 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.63rem; font-weight: 700; letter-spacing: 0.13em;
+    text-transform: uppercase; color: #0D0D0C;
+}
+.ac-pill-ring { position: relative; width: 8px; height: 8px; flex-shrink: 0; }
+.ac-pill-ping {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: #E8590C; opacity: 0.6; animation: ac-ping 1.6s ease-out infinite;
+}
+@keyframes ac-ping {
+    0%        { transform: scale(1); opacity: 0.6; }
     75%, 100% { transform: scale(2.2); opacity: 0; }
 }
-
-.lp-signal-ring-dot {
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #E8590C;
+.ac-pill-dot {
+    position: absolute; inset: 0; margin: auto;
+    width: 8px; height: 8px; border-radius: 50%; background: #E8590C;
+}
+.ac-pill-muted {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.7rem; font-weight: 400; letter-spacing: 0;
+    text-transform: none; color: #9D9996;
 }
 
-.lp-live-muted {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 0.72rem;
-    font-weight: 400;
-    letter-spacing: 0;
-    text-transform: none;
-    color: #9D9996;
+/* ── Form typography ── */
+.ac-title {
+    font-size: 1.8rem; font-weight: 700; line-height: 1.05;
+    letter-spacing: -0.035em; color: #0D0D0C; margin: 0 0 0.38rem;
 }
+.ac-desc { font-size: 0.82rem; color: #5C5956; line-height: 1.5; margin: 0 0 1.25rem; }
 
-/* Card Header */
-.auth-title {
-    font-size: 1.85rem;
-    font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -0.035em;
-    color: #0D0D0C;
-    margin: 0 0 0.5rem 0;
-}
-
-.auth-desc {
-    font-size: 0.86rem;
-    color: #5C5956;
-    line-height: 1.55;
-    margin: 0 0 1.75rem 0;
-}
-
-/* Form Styles */
-.form-group {
-    margin-bottom: 1.15rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.4rem;
+/* ── Form fields ── */
+.ac-field { margin-bottom: 0.9rem; }
+.ac-label {
+    display: block; margin-bottom: 0.3rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #5C5956;
+    font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: #5C5956;
+}
+.ac-field input[type="text"],
+.ac-field input[type="password"],
+.ac-field input[type="email"] {
+    display: block; width: 100%;
+    background: #FAFAFA; border: 1px solid #D8D4D0; border-radius: 7px;
+    padding: 0.58rem 0.78rem; font-size: 0.86rem; color: #0D0D0C;
+    font-family: inherit; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ac-field input:focus {
+    background: #FFF; border-color: #0D0D0C;
+    box-shadow: 0 0 0 3px rgba(13,13,12,0.07);
 }
 
-.form-control input, input[type="text"], input[type="password"] {
-    width: 100%;
-    box-sizing: border-box;
-    background: #FAFAFA;
-    border: 1px solid #D8D4D0;
-    border-radius: 6px;
-    padding: 0.65rem 0.85rem;
-    font-size: 0.875rem;
-    color: #0D0D0C;
-    font-family: inherit;
-    transition: all 0.15s;
+/* ── Errors ── */
+.ac-errors {
+    background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B;
+    padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.78rem;
+    margin-bottom: 0.9rem; line-height: 1.45;
+}
+.ac-field-errors {
+    list-style: none; padding: 0; margin: 0.25rem 0 0;
+    color: #B91C1C; font-size: 0.74rem;
 }
 
-.form-control input:focus, input[type="text"]:focus, input[type="password"]:focus {
-    background: #FFFFFF;
-    border-color: #0D0D0C;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(13, 13, 12, 0.08);
+/* ── Submit ── */
+.ac-submit {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.5rem; width: 100%;
+    background: #0D0D0C; color: #F7F5F4;
+    border: 1px solid #0D0D0C; border-radius: 7px;
+    padding: 0.68rem 1rem; font-size: 0.875rem; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s; margin-top: 0.35rem;
 }
+.ac-submit:hover { background: #262624; }
 
-/* Submit Button */
-.auth-btn-submit {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    background: #0D0D0C;
-    color: #F7F5F4;
-    border: 1px solid #0D0D0C;
-    border-radius: 6px;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.15s;
-    margin-top: 0.5rem;
+/* ── Form footer ── */
+.ac-form-footer {
+    margin-top: 1.1rem; padding-top: 0.9rem;
+    border-top: 1px solid #EDE9E5;
+    text-align: center; font-size: 0.79rem; color: #5C5956;
 }
-
-.auth-btn-submit:hover {
-    background: #262624;
+.ac-form-footer a, .ac-toggle-link {
+    color: #E8590C; font-weight: 600; text-decoration: none; cursor: pointer;
+    background: none; border: none; font-size: 0.79rem; font-family: inherit; padding: 0;
 }
+.ac-form-footer a:hover, .ac-toggle-link:hover { text-decoration: underline; }
 
-/* Links & Help */
-.auth-footer {
-    margin-top: 1.5rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid #E8E4E1;
-    text-align: center;
-    font-size: 0.82rem;
-    color: #5C5956;
-}
-
-.auth-footer a {
-    color: #E8590C;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.auth-footer a:hover {
-    text-decoration: underline;
-}
-
-.errorlist {
-    color: #B91C1C;
-    font-size: 0.78rem;
-    margin: 0.35rem 0 0 0;
-    padding-left: 0;
-    list-style: none;
-}
-
-/* Trust Badge Strip */
-.auth-trust-strip {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1.25rem;
-    flex-wrap: wrap;
-}
-
-.auth-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.22rem 0.55rem;
-    background: #F0ECE8;
-    border: 1px solid #E0DBD6;
-    border-radius: 4px;
-    font-size: 0.68rem;
-    color: #5C5956;
+/* ── Trust chips ── */
+.ac-chips { display: flex; justify-content: center; gap: 0.38rem; flex-wrap: wrap; margin-top: 0.8rem; }
+.ac-chip {
+    display: inline-flex; align-items: center; gap: 0.26rem;
+    padding: 0.18rem 0.46rem;
+    background: #F0ECE8; border: 1px solid #E0DBD6; border-radius: 4px;
+    font-size: 0.63rem; color: #5C5956;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ── Responsive ── */
+@media (max-width: 620px) {
+    .ac-card { height: auto; }
+    .ac-forms-row { position: static; flex-direction: column; }
+    .ac-form-panel { width: 100%; height: auto; min-height: auto; overflow: visible; }
+    .ac-overlay { position: static; width: 100%; height: auto; min-height: 220px;
+                  left: 0; transform: none !important; transition: none; }
+    .ac-card[data-panel="login"]    #panel-register { display: none; }
+    .ac-card[data-panel="register"] #panel-login    { display: none; }
 }
 {% endblock %}
 
@@ -224,68 +276,144 @@ header, footer {
 {% block footer %}{% endblock footer %}
 
 {% block content %}
-<div class="auth-page-wrapper">
-  <!-- Brand Logo above card -->
-  <div style="margin-bottom: 1.5rem; text-align: center;">
-    <a href="/" style="display: inline-flex; align-items: center; gap: 0.55rem; text-decoration: none; color: #0D0D0C; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.025em;">
-      <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #E8590C; color: #FFFFFF; border-radius: 6px; font-size: 0.85rem; font-weight: 800; box-shadow: 0 1px 3px rgba(232, 89, 12, 0.3);">⚡</span>
-      <span>AI-Native SDLC</span>
-    </a>
-  </div>
+<div class="ac-card" id="ac-card" data-panel="login">
 
-  <div class="auth-card">
-    <!-- Live Pill -->
-    <div class="lp-live-pill">
-      <span class="lp-signal-ring">
-        <span class="lp-signal-ring-ping"></span>
-        <span class="lp-signal-ring-dot"></span>
-      </span>
-      <span>System Access</span>
-      <span class="lp-live-muted">HITL Governance</span>
-    </div>
+  <!-- ╔══════════════════════════════════════╗
+       ║  STATIC forms row — never moves      ║
+       ╚══════════════════════════════════════╝ -->
+  <div class="ac-forms-row">
 
-    <!-- Title & Subtitle -->
-    <h1 class="auth-title">Sign In</h1>
-    <p class="auth-desc">Access the 5-stage dual-engine autonomous software engineering dashboard.</p>
+    <!-- LEFT: Login form -->
+    <div class="ac-form-panel" id="panel-login">
+      <div class="ac-pill">
+        <span class="ac-pill-ring">
+          <span class="ac-pill-ping"></span>
+          <span class="ac-pill-dot"></span>
+        </span>
+        <span>System Access</span>
+        <span class="ac-pill-muted">HITL Governance</span>
+      </div>
+      <h1 class="ac-title">Sign In</h1>
+      <p class="ac-desc">Access the 5-stage dual-engine autonomous SDLC dashboard.</p>
 
-    <form method="post">
-      {% csrf_token %}
-      {% if form.non_field_errors %}
-        <div style="background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.82rem; margin-bottom: 1.25rem;">
-          {{ form.non_field_errors }}
-        </div>
-      {% endif %}
-
-      {% for field in form %}
-        <div class="form-group">
-          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-          <div class="form-control">
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="ac-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% for field in form %}
+          <div class="ac-field">
+            <label class="ac-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
+            {% if field.errors %}
+              <ul class="ac-field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
           </div>
-          {% if field.errors %}
-            <ul class="errorlist">
-              {% for error in field.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
-      {% endfor %}
+        {% endfor %}
+        <button type="submit" class="ac-submit">Sign In to Dashboard &rarr;</button>
+      </form>
 
-      <button type="submit" class="auth-btn-submit">
-        <span>Sign In to Dashboard</span>
-        <span>&rarr;</span>
-      </button>
-    </form>
-
-    <div class="auth-footer">
-      <p style="margin: 0;">Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+      <div class="ac-form-footer">
+        <p style="margin:0;">Don't have an account?
+          <button class="ac-toggle-link" onclick="slideToRegister()">Register here</button>
+        </p>
+      </div>
+      <div class="ac-chips">
+        <span class="ac-chip">🔒 Append-Only Ledger</span>
+        <span class="ac-chip">🛡️ Human Sovereignty</span>
+      </div>
     </div>
 
-    <div class="auth-trust-strip">
-      <span class="auth-chip">🔒 Append-Only Ledger</span>
-      <span class="auth-chip">🛡️ Human Sovereignty</span>
+    <!-- RIGHT: Register form -->
+    <div class="ac-form-panel" id="panel-register">
+      <h1 class="ac-title" style="margin-bottom: 1.25rem;">Create Account</h1>
+
+      <form method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        {% if reg_form.non_field_errors %}
+          <div class="ac-errors">{{ reg_form.non_field_errors }}</div>
+        {% endif %}
+        {% for field in reg_form %}
+          <div class="ac-field">
+            <label class="ac-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <ul class="ac-field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="ac-submit">Create Account &rarr;</button>
+      </form>
+
+      <div class="ac-form-footer">
+        <p style="margin:0;">Already have an account?
+          <button class="ac-toggle-link" onclick="slideToLogin()">Sign in here</button>
+        </p>
+      </div>
     </div>
-  </div>
-</div>
+
+  </div><!-- /ac-forms-row -->
+
+  <!-- ╔══════════════════════════════════════╗
+       ║  DARK OVERLAY — the ONLY moving part ║
+       ║  Slides left/right as a solid curtain ║
+       ╚══════════════════════════════════════╝ -->
+  <div class="ac-overlay" id="ac-overlay">
+    <div class="ac-blob ac-blob-1"></div>
+    <div class="ac-blob ac-blob-2"></div>
+
+    <!-- Shown when login is active: CTA to register -->
+    <div class="ac-oc ac-oc-login">
+      <a href="/" class="ac-oc-logo">
+        <span class="ac-oc-logo-icon">⚡</span>
+        AI-Native SDLC
+      </a>
+      <div class="ac-oc-pipeline">
+        <span class="ac-oc-dot"></span>
+        <span class="ac-oc-line"></span>
+        <span>AI ✕ Human</span>
+        <span class="ac-oc-line"></span>
+        <span class="ac-oc-dot"></span>
+      </div>
+      <h2>Start your<br>journey now</h2>
+      <p>New to the platform? Join us and engineer software at autonomous scale.</p>
+      <button class="ac-oc-btn" onclick="slideToRegister()">Register &rarr;</button>
+    </div>
+
+    <!-- Shown when register is active: CTA to sign in -->
+    <div class="ac-oc ac-oc-register">
+      <a href="/" class="ac-oc-logo">
+        <span class="ac-oc-logo-icon">⚡</span>
+        AI-Native SDLC
+      </a>
+      <div class="ac-oc-pipeline">
+        <span class="ac-oc-dot"></span>
+        <span class="ac-oc-line"></span>
+        <span>5-Stage SDLC</span>
+        <span class="ac-oc-line"></span>
+        <span class="ac-oc-dot"></span>
+      </div>
+      <h2>Already part<br>of the crew?</h2>
+      <p>Sign in to your account and pick up right where the pipeline left off.</p>
+      <button class="ac-oc-btn" onclick="slideToLogin()">&larr; Sign In</button>
+    </div>
+  </div><!-- /ac-overlay -->
+
+</div><!-- /ac-card -->
+
+<script>
+  const card = document.getElementById('ac-card');
+
+  function slideToRegister() {
+    card.setAttribute('data-panel', 'register');
+  }
+  function slideToLogin() {
+    card.setAttribute('data-panel', 'login');
+  }
+
+  // Server tells us which panel to start on
+  (function() {
+    if ("{{ initial_panel|default:'login' }}" === 'register') slideToRegister();
+  })();
+</script>
 {% endblock %}
