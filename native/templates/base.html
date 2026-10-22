@@ -176,21 +176,122 @@
             padding: 0 1.5rem;
         }
 
-        .alert {
-            padding: 0.85rem 1.15rem;
-            margin-bottom: 1.25rem;
-            border-radius: 6px;
-            font-size: 0.875rem;
+        /* Modern Floating Toast Notification System */
+        .messages-toast-container {
+            position: fixed;
+            top: 4.85rem;
+            right: 1.75rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            max-width: 440px;
+            pointer-events: none;
+        }
+
+        .alert-toast {
+            pointer-events: auto;
+            background: #FFFFFF;
+            border-radius: 8px;
+            padding: 0.8rem 1.05rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            gap: 0.85rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+            border: 1px solid #D8D4D0;
+            border-left: 4px solid #0D0D0C;
+            animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
 
-        .alert-success { background-color: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
-        .alert-error, .alert-danger { background-color: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); }
-        .alert-warning { background-color: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
-        .alert-info { background-color: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
+        .alert-toast.alert-success {
+            border-left-color: #059669;
+        }
+
+        .alert-toast.alert-error, .alert-toast.alert-danger {
+            border-left-color: #DC2626;
+        }
+
+        .alert-toast.alert-warning {
+            border-left-color: #D97706;
+        }
+
+        .alert-toast.alert-info {
+            border-left-color: #2563EB;
+        }
+
+        .toast-body {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.84rem;
+            color: #0D0D0C;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .toast-indicator {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: #0D0D0C;
+        }
+        .alert-success .toast-indicator { background: #059669; }
+        .alert-error .toast-indicator, .alert-danger .toast-indicator { background: #DC2626; }
+        .alert-warning .toast-indicator { background: #D97706; }
+        .alert-info .toast-indicator { background: #2563EB; }
+
+        .toast-tag {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            background: #F4F1EE;
+            color: #5C5956;
+            flex-shrink: 0;
+        }
+
+        .toast-text {
+            color: #1A1918;
+            word-break: break-word;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #9D9996;
+            font-size: 1.15rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            transition: color 0.15s, background-color 0.15s;
+        }
+
+        .toast-close:hover {
+            color: #0D0D0C;
+            background: #F4F1EE;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-hiding {
+            opacity: 0 !important;
+            transform: translateY(-8px) scale(0.96) !important;
+        }
 
         /* Shared Badge Styles */
         .badge {
@@ -294,9 +395,18 @@
     <main class="{% block main_class %}container{% endblock %}">
         {% block messages %}
         {% if messages %}
-            <div class="messages">
+            <div class="messages-toast-container" id="systemMessages">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    <div class="alert alert-toast alert-{{ message.tags }}" role="alert">
+                        <div class="toast-body">
+                            <span class="toast-indicator"></span>
+                            <span class="toast-tag">
+                                {% if message.tags == 'success' %}SUCCESS{% elif message.tags == 'error' or message.tags == 'danger' %}ERROR{% elif message.tags == 'warning' %}WARNING{% else %}INFO{% endif %}
+                            </span>
+                            <span class="toast-text">{{ message }}</span>
+                        </div>
+                        <button type="button" class="toast-close" onclick="dismissToast(this.closest('.alert-toast'))" aria-label="Dismiss">&times;</button>
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}
@@ -313,9 +423,28 @@
     {% endblock footer %}
     
     <script>
-        // Main Javascript file
+        function dismissToast(toastEl) {
+            if (!toastEl) return;
+            toastEl.classList.add('toast-hiding');
+            setTimeout(function() {
+                toastEl.remove();
+                var container = document.getElementById('systemMessages');
+                if (container && container.children.length === 0) {
+                    container.remove();
+                }
+            }, 260);
+        }
+
+        // Auto-dismiss toasts after 4.2 seconds
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("AI-Native SDLC Prototype initialized.");
+            var toasts = document.querySelectorAll('.alert-toast');
+            toasts.forEach(function(toast, index) {
+                if (toast.classList.contains('alert-success') || toast.classList.contains('alert-info')) {
+                    setTimeout(function() {
+                        dismissToast(toast);
+                    }, 4200 + (index * 400));
+                }
+            });
         });
         
         {% block extra_js %}{% endblock %}

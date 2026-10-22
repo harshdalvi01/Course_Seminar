@@ -160,7 +160,6 @@ def artifact_review_view(request, artifact_id):
                 messages.warning(request, 'Artifact rejected. Waiting for regeneration or manual edit.')
                 
             elif action == 'REGENERATE':
-                messages.info(request, 'AI is regenerating the artifact based on your feedback...')
                 hitl_service.regenerate_artifact(artifact, request.user, feedback)
                 messages.success(request, 'Artifact regenerated successfully.')
                 

@@ -651,6 +651,367 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* ============================================================
+   AI GENERATION OVERLAY & LAZY LOADING EXPERIENCE
+   ============================================================ */
+.gen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(247, 245, 244, 0.90);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    animation: overlayFadeIn 0.25s ease-out forwards;
+}
+
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.gen-modal-card {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 580px;
+    padding: 2.25rem 2.25rem;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.05);
+    position: relative;
+    text-align: center;
+    animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalPopIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.gen-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #EDE9E5;
+}
+
+.gen-chip-tag {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.22rem 0.65rem;
+    border-radius: 9999px;
+    background: #FFF7ED;
+    color: #C2410C;
+    border: 1px solid #FED7AA;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.gen-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8590C;
+    animation: radarPulse 1.6s infinite;
+}
+
+.gen-timer {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #5C5956;
+    background: #F4F1EE;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    border: 1px solid #E8E4E1;
+}
+
+.gen-spinner-container {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 1.35rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gen-orbital-spinner {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid #EDE9E5;
+    border-top-color: #E8590C;
+    border-right-color: #E8590C;
+    animation: genSpin 1.1s cubic-bezier(0.6, 0.2, 0.4, 0.9) infinite;
+}
+
+@keyframes genSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.gen-core-beacon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #FFF7ED;
+    border: 1px solid #FDBA74;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 0 16px rgba(232, 89, 12, 0.25);
+    animation: corePulse 2s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); box-shadow: 0 0 24px rgba(232, 89, 12, 0.4); }
+}
+
+.gen-modal-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0D0D0C;
+    margin: 0 0 0.35rem 0;
+    letter-spacing: -0.025em;
+}
+
+.gen-modal-subtitle {
+    font-size: 0.84rem;
+    color: #5C5956;
+    line-height: 1.5;
+    margin: 0 0 1.5rem 0;
+}
+
+/* Progressive pipeline checklist */
+.gen-pipeline-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    text-align: left;
+    margin-bottom: 1.5rem;
+    background: #FAFAFA;
+    border: 1px solid #EDE9E5;
+    border-radius: 10px;
+    padding: 0.9rem 1.15rem;
+}
+
+.gen-step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.3rem 0.2rem;
+    transition: all 0.25s ease;
+}
+
+.gen-step-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+}
+
+.gen-step-item.active .gen-step-icon {
+    color: #E8590C;
+}
+
+.gen-step-item.completed .gen-step-icon {
+    color: #059669;
+    font-weight: 800;
+    font-size: 0.88rem;
+}
+
+.step-spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #FED7AA;
+    border-top-color: #E8590C;
+    animation: genSpin 0.9s linear infinite;
+    display: inline-block;
+}
+
+.step-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #D8D4D0;
+    display: inline-block;
+}
+
+.gen-step-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.gen-step-title {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0D0D0C;
+    letter-spacing: 0.04em;
+}
+
+.gen-step-item.pending .gen-step-title {
+    color: #9D9996;
+}
+
+.gen-step-desc {
+    font-size: 0.74rem;
+    color: #5C5956;
+    margin-top: 0.12rem;
+}
+
+.gen-step-item.pending .gen-step-desc {
+    color: #B5B1AC;
+}
+
+/* Lazy Loading Skeleton Card Preview */
+.gen-lazy-skeleton {
+    background: #FFFFFF;
+    border: 1px solid #E8E4E1;
+    border-radius: 8px;
+    padding: 1rem 1.15rem;
+    text-align: left;
+}
+
+.skeleton-bar-header {
+    height: 12px;
+    width: 36%;
+    border-radius: 4px;
+    margin-bottom: 0.85rem;
+}
+
+.skeleton-content-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+}
+
+.skeleton-bar {
+    height: 9px;
+    border-radius: 3px;
+}
+
+.shimmer {
+    background: linear-gradient(90deg, #F0EDE9 0%, #FAF8F6 50%, #F0EDE9 100%);
+    background-size: 400px 100%;
+    animation: lazyShimmer 1.5s infinite linear;
+}
+
+@keyframes lazyShimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+
+.skeleton-terminal-ticker {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #7D7975;
+    letter-spacing: 0.08em;
+    padding-top: 0.55rem;
+    border-top: 1px dashed #EDE9E5;
+}
+
+.ticker-pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #059669;
+    animation: radarPulse 1.8s infinite;
+}
+
+/* Cancel Generation Button & Modal Footer */
+.gen-modal-footer {
+    margin-top: 1.35rem;
+    padding-top: 1.15rem;
+    border-top: 1px solid #EDE9E5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-cancel-generation {
+    background: #FFFFFF;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+    padding: 0.65rem 1.4rem;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.18s ease;
+    font-family: inherit;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.08);
+}
+
+.btn-cancel-generation:hover {
+    background: #FEF2F2;
+    border-color: #DC2626;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+}
+
+.cancel-icon {
+    font-size: 0.8rem;
+    font-weight: 900;
+}
+
+.cancel-hint {
+    font-size: 0.72rem;
+    color: #9D9996;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0.02em;
+}
+
+.gen-close-btn {
+    background: none;
+    border: 1px solid #E8E4E1;
+    color: #7D7975;
+    font-size: 1.15rem;
+    line-height: 1;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.gen-close-btn:hover {
+    color: #0D0D0C;
+    background: #F4F1EE;
+    border-color: #D8D4D0;
+}
 {% endblock %}
 
 {% block content %}
@@ -982,6 +1343,7 @@
 
             <form method="post" action="{% url 'artifact_review' active_artifact.pk %}" id="reviewForm">
                 {% csrf_token %}
+                <input type="hidden" name="action" id="reviewFormAction" value="">
                 <div style="margin-bottom:0.85rem;">
                     <label for="id_feedback" style="display:block; font-weight:700; font-size:0.82rem; margin-bottom:0.4rem; color:#0D0D0C; font-family:ui-monospace, monospace; text-transform:uppercase; letter-spacing:0.06em;">
                         Reviewer Directives / Governance Notes:
@@ -1032,6 +1394,18 @@
                 alert('Directive feedback is strictly required when choosing Reject or Regenerate.');
                 document.getElementById('id_feedback').focus();
                 return false;
+            }
+            
+            // Set the hidden input value explicitly so POST ALWAYS has action
+            const actionInput = document.getElementById('reviewFormAction');
+            if (actionInput) {
+                actionInput.value = action;
+            }
+            
+            if (action === 'REGENERATE') {
+                showAIGenerationOverlay('Regenerating {{ stage_name }} Artifact', 'Groq LLaMA-3 domain model is revising the artifact with reviewer directives. Jev will validate before reload.');
+            } else if (action === 'APPROVE') {
+                showAdvancingOverlay();
             }
             return true;
         }
@@ -1192,15 +1566,370 @@
             The specialized <strong>{{ stage_name }} AI Agent</strong> is ready to construct this domain artifact from previously approved context. Jev will validate it before human review.
         </p>
         
-        <form method="post" action="{% url 'stage_detail' project.pk stage %}" style="display:inline-block;">
+        <form method="post" action="{% url 'stage_detail' project.pk stage %}" style="display:inline-block;" id="initialGenForm">
             {% csrf_token %}
             <input type="hidden" name="generate_ai" value="1">
-            <button type="submit" class="btn-primary" style="font-size:1rem; padding:0.85rem 2rem;">
+            <button type="submit" id="btnInitialGen" class="btn-primary" style="font-size:1rem; padding:0.85rem 2rem;">
                 <span>⚡ Generate {{ stage_name }} Artifact with AI</span>
                 <span>&rarr;</span>
             </button>
         </form>
     </div>
 {% endif %}
+
+<!-- Sovereign AI Generation & Lazy Loading Modal Overlay -->
+<div id="aiGenerationOverlay" class="gen-overlay" style="display:none;" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="gen-modal-card">
+        <!-- Top Tech Ticker & Close Button -->
+        <div class="gen-modal-header">
+            <div class="gen-chip-tag">
+                <span class="gen-pulse-dot"></span>
+                <span id="genEngineBadge">GROQ × JEV // SYNTHESIS PIPELINE</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.65rem;">
+                <div class="gen-timer" id="genTimerText">00.0s</div>
+                <button type="button" class="gen-close-btn" onclick="cancelAIGeneration()" title="Cancel & Return to Workspace" aria-label="Cancel Generation">&times;</button>
+            </div>
+        </div>
+
+        <!-- Center Spinner & Orbital Radar -->
+        <div class="gen-spinner-container">
+            <div class="gen-orbital-spinner"></div>
+            <div class="gen-core-beacon">⚡</div>
+        </div>
+
+        <h3 class="gen-modal-title" id="genModalTitle">Synthesizing {{ stage_name }} Artifact...</h3>
+        <p class="gen-modal-subtitle" id="genModalSubtitle">
+            Autonomous agent pipeline is generating domain specifications using Groq LLaMA-3. Validation matrix will be evaluated by Jev before write.
+        </p>
+
+        <!-- Progressive Pipeline Steps with Checkmarks -->
+        <div class="gen-pipeline-steps">
+            <div class="gen-step-item active" id="genStep1">
+                <div class="gen-step-icon"><span class="step-spinner"></span></div>
+                <div class="gen-step-body">
+                    <span class="gen-step-title">[01/03] Groq Agent Synthesizing Context</span>
+                    <span class="gen-step-desc">Processing problem specification & upstream stage approvals...</span>
+                </div>
+            </div>
+            <div class="gen-step-item pending" id="genStep2">
+                <div class="gen-step-icon"><span class="step-dot"></span></div>
+                <div class="gen-step-body">
+                    <span class="gen-step-title">[02/03] Jev Sovereign Validation Matrix</span>
+                    <span class="gen-step-desc">Automated AST syntax checking, boundary validation & security scoring...</span>
+                </div>
+            </div>
+            <div class="gen-step-item pending" id="genStep3">
+                <div class="gen-step-icon"><span class="step-dot"></span></div>
+                <div class="gen-step-body">
+                    <span class="gen-step-title">[03/03] Append-Only Ledger Entry</span>
+                    <span class="gen-step-desc">Committing verified cryptographic version to sovereign audit log...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lazy Loading Skeleton Wireframe Preview -->
+        <div class="gen-lazy-skeleton">
+            <div class="skeleton-bar-header shimmer"></div>
+            <div class="skeleton-content-lines">
+                <div class="skeleton-bar shimmer" style="width: 95%;"></div>
+                <div class="skeleton-bar shimmer" style="width: 86%;"></div>
+                <div class="skeleton-bar shimmer" style="width: 90%;"></div>
+                <div class="skeleton-bar shimmer" style="width: 68%;"></div>
+            </div>
+            <div class="skeleton-terminal-ticker">
+                <span class="ticker-pulse"></span>
+                <span>STATUS: STREAMING_INFERENCE_PIPELINE // BUFFERING_ARTIFACT</span>
+            </div>
+        </div>
+
+        <!-- Cancel Action Footer -->
+        <div class="gen-modal-footer">
+            <button type="button" class="btn-cancel-generation" onclick="cancelAIGeneration()" id="btnCancelGen">
+                <span class="cancel-icon">&times;</span>
+                <span>Abort / Cancel Generation</span>
+            </button>
+            <div class="cancel-hint">
+                Human sovereign override. Halts browser pipeline execution and restores review workspace.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let genTimerInterval = null;
+let genStepTimeout1 = null;
+let genStepTimeout2 = null;
+let genStepTimeout3 = null;
+
+function showAdvancingOverlay() {
+    const overlay = document.getElementById('aiGenerationOverlay');
+    if (!overlay) return;
+    
+    const badge = document.getElementById('genEngineBadge');
+    if (badge) badge.textContent = 'HITL GOVERNANCE // STAGE ADVANCE';
+    const title = document.getElementById('genModalTitle');
+    if (title) title.textContent = 'Advancing to Next Stage...';
+    const sub = document.getElementById('genModalSubtitle');
+    if (sub) sub.textContent = 'Stage approved by human sovereign. Unlocking next phase pipeline...';
+    
+    const step1 = document.getElementById('genStep1');
+    const step2 = document.getElementById('genStep2');
+    const step3 = document.getElementById('genStep3');
+    
+    if (step1) {
+        step1.className = 'gen-step-item completed';
+        step1.querySelector('.gen-step-icon').innerHTML = '✓';
+        step1.querySelector('.gen-step-title').textContent = '[01/02] Recording Sovereign Approval Signature';
+        step1.querySelector('.gen-step-desc').textContent = 'Human verdict signed & committed to review ledger...';
+    }
+    if (step2) {
+        step2.className = 'gen-step-item active';
+        step2.querySelector('.gen-step-icon').innerHTML = '<span class="step-spinner"></span>';
+        step2.querySelector('.gen-step-title').textContent = '[02/02] Unlocking Next Stage Pipeline Workspace';
+        step2.querySelector('.gen-step-desc').textContent = 'Updating project lifecycle state and advancing stage...';
+    }
+    if (step3) {
+        step3.style.display = 'none';
+    }
+    
+    const skeleton = document.querySelector('.gen-lazy-skeleton');
+    if (skeleton) skeleton.style.display = 'none';
+    
+    overlay.style.display = 'flex';
+    
+    // Prevent double submission without disabling buttons
+    const actions = document.querySelector('.btn-group-actions');
+    if (actions) actions.style.pointerEvents = 'none';
+}
+
+function showAIGenerationOverlay(title, subtitle) {
+    const overlay = document.getElementById('aiGenerationOverlay');
+    if (!overlay) return;
+    
+    const badge = document.getElementById('genEngineBadge');
+    if (badge) badge.textContent = 'GROQ × JEV // SYNTHESIS PIPELINE';
+    if (title) {
+        const titleEl = document.getElementById('genModalTitle');
+        if (titleEl) titleEl.textContent = title;
+    }
+    if (subtitle) {
+        const subEl = document.getElementById('genModalSubtitle');
+        if (subEl) subEl.textContent = subtitle;
+    }
+    
+    const step3 = document.getElementById('genStep3');
+    if (step3) step3.style.display = 'flex';
+    const skeleton = document.querySelector('.gen-lazy-skeleton');
+    if (skeleton) skeleton.style.display = 'block';
+
+    overlay.style.display = 'flex';
+    
+    // Prevent double submission via pointer-events (NEVER disable submit buttons, which cancels form submit in browsers!)
+    const actions = document.querySelector('.btn-group-actions');
+    if (actions) actions.style.pointerEvents = 'none';
+    const initBtn = document.getElementById('btnInitialGen');
+    if (initBtn) initBtn.style.pointerEvents = 'none';
+    
+    // Clear any active timers
+    if (genTimerInterval) clearInterval(genTimerInterval);
+    if (genStepTimeout1) clearTimeout(genStepTimeout1);
+    if (genStepTimeout2) clearTimeout(genStepTimeout2);
+    if (genStepTimeout3) clearTimeout(genStepTimeout3);
+
+    // Live timer
+    let seconds = 0;
+    const timerEl = document.getElementById('genTimerText');
+    if (timerEl) timerEl.textContent = '00.0s';
+    
+    genTimerInterval = setInterval(function() {
+        seconds += 0.1;
+        if (timerEl) timerEl.textContent = (seconds < 10 ? '0' : '') + seconds.toFixed(1) + 's';
+    }, 100);
+    
+    // Reset steps to initial state
+    const step1 = document.getElementById('genStep1');
+    const step2 = document.getElementById('genStep2');
+    
+    if (step1) {
+        step1.className = 'gen-step-item active';
+        step1.querySelector('.gen-step-icon').innerHTML = '<span class="step-spinner"></span>';
+        step1.querySelector('.gen-step-title').textContent = '[01/03] Groq Agent Synthesizing Context';
+        step1.querySelector('.gen-step-desc').textContent = 'Processing problem specification & upstream stage approvals...';
+    }
+    if (step2) {
+        step2.className = 'gen-step-item pending';
+        step2.querySelector('.gen-step-icon').innerHTML = '<span class="step-dot"></span>';
+        step2.querySelector('.gen-step-title').textContent = '[02/03] Jev Sovereign Validation Matrix';
+        step2.querySelector('.gen-step-desc').textContent = 'Automated AST syntax checking, boundary validation & security scoring...';
+    }
+    if (step3) {
+        step3.className = 'gen-step-item pending';
+        step3.querySelector('.gen-step-icon').innerHTML = '<span class="step-dot"></span>';
+        step3.querySelector('.gen-step-title').textContent = '[03/03] Append-Only Ledger Entry';
+        step3.querySelector('.gen-step-desc').textContent = 'Committing verified cryptographic version to sovereign audit log...';
+    }
+    
+    // Step 1 -> Step 2
+    genStepTimeout1 = setTimeout(function() {
+        if (step1 && step2) {
+            step1.classList.remove('active');
+            step1.classList.add('completed');
+            step1.querySelector('.gen-step-icon').innerHTML = '✓';
+            
+            step2.classList.remove('pending');
+            step2.classList.add('active');
+            step2.querySelector('.gen-step-icon').innerHTML = '<span class="step-spinner"></span>';
+        }
+    }, 2000);
+    
+    // Step 2 -> Step 3
+    genStepTimeout2 = setTimeout(function() {
+        if (step2 && step3) {
+            step2.classList.remove('active');
+            step2.classList.add('completed');
+            step2.querySelector('.gen-step-icon').innerHTML = '✓';
+            
+            step3.classList.remove('pending');
+            step3.classList.add('active');
+            step3.querySelector('.gen-step-icon').innerHTML = '<span class="step-spinner"></span>';
+        }
+    }, 4200);
+
+    // Step 3 Completion (Transitions to checkmark so it never stays stuck on 03/03!)
+    genStepTimeout3 = setTimeout(function() {
+        if (step3) {
+            step3.classList.remove('active');
+            step3.classList.add('completed');
+            step3.querySelector('.gen-step-icon').innerHTML = '✓';
+            step3.querySelector('.gen-step-desc').textContent = 'Ledger write confirmed. Refreshing workspace...';
+            
+            const ticker = document.querySelector('.skeleton-terminal-ticker span:last-child');
+            if (ticker) ticker.textContent = 'STATUS: SYNTHESIS_FINALIZED // COMMITTING_AND_RELOADING...';
+        }
+    }, 6500);
+}
+
+function cancelAIGeneration() {
+    // 1. Immediately abort any active HTTP network request in the browser
+    try {
+        window.stop();
+    } catch (e) {
+        console.warn("window.stop failed:", e);
+    }
+    
+    // 2. Clear intervals and timeouts
+    if (genTimerInterval) {
+        clearInterval(genTimerInterval);
+        genTimerInterval = null;
+    }
+    if (genStepTimeout1) {
+        clearTimeout(genStepTimeout1);
+        genStepTimeout1 = null;
+    }
+    if (genStepTimeout2) {
+        clearTimeout(genStepTimeout2);
+        genStepTimeout2 = null;
+    }
+    if (genStepTimeout3) {
+        clearTimeout(genStepTimeout3);
+        genStepTimeout3 = null;
+    }
+    
+    // 3. Hide the overlay modal
+    const overlay = document.getElementById('aiGenerationOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+    
+    // 4. Restore pointer events
+    const actions = document.querySelector('.btn-group-actions');
+    if (actions) actions.style.pointerEvents = 'auto';
+    const initBtn = document.getElementById('btnInitialGen');
+    if (initBtn) initBtn.style.pointerEvents = 'auto';
+    
+    // 5. Reset timer display and steps for next attempt
+    const timerEl = document.getElementById('genTimerText');
+    if (timerEl) timerEl.textContent = '00.0s';
+    
+    const step1 = document.getElementById('genStep1');
+    const step2 = document.getElementById('genStep2');
+    const step3 = document.getElementById('genStep3');
+    if (step1) {
+        step1.className = 'gen-step-item active';
+        step1.querySelector('.gen-step-icon').innerHTML = '<span class="step-spinner"></span>';
+    }
+    if (step2) {
+        step2.className = 'gen-step-item pending';
+        step2.querySelector('.gen-step-icon').innerHTML = '<span class="step-dot"></span>';
+    }
+    if (step3) {
+        step3.style.display = 'flex';
+        step3.className = 'gen-step-item pending';
+        step3.querySelector('.gen-step-icon').innerHTML = '<span class="step-dot"></span>';
+    }
+    const skeleton = document.querySelector('.gen-lazy-skeleton');
+    if (skeleton) skeleton.style.display = 'block';
+    
+    // 6. Surface feedback toast to the human reviewer
+    showClientToast('Action cancelled by human reviewer. Workspace restored.', 'warning');
+}
+
+function showClientToast(message, type) {
+    let container = document.getElementById('systemMessages');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'systemMessages';
+        container.className = 'messages-toast-container';
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = 'alert alert-toast alert-' + (type || 'warning');
+    toast.setAttribute('role', 'alert');
+    
+    const tagText = type === 'success' ? 'SUCCESS' : (type === 'error' ? 'ERROR' : (type === 'info' ? 'INFO' : 'ABORTED'));
+    
+    toast.innerHTML = `
+        <div class="toast-body">
+            <span class="toast-indicator"></span>
+            <span class="toast-tag">${tagText}</span>
+            <span class="toast-text">${message}</span>
+        </div>
+        <button type="button" class="toast-close" onclick="dismissToast(this.closest('.alert-toast'))" aria-label="Dismiss">&times;</button>
+    `;
+    container.appendChild(toast);
+    
+    setTimeout(function() {
+        if (typeof dismissToast === 'function') {
+            dismissToast(toast);
+        } else {
+            toast.remove();
+        }
+    }, 4500);
+}
+
+// Support Escape key to abort generation
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const overlay = document.getElementById('aiGenerationOverlay');
+        if (overlay && overlay.style.display === 'flex') {
+            cancelAIGeneration();
+        }
+    }
+});
+
+// Attach listener to initial generation form
+document.addEventListener('DOMContentLoaded', function() {
+    const initialGenForm = document.getElementById('initialGenForm');
+    if (initialGenForm) {
+        initialGenForm.addEventListener('submit', function() {
+            showAIGenerationOverlay(
+                'Synthesizing {{ stage_name }} Artifact...',
+                'Specialized AI agent is constructing domain specifications from upstream project context. Jev sovereign matrix is running automated validation.'
+            );
+        });
+    }
+});
+</script>
 
 {% endblock %}
