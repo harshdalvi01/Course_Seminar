@@ -1012,6 +1012,537 @@
     background: #F4F1EE;
     border-color: #D8D4D0;
 }
+
+/* ============================================================
+   REQUIREMENTS STAGE STRUCTURED WORKSPACE THEME
+   ============================================================ */
+.req-workspace-container {
+    display: flex;
+    border: 1px solid #D8D4D0;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 640px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    background: #FFFFFF;
+}
+
+/* Left Sidebar - Requirements Index */
+.req-sidebar {
+    width: 290px;
+    background: #F7F5F4;
+    border-right: 1px solid #D8D4D0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.req-sidebar-header {
+    padding: 0.8rem 1.15rem;
+    background: #EDE9E5;
+    font-weight: 700;
+    font-size: 0.72rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5C5956;
+    border-bottom: 1px solid #D8D4D0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.req-sidebar-badge {
+    font-size: 0.65rem;
+    background: #0D0D0C;
+    color: #FFFFFF;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+}
+
+.req-sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.req-sidebar-item {
+    padding: 0.72rem 1.1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #E8E4E1;
+    font-size: 0.82rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #4D4945;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.req-sidebar-item:hover {
+    background: #EFECE9;
+    color: #0D0D0C;
+}
+
+.req-sidebar-item.active {
+    background: #FFFFFF;
+    color: #0D0D0C;
+    font-weight: 700;
+    border-left: 3px solid #E8590C;
+}
+
+.req-item-icon {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.req-item-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.req-table-pill {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 800;
+    background: #FFF7ED;
+    color: #C2410C;
+    border: 1px solid #FED7AA;
+    border-radius: 4px;
+    padding: 1px 5px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.req-full-pill {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 800;
+    background: #F4F1EE;
+    color: #0D0D0C;
+    border: 1px solid #D8D4D0;
+    border-radius: 4px;
+    padding: 1px 5px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.req-sidebar-footer {
+    padding: 0.65rem 1rem;
+    background: #EDE9E5;
+    border-top: 1px solid #D8D4D0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    color: #5C5956;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.req-indicator-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #059669;
+}
+
+/* Right Content Area */
+.req-content-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    min-width: 0;
+}
+
+.req-header-bar {
+    padding: 0.8rem 1.4rem;
+    background: #FAFAF9;
+    border-bottom: 1px solid #E8E4E1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.req-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.req-header-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.req-header-title {
+    margin: 0;
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: #0D0D0C;
+    letter-spacing: -0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.req-header-meta {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.7rem;
+    color: #7D7975;
+    letter-spacing: 0.06em;
+    margin-top: 0.15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.req-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.req-view-toggle-btn {
+    background: #F4F1EE;
+    border: 1px solid #D8D4D0;
+    color: #5C5956;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.req-view-toggle-btn:hover {
+    color: #0D0D0C;
+    border-color: #0D0D0C;
+}
+
+.req-view-toggle-btn.active {
+    background: #0D0D0C;
+    color: #FFFFFF;
+    border-color: #0D0D0C;
+}
+
+/* Scrollable Content Body */
+.req-content-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 1.75rem;
+    background: #FFFFFF;
+    line-height: 1.6;
+}
+
+.req-raw-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem;
+    background: #0D0D0C;
+}
+
+.req-raw-pre {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #E8E4E1;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Section Cards */
+.req-section-card {
+    margin-bottom: 2rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px dashed #E0DBD5;
+}
+
+.req-section-card:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.req-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.85rem;
+}
+
+.req-section-header-icon {
+    font-size: 1.15rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #FFF7ED;
+    border: 1px solid #FED7AA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.req-section-heading {
+    margin: 0;
+    font-size: 1.18rem;
+    font-weight: 800;
+    color: #0D0D0C;
+    letter-spacing: -0.02em;
+    flex: 1;
+}
+
+.req-section-tag {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #5C5956;
+    background: #F4F1EE;
+    border: 1px solid #D8D4D0;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+}
+
+.req-section-summary {
+    font-size: 0.82rem;
+    color: #7D7975;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid #F0EDE9;
+}
+
+/* ============================================================
+   STRUCTURED TABLE STYLES
+   ============================================================ */
+.req-table-wrapper {
+    margin: 1.15rem 0 1.5rem 0;
+    border: 1px solid #D8D4D0;
+    border-radius: 8px;
+    overflow-x: auto;
+    background: #FFFFFF;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.req-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    text-align: left;
+}
+
+.req-table thead th {
+    background: #F4F1EE;
+    color: #5C5956;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.8rem 1rem;
+    border-bottom: 2px solid #D8D4D0;
+    white-space: nowrap;
+}
+
+.req-table tbody td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #EDE9E5;
+    color: #1A1918;
+    vertical-align: top;
+}
+
+.req-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.req-table tbody tr:hover {
+    background-color: #FAF8F6;
+}
+
+/* Priority Badges */
+.req-priority {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.req-priority-high {
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+}
+
+.req-priority-medium {
+    background: #FFFBEB;
+    color: #D97706;
+    border: 1px solid #FDE68A;
+}
+
+.req-priority-low {
+    background: #F0FDF4;
+    color: #059669;
+    border: 1px solid #A7F3D0;
+}
+
+/* ID & Category Pills */
+.req-id-pill {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #F4F1EE;
+    color: #0D0D0C;
+    border: 1px solid #D8D4D0;
+    border-radius: 4px;
+    padding: 0.15rem 0.45rem;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.req-cat-pill {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #0D0D0C;
+}
+
+/* Key-Value Metadata Cards */
+.req-kv-card {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    margin-bottom: 0.65rem;
+    padding: 0.65rem 0.95rem;
+    background: #FAFAF9;
+    border: 1px solid #EDE9E5;
+    border-radius: 6px;
+    font-size: 0.88rem;
+}
+
+.req-kv-label {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #5C5956;
+    flex-shrink: 0;
+}
+
+.req-kv-value {
+    color: #0D0D0C;
+    line-height: 1.5;
+}
+
+.req-block-heading {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5C5956;
+    margin: 1.25rem 0 0.5rem 0;
+}
+
+/* Lists */
+.req-list {
+    margin: 0.75rem 0 1.25rem 0;
+    padding-left: 1.5rem;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: #2D2B29;
+}
+
+.req-list li {
+    margin-bottom: 0.45rem;
+}
+
+.req-list li strong {
+    color: #0D0D0C;
+}
+
+/* Dividers & Blockquotes */
+.req-divider {
+    border: none;
+    border-top: 1px solid #EDE9E5;
+    margin: 1.75rem 0;
+}
+
+.req-blockquote {
+    margin: 1rem 0;
+    padding: 0.75rem 1.15rem;
+    border-left: 3px solid #E8590C;
+    background: #FFF7ED;
+    border-radius: 0 6px 6px 0;
+    color: #9A3412;
+    font-size: 0.86rem;
+    line-height: 1.55;
+}
+
+.req-p {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: #2D2B29;
+    margin: 0.75rem 0;
+}
+
+.req-subheading {
+    margin: 1.25rem 0 0.5rem 0;
+    font-weight: 800;
+    color: #0D0D0C;
+    letter-spacing: -0.015em;
+}
+
+.req-h2 { font-size: 1.1rem; }
+.req-h3 { font-size: 0.98rem; }
+.req-h4 { font-size: 0.88rem; }
+
+.req-inline-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.82rem;
+    background: #F4F1EE;
+    color: #C2410C;
+    border: 1px solid #E8E4E1;
+    border-radius: 3px;
+    padding: 0.1rem 0.35rem;
+}
+
+@media (max-width: 900px) {
+    .req-workspace-container {
+        flex-direction: column;
+        height: auto;
+    }
+    .req-sidebar {
+        width: 100%;
+        max-height: 220px;
+        border-right: none;
+        border-bottom: 1px solid #D8D4D0;
+    }
+    .req-header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.65rem;
+    }
+}
 {% endblock %}
 
 {% block content %}
@@ -1155,7 +1686,7 @@
         <!-- AI Output Display Area -->
         <div class="artifact-viewer-container">
             <div class="artifact-actions-bar">
-                <span>FORMAT // {% if code_files %}MULTI-FILE REPOSITORY SPECIFICATION{% else %}STRUCTURED DOMAIN SPECIFICATION{% endif %}</span>
+                <span>FORMAT // {% if code_files %}MULTI-FILE REPOSITORY SPECIFICATION{% elif requirements_data %}STRUCTURED REQUIREMENTS SPECIFICATION{% else %}STRUCTURED DOMAIN SPECIFICATION{% endif %}</span>
                 <button type="button" class="copy-btn" onclick="copyArtifactContent()">Copy Artifact Text</button>
             </div>
 
@@ -1220,6 +1751,180 @@
                     if (filePaths[index]) {
                         document.getElementById('activeFilePath').textContent = filePaths[index];
                         document.getElementById('activeFilePurpose').textContent = filePurposes[index];
+                    }
+                }
+                </script>
+            {% elif requirements_data %}
+                <!-- Split-Pane Requirements Specification Viewer for REQUIREMENTS Stage -->
+                <div class="req-workspace-container">
+                    <!-- Sidebar Explorer: Sections & Document Index -->
+                    <div class="req-sidebar">
+                        <div class="req-sidebar-header">
+                            <span>SPEC INDEX ({{ requirements_data.sections|length }})</span>
+                            <span class="req-sidebar-badge">PRD SPEC</span>
+                        </div>
+                        <ul class="req-sidebar-list">
+                            <!-- All Sections Option -->
+                            <li class="req-sidebar-item active" id="req-nav-all" onclick="showReqSection('all')">
+                                <span class="req-item-icon">📑</span>
+                                <span class="req-item-label">All Sections (Full Document)</span>
+                                <span class="req-full-pill">FULL</span>
+                            </li>
+                            {% for sec in requirements_data.sections %}
+                                <li class="req-sidebar-item" id="req-nav-{{ forloop.counter0 }}" onclick="showReqSection({{ forloop.counter0 }})">
+                                    <span class="req-item-icon">{{ sec.icon }}</span>
+                                    <span class="req-item-label">{{ sec.full_title }}</span>
+                                    {% if sec.has_table %}
+                                        <span class="req-table-pill" title="Contains structured table">TABLE</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="req-sidebar-footer">
+                            <span class="req-indicator-dot"></span>
+                            <span>HITL AUDITED SPECIFICATION</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Content Pane -->
+                    <div class="req-content-pane">
+                        <!-- Header Bar -->
+                        <div class="req-header-bar">
+                            <div class="req-header-left">
+                                <span class="req-header-icon" id="reqActiveIcon">📑</span>
+                                <div>
+                                    <h4 class="req-header-title" id="reqActiveTitle">Comprehensive Software Requirements Specification</h4>
+                                    <span class="req-header-meta" id="reqActiveMeta">PRD // {{ requirements_data.sections|length }} SECTIONS // CONTINUOUS SPECIFICATION VIEW</span>
+                                </div>
+                            </div>
+                            <div class="req-header-actions">
+                                <button type="button" class="req-view-toggle-btn active" id="btnRichView" onclick="setReqViewMode('rich')">Structured View</button>
+                                <button type="button" class="req-view-toggle-btn" id="btnRawView" onclick="setReqViewMode('raw')">Raw Markdown</button>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Content Body -->
+                        <div class="req-content-body" id="reqRichBody">
+                            <!-- Full Document Pane (Default active) -->
+                            <div id="req-pane-all" class="req-section-pane" style="display:block;">
+                                {% for sec in requirements_data.sections %}
+                                    <div class="req-section-card" id="full-sec-{{ forloop.counter0 }}">
+                                        <div class="req-section-header">
+                                            <span class="req-section-header-icon">{{ sec.icon }}</span>
+                                            <h3 class="req-section-heading">{{ sec.full_title }}</h3>
+                                            <span class="req-section-tag">{{ sec.tag }}</span>
+                                        </div>
+                                        {% if sec.summary %}
+                                            <div class="req-section-summary">{{ sec.summary }}</div>
+                                        {% endif %}
+                                        <div class="req-section-content">
+                                            {{ sec.html_content|safe }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Individual Section Panes -->
+                            {% for sec in requirements_data.sections %}
+                                <div id="req-pane-{{ forloop.counter0 }}" class="req-section-pane" style="display:none;">
+                                    <div class="req-section-card" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                                        <div class="req-section-header">
+                                            <span class="req-section-header-icon">{{ sec.icon }}</span>
+                                            <h3 class="req-section-heading">{{ sec.full_title }}</h3>
+                                            <span class="req-section-tag">{{ sec.tag }}</span>
+                                        </div>
+                                        {% if sec.summary %}
+                                            <div class="req-section-summary">{{ sec.summary }}</div>
+                                        {% endif %}
+                                        <div class="req-section-content">
+                                            {{ sec.html_content|safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Raw Markdown Mode -->
+                        <div class="req-raw-body" id="reqRawBody" style="display:none;">
+                            <pre class="req-raw-pre"><code>{{ active_artifact.content }}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden element for clipboard copyArtifactContent -->
+                <div id="artifactTextContent" style="display:none;">{{ active_artifact.content }}</div>
+
+                <script>
+                function showReqSection(index) {
+                    const navItems = document.querySelectorAll('.req-sidebar-item');
+                    navItems.forEach(function(it) {
+                        it.classList.remove('active');
+                    });
+
+                    const panes = document.querySelectorAll('.req-section-pane');
+                    panes.forEach(function(p) {
+                        p.style.display = 'none';
+                    });
+
+                    const richBody = document.getElementById('reqRichBody');
+                    const rawBody = document.getElementById('reqRawBody');
+                    if (rawBody && rawBody.style.display !== 'none') {
+                        setReqViewMode('rich');
+                    }
+
+                    if (index === 'all') {
+                        const allNav = document.getElementById('req-nav-all');
+                        if (allNav) allNav.classList.add('active');
+                        const allPane = document.getElementById('req-pane-all');
+                        if (allPane) allPane.style.display = 'block';
+
+                        const titleEl = document.getElementById('reqActiveTitle');
+                        if (titleEl) titleEl.textContent = 'Comprehensive Software Requirements Specification';
+                        const metaEl = document.getElementById('reqActiveMeta');
+                        if (metaEl) metaEl.textContent = 'PRD // {{ requirements_data.sections|length }} SECTIONS // CONTINUOUS SPECIFICATION VIEW';
+                        const iconEl = document.getElementById('reqActiveIcon');
+                        if (iconEl) iconEl.textContent = '📑';
+                    } else {
+                        const targetNav = document.getElementById('req-nav-' + index);
+                        if (targetNav) targetNav.classList.add('active');
+                        const targetPane = document.getElementById('req-pane-' + index);
+                        if (targetPane) targetPane.style.display = 'block';
+
+                        const secTitles = [{% for sec in requirements_data.sections %}"{{ sec.full_title|escapejs }}",{% endfor %}];
+                        const secTags = [{% for sec in requirements_data.sections %}"{{ sec.tag|escapejs }}",{% endfor %}];
+                        const secIcons = [{% for sec in requirements_data.sections %}"{{ sec.icon|escapejs }}",{% endfor %}];
+                        const secHasTables = [{% for sec in requirements_data.sections %}{{ sec.has_table|yesno:"true,false" }},{% endfor %}];
+
+                        if (secTitles[index]) {
+                            const titleEl = document.getElementById('reqActiveTitle');
+                            if (titleEl) titleEl.textContent = secTitles[index];
+                            const metaEl = document.getElementById('reqActiveMeta');
+                            const tblNote = secHasTables[index] ? 'STRUCTURED TABLE VIEW' : 'SPECIFICATION MODULE';
+                            if (metaEl) metaEl.textContent = (secIcons[index] || '📄') + ' ' + (secTags[index] || 'SPEC') + ' // ' + tblNote + ' // HITL AUDITED';
+                            const iconEl = document.getElementById('reqActiveIcon');
+                            if (iconEl) iconEl.textContent = secIcons[index] || '📄';
+                        }
+                    }
+
+                    if (richBody) richBody.scrollTop = 0;
+                }
+
+                function setReqViewMode(mode) {
+                    const richBody = document.getElementById('reqRichBody');
+                    const rawBody = document.getElementById('reqRawBody');
+                    const btnRich = document.getElementById('btnRichView');
+                    const btnRaw = document.getElementById('btnRawView');
+
+                    if (mode === 'raw') {
+                        if (richBody) richBody.style.display = 'none';
+                        if (rawBody) rawBody.style.display = 'block';
+                        if (btnRich) btnRich.classList.remove('active');
+                        if (btnRaw) btnRaw.classList.add('active');
+                    } else {
+                        if (rawBody) rawBody.style.display = 'none';
+                        if (richBody) richBody.style.display = 'block';
+                        if (btnRaw) btnRaw.classList.remove('active');
+                        if (btnRich) btnRich.classList.add('active');
                     }
                 }
                 </script>

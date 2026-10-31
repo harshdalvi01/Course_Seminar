@@ -88,6 +88,11 @@ def stage_detail_view(request, project_id, stage):
         from .utils import parse_code_files
         code_files = parse_code_files(active_artifact.content)
         
+    requirements_data = None
+    if stage == 'REQUIREMENTS' and active_artifact:
+        from .utils import parse_requirements_doc
+        requirements_data = parse_requirements_doc(active_artifact.content)
+        
     completion_summary = None
     if project.status == 'COMPLETED' or (stage == 'DEPLOYMENT' and latest_artifact and latest_artifact.is_approved):
         summary_artifacts = []
@@ -113,6 +118,7 @@ def stage_detail_view(request, project_id, stage):
         'is_historical': is_historical,
         'review_form': review_form,
         'code_files': code_files,
+        'requirements_data': requirements_data,
         'completion_summary': completion_summary,
         'pipeline_info': pipeline_info,
         'next_stage': next_stage,
