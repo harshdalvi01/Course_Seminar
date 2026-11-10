@@ -1,0 +1,61 @@
+<!-- ============================================================
+     SYSTEM DESIGN DIAGRAMS WORKSPACE COMPONENT
+     Autonomous Multi-Diagram Visualization & Governance
+     ============================================================ -->
+<div class="system-diagrams-section" id="systemDesignDiagramsSection">
+    <!-- Header Banner -->
+    <div class="diagrams-section-header">
+        <div class="diagrams-header-title-box">
+            <div class="diagrams-header-badge">
+                <span class="gen-pulse-dot" style="background:#0284C7;"></span>
+                <span>SYSTEM DESIGN DIAGRAMS // MERMAID.JS</span>
+            </div>
+            <h3 class="diagrams-main-title">System Design Diagrams</h3>
+            <p class="diagrams-main-subtitle">
+                Dynamic visual architectural representations synthesized from approved requirements. 
+                Essential structural diagrams are mandatory; recommended diagrams are conditionally rendered without inventing unstated requirements.
+            </p>
+        </div>
+        <div class="diagrams-summary-pills">
+            <span class="d-summary-pill essential-pill">3 Essential</span>
+            <span class="d-summary-pill recommended-pill">2 Recommended</span>
+            <span class="d-summary-pill audit-pill">HITL Audited</span>
+        </div>
+    </div>
+
+    <!-- 1. ESSENTIAL DIAGRAMS (Mandatory: System Architecture, Use Case, ERD) -->
+    <div class="diagram-tier-container">
+        <div class="diagram-tier-header">
+            <div class="tier-indicator essential-tier-indicator"></div>
+            <div>
+                <h4 class="diagram-tier-title">Essential Architecture Diagrams</h4>
+                <span class="diagram-tier-subtitle">Core topological, actor-interaction, and data persistence foundations (Mandatory)</span>
+            </div>
+            <span class="tier-count-badge">3 / 3 Essential</span>
+        </div>
+
+        <div class="diagrams-grid diagrams-grid-essential">
+            {% for diag in design_data.essential_diagrams %}
+                {% include "workflow/components/diagram_card_item.html" with diag=diag %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 2. RECOMMENDED DIAGRAMS (Conditional: Class Diagram, Sequence Diagram) -->
+    <div class="diagram-tier-container" style="margin-top: 2rem;">
+        <div class="diagram-tier-header">
+            <div class="tier-indicator recommended-tier-indicator"></div>
+            <div>
+                <h4 class="diagram-tier-title">Recommended Specification Diagrams</h4>
+                <span class="diagram-tier-subtitle">Detailed domain models and chronological request execution flows (Generated when requirements provide sufficient detail)</span>
+            </div>
+            <span class="tier-count-badge" style="background:#F0FDF4; color:#166534; border-color:#BBF7D0;">2 Recommended</span>
+        </div>
+
+        <div class="diagrams-grid diagrams-grid-recommended">
+            {% for diag in design_data.recommended_diagrams %}
+                {% include "workflow/components/diagram_card_item.html" with diag=diag %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

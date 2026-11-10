@@ -342,3 +342,198 @@ class HITLServiceTests(TestCase):
         res_completed = self.client.get(reverse('stage_detail', kwargs={'project_id': self.project.pk, 'stage': 'COMPLETED'}))
         self.assertRedirects(res_completed, reverse('project_detail', kwargs={'pk': self.project.pk}))
 
+
+class DesignDiagramTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='diagram_tester', password='password123')
+        self.project = Project.objects.create(
+            owner=self.user,
+            name='Design Diagram System',
+            description='Test App for Diagrams',
+            current_stage='DESIGN'
+        )
+        self.req_artifact = Artifact.objects.create(
+            project=self.project,
+            stage='REQUIREMENTS',
+            version=1,
+            content='Approved requirements content for design testing.',
+            created_by=self.user,
+            is_approved=True
+        )
+        self.sample_design_markdown = """# System Design Specification
+
+## 1. System Architecture
+Client-server architecture on Django.
+
+## 2. Database Design
+Relational entities.
+
+# System Design Diagrams
+
+### 1. System Architecture Diagram (Essential)
+**Type:** System Architecture Diagram (Essential)
+**Status:** Generated
+**Description:** High-level component topology illustrating browser client, backend services, and database.
+```mermaid
+flowchart TD
+    Client[Browser Client] --> Backend[Django Server]
+    Backend --> DB[(Database)]
+```
+**Key Observations:** Clean separation of concerns.
+
+### 2. Use Case Diagram (Essential)
+**Type:** Use Case Diagram (Essential)
+**Status:** Generated
+**Description:** Visual actor-to-functionality representation.
+```mermaid
+flowchart LR
+    User([End User]) --> Action[Perform Task]
+```
+
+### 3. Entity Relationship Diagram (ERD) (Essential)
+**Type:** Entity Relationship Diagram (ERD) (Essential)
+**Status:** Generated
+**Description:** Relational schema.
+```mermaid
+erDiagram
+    USER ||--o{ TASK : manages
+```
+
+### 4. Class Diagram (Recommended)
+**Type:** Class Diagram (Recommended)
+**Status:** Not Generated
+**Description:** Not generated: The approved requirements do not specify sufficient information to model a class diagram without inventing unauthorized information.
+
+### 5. Sequence Diagram (Recommended)
+**Type:** Sequence Diagram (Recommended)
+**Status:** Generated
+**Description:** Chronological request flow.
+```mermaid
+sequenceDiagram
+    User->>Server: Request Data
+    Server-->>User: Response
+```
+"""
+        self.design_artifact = Artifact.objects.create(
+            project=self.project,
+            stage='DESIGN',
+            version=1,
+            content=self.sample_design_markdown,
+            created_by=self.user,
+            is_approved=False
+        )
+
+    def test_extract_and_validate_all_five_diagrams(self):
+        from workflow.utils import extract_design_diagrams, parse_design_doc
+        parsed = parse_design_doc(self.sample_design_markdown)
+        self.assertIsNotNone(parsed)
+        self.assertEqual(len(parsed['diagrams']), 5)
+        
+        # Verify 3 essential appear first
+        essential = parsed['essential_diagrams']
+        self.assertEqual(len(essential), 3)
+        self.assertEqual(essential[0]['type'], 'system_architecture')
+        self.assertEqual(essential[1]['type'], 'use_case')
+        self.assertEqual(essential[2]['type'], 'erd')
+        
+        for d in essential:
+            self.assertEqual(d['status'], 'generated')
+            self.assertTrue(d['is_valid_syntax'])
+
+        # Verify 2 recommended appear below
+        recommended = parsed['recommended_diagrams']
+        self.assertEqual(len(recommended), 2)
+        self.assertEqual(recommended[0]['type'], 'class_diagram')
+        self.assertEqual(recommended[1]['type'], 'sequence_diagram')
+        
+        # Class diagram should be not_generated with clear explanation
+        self.assertEqual(recommended[0]['status'], 'not_generated')
+        self.assertIn("not specify sufficient information", recommended[0]['description'])
+        
+        # Sequence diagram is generated
+        self.assertEqual(recommended[1]['status'], 'generated')
+        self.assertTrue(recommended[1]['is_valid_syntax'])
+
+    @patch('ai_services.agents.groq_service.generate')
+    @patch('ai_services.agents.jev_service.validate_artifact')
+    def test_single_diagram_regeneration_creates_v_plus_1(self, mock_validate, mock_generate):
+        mock_generate.return_value = """### Class Diagram (Recommended)
+**Type:** Class Diagram (Recommended)
+**Status:** Generated
+**Description:** Regenerated class diagram based on reviewer directives.
+```mermaid
+classDiagram
+    class User {
+        +int id
+    }
+```
+**Key Observations:** Now includes user domain model.
+"""
+        mock_validate.return_value = {
+            'valid': True,
+            'confidence': 0.95,
+            'issues': [],
+            'warnings': [],
+            'requires_human_review': True
+        }
+
+        new_art = hitl_service.regenerate_diagram(
+            artifact=self.design_artifact,
+            diagram_type='class_diagram',
+            requester=self.user,
+            feedback='Please model the User domain class.'
+        )
+
+        self.assertEqual(new_art.version, 2)
+        self.assertEqual(new_art.stage, 'DESIGN')
+        self.assertFalse(new_art.is_approved)
+        
+        # Verify review audit log
+        reviews = Review.objects.filter(artifact=self.design_artifact)
+        self.assertEqual(reviews.count(), 1)
+        self.assertEqual(reviews.first().action, 'REGENERATE')
+        self.assertIn('Class Diagram', reviews.first().feedback)
+
+        # Verify the new artifact contains the regenerated class diagram
+        self.assertIn("classDiagram", new_art.content)
+        self.assertIn("class User", new_art.content)
+        
+        # And verify that all original sections were preserved
+        self.assertIn("System Architecture", new_art.content)
+        self.assertIn("Entity Relationship Diagram", new_art.content)
+
+    @patch('ai_services.agents.groq_service.generate')
+    @patch('ai_services.agents.jev_service.validate_artifact')
+    def test_regenerate_diagram_view_endpoint(self, mock_validate, mock_generate):
+        mock_generate.return_value = """### Use Case Diagram (Essential)
+**Type:** Use Case Diagram (Essential)
+**Status:** Generated
+**Description:** Updated use case diagram.
+```mermaid
+flowchart LR
+    Admin([Admin]) --> Manage[Manage System]
+```
+"""
+        mock_validate.return_value = {
+            'valid': True,
+            'confidence': 0.92,
+            'issues': [],
+            'warnings': [],
+            'requires_human_review': True
+        }
+
+        self.client.force_login(self.user)
+        url = reverse('regenerate_diagram', kwargs={
+            'artifact_id': self.design_artifact.pk,
+            'diagram_type': 'use_case'
+        })
+        response = self.client.post(url, {'feedback': 'Add Admin use cases'})
+        
+        # Should redirect back to stage_detail
+        self.assertRedirects(response, reverse('stage_detail', kwargs={
+            'project_id': self.project.pk,
+            'stage': 'DESIGN'
+        }))
+        
+        # Check that artifact version 2 was created
+        self.assertEqual(Artifact.objects.filter(project=self.project, stage='DESIGN').count(), 2)

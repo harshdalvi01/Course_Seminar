@@ -1,0 +1,141 @@
+<div class="diagram-card {% if diag.is_essential %}diagram-card-essential{% else %}diagram-card-recommended{% endif %}" id="card-{{ diag.type }}">
+    <!-- Card Top Bar -->
+    <div class="diagram-card-topbar">
+        <div class="diagram-topbar-left">
+            <span class="diagram-tier-dot {% if diag.is_essential %}tier-dot-essential{% else %}tier-dot-recommended{% endif %}"></span>
+            <div class="diagram-title-wrap">
+                <span class="diagram-card-title">{{ diag.title }}</span>
+                <span class="diagram-type-tag {% if diag.is_essential %}type-tag-essential{% else %}type-tag-recommended{% endif %}">
+                    {{ diag.category|upper }}
+                </span>
+            </div>
+        </div>
+        <div class="diagram-topbar-right">
+            {% if diag.status == 'generated' %}
+                {% if diag.is_valid_syntax %}
+                    <span class="diagram-status-pill status-pill-success" title="Valid Mermaid syntax structure">
+                        ✓ Generated
+                    </span>
+                {% else %}
+                    <span class="diagram-status-pill status-pill-warning" title="Syntax validation warning">
+                        ⚠ Syntax Issue
+                    </span>
+                {% endif %}
+            {% else %}
+                <span class="diagram-status-pill status-pill-omitted" title="Not generated due to unstated requirements">
+                    ○ Not Generated
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Card Description -->
+    <p class="diagram-card-description">
+        {{ diag.description }}
+    </p>
+
+    <!-- Card Visualization Canvas Area -->
+    <div class="diagram-canvas-outer">
+        {% if diag.status == 'generated' %}
+            {% if diag.is_valid_syntax %}
+                <div class="diagram-canvas-container" id="container-{{ diag.type }}">
+                    <div class="diagram-loading-placeholder">
+                        <span class="step-spinner" style="border-top-color:#0284C7;"></span>
+                        <span>Rendering Mermaid Diagram...</span>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Syntax Error Safeguard -->
+                <div class="diagram-syntax-fallback">
+                    <div class="syntax-error-header">
+                        <span class="syntax-err-icon">⚠️</span>
+                        <div>
+                            <strong>Syntax Verification Notice</strong>
+                            <div class="syntax-err-details">{{ diag.syntax_error }}</div>
+                        </div>
+                    </div>
+                    <div class="syntax-source-preview">
+                        <pre><code>{{ diag.mermaid_source|escape }}</code></pre>
+                    </div>
+                    <p class="syntax-fix-hint">
+                        You can regenerate this diagram with specific directives to correct the syntax.
+                    </p>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Unrendered Informational Safeguard -->
+            <div class="diagram-unrendered-card">
+                <div class="unrendered-icon-wrap">
+                    <span class="unrendered-beacon">ℹ️</span>
+                </div>
+                <h5 class="unrendered-title">{{ diag.title }} was not generated</h5>
+                <p class="unrendered-explanation">
+                    {{ diag.description }}
+                </p>
+                <div class="unrendered-badge-note">
+                    Strict Architectural Governance: Agents do not invent entities, classes, or actors without explicit requirements.
+                </div>
+                {% if not is_historical and not active_artifact.is_approved %}
+                    <button type="button" class="btn-attempt-gen" onclick="openDiagramRegenModal('{{ diag.type }}', '{{ diag.title|escapejs }}')">
+                        <span>+ Synthesize Diagram with Guidance</span>
+                    </button>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Hidden Raw Source for Safe Mermaid Execution -->
+    {% if diag.mermaid_source %}
+        <textarea id="raw-src-{{ diag.type }}" class="mermaid-raw-payload" style="display:none;">{{ diag.mermaid_source }}</textarea>
+    {% endif %}
+
+    <!-- Key Design Observations Callout -->
+    {% if diag.observations %}
+        <div class="diagram-observations-box">
+            <span class="obs-icon">🔍</span>
+            <div class="obs-body">
+                <span class="obs-label">Key Design Observations:</span>
+                <span class="obs-text">{{ diag.observations }}</span>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Card Action Footer Controls -->
+    <div class="diagram-card-footer">
+        <div class="diagram-footer-actions-left">
+            {% if diag.mermaid_source %}
+                <button type="button" class="btn-card-control" onclick="toggleDiagramSource('{{ diag.type }}')" id="btn-toggle-src-{{ diag.type }}" title="View and copy raw Mermaid code">
+                    <span class="ctrl-icon">👁️</span>
+                    <span>View Mermaid Source</span>
+                </button>
+                <button type="button" class="btn-card-control" onclick="openDiagramFullscreen('{{ diag.type }}', '{{ diag.title|escapejs }}', '{{ diag.category }}')" title="Expand diagram in large modal">
+                    <span class="ctrl-icon">⛶</span>
+                    <span>Expand Canvas</span>
+                </button>
+            {% endif %}
+        </div>
+        <div class="diagram-footer-actions-right">
+            {% if not is_historical and not active_artifact.is_approved %}
+                <button type="button" class="btn-card-control btn-diagram-regen" onclick="openDiagramRegenModal('{{ diag.type }}', '{{ diag.title|escapejs }}')" title="Regenerate only this diagram (creates v+1 version)">
+                    <span class="ctrl-icon">🔄</span>
+                    <span>Regenerate Diagram</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Collapsible Mermaid Source Code Drawer -->
+    {% if diag.mermaid_source %}
+        <div class="diagram-source-drawer" id="drawer-{{ diag.type }}" style="display: none;">
+            <div class="source-drawer-header">
+                <div class="drawer-header-left">
+                    <span class="drawer-chip">MERMAID.JS SPEC // {{ diag.directive }}</span>
+                </div>
+                <button type="button" class="btn-copy-src" onclick="copyMermaidSource('raw-src-{{ diag.type }}', this)">
+                    <span>Copy Source</span>
+                </button>
+            </div>
+            <pre class="source-code-pre"><code>{{ diag.mermaid_source|escape }}</code></pre>
+        </div>
+    {% endif %}
+</div>

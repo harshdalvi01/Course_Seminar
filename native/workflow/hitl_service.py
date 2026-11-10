@@ -141,4 +141,43 @@ class HITLService:
             )
         return new_artifact
 
+    def regenerate_diagram(self, artifact: Artifact, diagram_type: str, requester: User, feedback: str = "") -> Artifact:
+        """
+        Regenerates an individual diagram in a DESIGN artifact, producing an append-only v+1 version
+        with full audit logging, Jev validation, and preserved human governance.
+        """
+        if artifact.stage != 'DESIGN':
+            raise HITLServiceError("Diagram regeneration is exclusively supported for the DESIGN stage.")
+            
+        agent = DesignAgent()
+        try:
+            new_content = agent.regenerate_single_diagram(
+                project=artifact.project,
+                current_content=artifact.content,
+                diagram_type=diagram_type,
+                feedback=feedback
+            )
+            validation = agent.validate(new_content, artifact.project)
+        except Exception as e:
+            raise HITLServiceError(f"Diagram Regeneration Failed: {str(e)}")
+            
+        from ai_services.agents import DIAGRAM_CONFIGS
+        diag_title = DIAGRAM_CONFIGS.get(diagram_type, {}).get('title', diagram_type)
+        log_feedback = f"Regenerated diagram: {diag_title}" + (f" (Directive: {feedback})" if feedback else ".")
+        
+        with transaction.atomic():
+            Review.objects.create(artifact=artifact, reviewer=requester, action='REGENERATE', feedback=log_feedback)
+            latest_v = Artifact.objects.filter(project=artifact.project, stage=artifact.stage).aggregate(Max('version'))['version__max'] or 0
+            new_artifact = Artifact.objects.create(
+                project=artifact.project,
+                stage=artifact.stage,
+                version=latest_v + 1,
+                content=new_content,
+                created_by=requester,
+                source_type='AI',
+                is_approved=False,
+                validation_meta=validation
+            )
+        return new_artifact
+
 hitl_service = HITLService()

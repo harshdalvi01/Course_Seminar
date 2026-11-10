@@ -1,3 +1,4 @@
+import re
 import json
 import logging
 from typing import Dict, Any, Optional
@@ -179,6 +180,78 @@ class RequirementAgent(BaseAgent):
         return self.jev.validate_artifact(content=output, stage=self.stage_name, rules=rules)
 
 
+
+DIAGRAM_CONFIGS = {
+    'system_architecture': {
+        'title': 'System Architecture Diagram',
+        'category': 'Essential',
+        'directive': 'flowchart TD',
+        'syntax_prefix': ('flowchart', 'graph'),
+        'description_template': 'High-level component topology illustrating frontend client, backend services, database persistence, and external integrations.',
+        'is_essential': True,
+    },
+    'use_case': {
+        'title': 'Use Case Diagram',
+        'category': 'Essential',
+        'directive': 'flowchart LR',
+        'syntax_prefix': ('flowchart', 'graph'),
+        'description_template': 'Visual actor-to-functionality representation mapping primary human/system actors to application capabilities.',
+        'is_essential': True,
+    },
+    'erd': {
+        'title': 'Entity Relationship Diagram (ERD)',
+        'category': 'Essential',
+        'directive': 'erDiagram',
+        'syntax_prefix': ('erDiagram',),
+        'description_template': 'Relational entity schemas, attributes, primary/foreign key relationships, and cardinalities.',
+        'is_essential': True,
+    },
+    'class_diagram': {
+        'title': 'Class Diagram',
+        'category': 'Recommended',
+        'directive': 'classDiagram',
+        'syntax_prefix': ('classDiagram',),
+        'description_template': 'Key domain classes, member attributes, methods, inheritance, and associations.',
+        'is_essential': False,
+    },
+    'sequence_diagram': {
+        'title': 'Sequence Diagram',
+        'category': 'Recommended',
+        'directive': 'sequenceDiagram',
+        'syntax_prefix': ('sequenceDiagram',),
+        'description_template': 'Chronological execution flow and request/response lifecycles across actors and services.',
+        'is_essential': False,
+    },
+}
+
+def replace_diagram_in_markdown(content: str, diagram_type: str, new_diagram_text: str) -> str:
+    """
+    Safely replaces or inserts a single diagram definition under the '# System Design Diagrams'
+    section in the design markdown document, preserving all other sections and diagrams.
+    """
+    patterns = {
+        'system_architecture': r'(###\s*(?:\d+\.\s*)?System Architecture[^\n]*\n)(.*?)(?=(?:\n###|\n##|\n#|\Z))',
+        'use_case': r'(###\s*(?:\d+\.\s*)?Use Case[^\n]*\n)(.*?)(?=(?:\n###|\n##|\n#|\Z))',
+        'erd': r'(###\s*(?:\d+\.\s*)?(?:Entity Relationship|ERD)[^\n]*\n)(.*?)(?=(?:\n###|\n##|\n#|\Z))',
+        'class_diagram': r'(###\s*(?:\d+\.\s*)?Class Diagram[^\n]*\n)(.*?)(?=(?:\n###|\n##|\n#|\Z))',
+        'sequence_diagram': r'(###\s*(?:\d+\.\s*)?Sequence Diagram[^\n]*\n)(.*?)(?=(?:\n###|\n##|\n#|\Z))',
+    }
+    pat = patterns.get(diagram_type)
+    if pat and re.search(pat, content, re.DOTALL | re.IGNORECASE):
+        cleaned_new = new_diagram_text.strip()
+        m = re.match(r'^###[^\n]*\n(.*)$', cleaned_new, re.DOTALL)
+        if m:
+            replacement_body = m.group(1).strip()
+            return re.sub(pat, lambda match: match.group(1) + replacement_body + '\n\n', content, count=1, flags=re.DOTALL | re.IGNORECASE)
+        else:
+            return re.sub(pat, lambda match: match.group(1) + cleaned_new + '\n\n', content, count=1, flags=re.DOTALL | re.IGNORECASE)
+    else:
+        if '# System Design Diagrams' not in content:
+            return content.rstrip() + '\n\n# System Design Diagrams\n\n' + new_diagram_text.strip() + '\n'
+        else:
+            return content.rstrip() + '\n\n' + new_diagram_text.strip() + '\n'
+
+
 class DesignAgent(BaseAgent):
     stage_name = 'DESIGN'
     
@@ -191,22 +264,142 @@ class DesignAgent(BaseAgent):
     def get_system_prompt(self) -> str:
         return (
             "You are the expert Software Design Architect.\n"
-            "Based on the project idea and approved requirements, generate a comprehensive software design document.\n"
-            "Your output MUST include exactly the following sections in Markdown:\n\n"
-            "1. System architecture\n"
-            "2. Components/modules\n"
-            "3. Database design\n"
-            "4. API design\n"
-            "5. Data flow\n"
-            "6. Security considerations\n"
-            "7. Important design decisions\n"
-            "8. Assumptions\n\n"
-            "Be highly structured, detailed, and professional."
+            "Based on the project idea and approved requirements, generate a comprehensive software design document and diagram specification.\n"
+            "Your output MUST include exactly the following technical sections in structured Markdown:\n\n"
+            "## 1. System Architecture\n"
+            "## 2. Components/Modules\n"
+            "## 3. Database Design\n"
+            "## 4. API Design\n"
+            "## 5. Data Flow\n"
+            "## 6. Security Considerations\n"
+            "## 7. Important Design Decisions\n"
+            "## 8. Assumptions\n\n"
+            "# System Design Diagrams\n\n"
+            "Immediately following the written documentation, you MUST include a dedicated section titled exactly `# System Design Diagrams`.\n"
+            "In this section, you MUST generate visual Mermaid diagrams based strictly on the approved requirements. "
+            "You MUST generate the three Essential diagrams, and generate the two Recommended diagrams ONLY if sufficient information exists in the requirements.\n\n"
+            "Generate ONLY these five diagram types. Do NOT generate activity diagrams, deployment diagrams, component diagrams, or state diagrams.\n\n"
+            "### 1. System Architecture Diagram (Essential)\n"
+            "- Mermaid syntax: ```mermaid\\nflowchart TD ...```\n"
+            "- Shows overall application topology: frontend, backend, database, external APIs, and connection protocols.\n"
+            "- Format:\n"
+            "**Type:** System Architecture Diagram (Essential)\n"
+            "**Status:** Generated\n"
+            "**Description:** [Short explanation of client, server, database, and integrations]\n"
+            "```mermaid\n"
+            "flowchart TD\n"
+            "...\n"
+            "```\n"
+            "**Key Observations:** [Key design observations]\n\n"
+            "### 2. Use Case Diagram (Essential)\n"
+            "- Mermaid syntax: ```mermaid\\nflowchart LR ...```\n"
+            "- Shows visual actor-to-functionality representation mapping user personas to major capabilities.\n"
+            "- Format:\n"
+            "**Type:** Use Case Diagram (Essential)\n"
+            "**Status:** Generated\n"
+            "**Description:** [Short explanation of actors and major functionalities]\n"
+            "```mermaid\n"
+            "flowchart LR\n"
+            "...\n"
+            "```\n"
+            "**Key Observations:** [Key design observations]\n\n"
+            "### 3. Entity Relationship Diagram (Essential)\n"
+            "- Mermaid syntax: ```mermaid\\nerDiagram ...```\n"
+            "- Shows database entities, attributes, PK/FK flags, and relationships with cardinalities.\n"
+            "- Format:\n"
+            "**Type:** Entity Relationship Diagram (Essential)\n"
+            "**Status:** Generated\n"
+            "**Description:** [Short explanation of database entities and relationships]\n"
+            "```mermaid\n"
+            "erDiagram\n"
+            "...\n"
+            "```\n"
+            "**Key Observations:** [Key design observations]\n\n"
+            "### 4. Class Diagram (Recommended)\n"
+            "- If requirements support classes/domain models:\n"
+            "**Type:** Class Diagram (Recommended)\n"
+            "**Status:** Generated\n"
+            "**Description:** [Short explanation of major classes, attributes, methods, relationships]\n"
+            "```mermaid\n"
+            "classDiagram\n"
+            "...\n"
+            "```\n"
+            "**Key Observations:** [Key design observations]\n\n"
+            "- If requirements do NOT contain sufficient object-oriented class specifications, do NOT invent them. Set:\n"
+            "**Type:** Class Diagram (Recommended)\n"
+            "**Status:** Not Generated\n"
+            "**Description:** Not generated: The approved requirements do not specify an object-oriented domain model or distinct class hierarchies.\n"
+            "**Key Observations:** System relies on procedural/API endpoints rather than class-based OOP architectures.\n\n"
+            "### 5. Sequence Diagram (Recommended)\n"
+            "- If requirements support multi-component sequence workflows:\n"
+            "**Type:** Sequence Diagram (Recommended)\n"
+            "**Status:** Generated\n"
+            "**Description:** [Short explanation of component request/response sequence]\n"
+            "```mermaid\n"
+            "sequenceDiagram\n"
+            "...\n"
+            "```\n"
+            "**Key Observations:** [Key design observations]\n\n"
+            "- If requirements lack multi-step sequence workflows, do NOT invent them. Set:\n"
+            "**Type:** Sequence Diagram (Recommended)\n"
+            "**Status:** Not Generated\n"
+            "**Description:** Not generated: The approved requirements do not specify multi-step asynchronous or multi-component transaction workflows.\n"
+            "**Key Observations:** Direct synchronous interactions without complex sequence lifecycles.\n\n"
+            "CRITICAL MERMAID SYNTAX RULES:\n"
+            "1. In flowcharts (flowchart TD, flowchart LR):\n"
+            "   - When any node label contains parentheses `( )`, brackets `[ ]`, braces `{ }`, slashes, commas, or special characters, ALWAYS enclose the label in double quotes inside the shape delimiter. Example: `NodeId[\"Static Web Server (e.g., GitHub Pages)\"]`, `UC2[\"Clear Entry (C)\"]`, `Actor([\"User (Admin)\"])`.\n"
+            "   - NEVER write unquoted parentheses inside square brackets like `NodeId[Text (with parens)]` because Mermaid treats parentheses as shape delimiters and throws a syntax parse error.\n"
+            "   - Node IDs must be clean alphanumeric words without spaces or symbols.\n\n"
+            "Be highly structured, detailed, professional, and strictly output valid Mermaid syntax."
         )
-        
+
+    def regenerate_single_diagram(self, project: Project, current_content: str, diagram_type: str, feedback: Optional[str] = None) -> str:
+        """
+        Regenerates an individual diagram within an existing design artifact,
+        preserving all other written sections and diagrams.
+        """
+        config = DIAGRAM_CONFIGS.get(diagram_type)
+        if not config:
+            raise ValueError(f"Unknown diagram type: {diagram_type}")
+
+        context = self.build_context(project)
+        system_prompt = (
+            f"You are the expert Software Design Architect.\n"
+            f"You are tasked with regenerating ONLY the following diagram based strictly on the approved requirements:\n"
+            f"Diagram: {config['title']} ({config['category']})\n"
+            f"Required Mermaid syntax format: {config['directive']}\n\n"
+            f"Requirements to observe strictly:\n"
+            f"1. Generate ONLY the single requested diagram.\n"
+            f"2. Use clean, valid Mermaid syntax ({config['directive']}). Always enclose node labels containing parentheses or special characters in double quotes: e.g. NodeId[\"Label (extra)\"].\n"
+            f"3. Base all components strictly on the approved requirements. Do not invent unauthorized entities, APIs, or actors.\n"
+            f"4. If this is a Recommended diagram and requirements lack sufficient information, set Status to 'Not Generated' and provide a clear explanation in Description.\n"
+            f"5. Output format must match exactly:\n\n"
+            f"### {config['title']} ({config['category']})\n"
+            f"**Type:** {config['title']} ({config['category']})\n"
+            f"**Status:** Generated\n"
+            f"**Description:** [Short explanation]\n"
+            f"```mermaid\n"
+            f"{config['directive']}\n"
+            f"...\n"
+            f"```\n"
+            f"**Key Observations:** [Key design observations]"
+        )
+        user_prompt = f"Please regenerate the {config['title']} for this project."
+        if feedback:
+            user_prompt += f"\n\nHuman Reviewer Directives / Feedback for this diagram:\n{feedback}"
+
+        generated_diagram_text = self.groq.generate(
+            user_prompt=user_prompt,
+            system_prompt=system_prompt,
+            context=context
+        )
+
+        return replace_diagram_in_markdown(current_content, diagram_type, generated_diagram_text)
+
     def validate(self, output: str, project: Project) -> Dict[str, Any]:
         rules = [
             "Evaluate consistency with the approved requirements.",
+            "Verify presence and completeness of the three essential diagrams (System Architecture, Use Case, ERD).",
             "Identify any missing essential components or modules.",
             "Identify any potential architectural issues or bottlenecks.",
             "Identify any security concerns in the proposed design.",

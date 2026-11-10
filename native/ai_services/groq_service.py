@@ -59,6 +59,7 @@ class GroqService:
             "model": self.model,
             "messages": messages,
             "temperature": 0.2, # Low temperature for more deterministic coding outputs
+            "max_tokens": 8000,
         }
 
         try:

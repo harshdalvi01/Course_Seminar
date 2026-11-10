@@ -1021,9 +1021,15 @@
     border: 1px solid #D8D4D0;
     border-radius: 8px;
     overflow: hidden;
-    height: 640px;
+    height: 680px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     background: #FFFFFF;
+}
+
+.design-workspace-container {
+    height: 820px;
+    max-height: calc(100vh - 140px);
+    min-height: 680px;
 }
 
 /* Left Sidebar - Requirements Index */
@@ -1151,12 +1157,16 @@
 }
 
 /* Right Content Area */
-.req-content-pane {
+.req-content-pane,
+.req-main-panel {
     flex: 1;
     display: flex;
     flex-direction: column;
     background: #FFFFFF;
     min-width: 0;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
 }
 
 .req-header-bar {
@@ -1239,10 +1249,40 @@
 /* Scrollable Content Body */
 .req-content-body {
     flex: 1;
-    overflow-y: auto;
+    display: block;
+    overflow-y: auto !important;
+    overflow-x: hidden;
     padding: 1.5rem 1.75rem;
     background: #FFFFFF;
     line-height: 1.6;
+    min-height: 0;
+    height: 100%;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #D8D4D0 #F7F5F4;
+}
+
+.req-content-body::-webkit-scrollbar,
+.req-sidebar-list::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.req-content-body::-webkit-scrollbar-track,
+.req-sidebar-list::-webkit-scrollbar-track {
+    background: #F7F5F4;
+}
+
+.req-content-body::-webkit-scrollbar-thumb,
+.req-sidebar-list::-webkit-scrollbar-thumb {
+    background: #D8D4D0;
+    border-radius: 4px;
+}
+
+.req-content-body::-webkit-scrollbar-thumb:hover,
+.req-sidebar-list::-webkit-scrollbar-thumb:hover {
+    background: #A8A29E;
 }
 
 .req-raw-body {
@@ -1543,6 +1583,939 @@
         gap: 0.65rem;
     }
 }
+
+/* ============================================================
+   SYSTEM DESIGN DIAGRAMS WORKSPACE STYLES (MERMAID.JS)
+   ============================================================ */
+.system-diagrams-section {
+    margin-top: 2.25rem;
+    padding-top: 2rem;
+    border-top: 2px dashed #D8D4D0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.diagrams-section-header {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.diagrams-header-title-box {
+    flex: 1;
+}
+
+.diagrams-header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    background: #F0F9FF;
+    color: #0369A1;
+    border: 1px solid #BAE6FD;
+    padding: 0.22rem 0.65rem;
+    border-radius: 9999px;
+    margin-bottom: 0.5rem;
+}
+
+.diagrams-main-title {
+    margin: 0 0 0.4rem 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0D0D0C;
+    letter-spacing: -0.02em;
+}
+
+.diagrams-main-subtitle {
+    margin: 0;
+    font-size: 0.84rem;
+    color: #5C5956;
+    line-height: 1.5;
+}
+
+.diagrams-summary-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.d-summary-pill {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid;
+    white-space: nowrap;
+}
+
+.d-summary-pill.essential-pill {
+    background: #F0F9FF;
+    color: #0369A1;
+    border-color: #BAE6FD;
+}
+
+.d-summary-pill.recommended-pill {
+    background: #F0FDF4;
+    color: #166534;
+    border-color: #BBF7D0;
+}
+
+.d-summary-pill.audit-pill {
+    background: #FAF5FF;
+    color: #7E22CE;
+    border-color: #E9D5FF;
+}
+
+/* Diagram Tier Groups */
+.diagram-tier-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+}
+
+.diagram-tier-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    background: #FAF8F6;
+    border: 1px solid #E8E4E1;
+    border-radius: 8px;
+}
+
+.tier-indicator {
+    width: 4px;
+    height: 28px;
+    border-radius: 2px;
+}
+
+.essential-tier-indicator {
+    background: #0284C7;
+}
+
+.recommended-tier-indicator {
+    background: #16A34A;
+}
+
+.diagram-tier-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0D0D0C;
+    letter-spacing: -0.01em;
+}
+
+.diagram-tier-subtitle {
+    font-size: 0.76rem;
+    color: #7D7975;
+    display: block;
+}
+
+.tier-count-badge {
+    margin-left: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    background: #F0F9FF;
+    color: #0369A1;
+    border: 1px solid #BAE6FD;
+}
+
+/* Diagram Responsive Grids */
+.diagrams-grid {
+    display: grid;
+    gap: 1.35rem;
+}
+
+.diagrams-grid-essential {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.diagrams-grid-recommended {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 1200px) {
+    .diagrams-grid-essential {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 820px) {
+    .diagrams-grid-essential,
+    .diagrams-grid-recommended {
+        grid-template-columns: 1fr;
+    }
+    .diagrams-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Individual Diagram Card */
+.diagram-card {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+}
+
+.diagram-card:hover {
+    border-color: #B5B0AA;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+}
+
+.diagram-card-essential {
+    border-top: 3px solid #0284C7;
+}
+
+.diagram-card-recommended {
+    border-top: 3px solid #16A34A;
+}
+
+/* Card Topbar */
+.diagram-card-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+}
+
+.diagram-topbar-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    flex: 1;
+}
+
+.diagram-tier-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+}
+
+.tier-dot-essential {
+    background: #0284C7;
+}
+
+.tier-dot-recommended {
+    background: #16A34A;
+}
+
+.diagram-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.diagram-card-title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: #0D0D0C;
+    line-height: 1.3;
+}
+
+.diagram-type-tag {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 0.12rem 0.4rem;
+    border-radius: 3px;
+    align-self: flex-start;
+}
+
+.type-tag-essential {
+    background: #F0F9FF;
+    color: #0284C7;
+    border: 1px solid #BAE6FD;
+}
+
+.type-tag-recommended {
+    background: #F0FDF4;
+    color: #16A34A;
+    border: 1px solid #BBF7D0;
+}
+
+.diagram-status-pill {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.status-pill-success {
+    background: #ECFDF5;
+    color: #059669;
+    border: 1px solid #A7F3D0;
+}
+
+.status-pill-warning {
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+}
+
+.status-pill-omitted {
+    background: #F4F1EE;
+    color: #7D7975;
+    border: 1px solid #E8E4E1;
+}
+
+.diagram-card-description {
+    font-size: 0.81rem;
+    color: #5C5956;
+    line-height: 1.45;
+    margin: 0 0 0.85rem 0;
+    min-height: 2.6rem;
+}
+
+/* Visualization Canvas Box */
+.diagram-canvas-outer {
+    background: #FAF8F6;
+    border: 1px solid #EDE9E5;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    min-height: 260px;
+    max-height: 420px;
+    display: flex;
+    flex-direction: column;
+}
+
+.diagram-canvas-container {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    overscroll-behavior: auto;
+}
+
+.diagram-canvas-container svg {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto;
+}
+
+.diagram-loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    color: #7D7975;
+    font-size: 0.8rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    padding: 2.5rem 1rem;
+}
+
+/* Syntax Fallback */
+.diagram-syntax-fallback {
+    padding: 1rem;
+    background: #FEF2F2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.syntax-error-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: #991B1B;
+    font-size: 0.82rem;
+}
+
+.syntax-err-details {
+    font-size: 0.74rem;
+    color: #B91C1C;
+    margin-top: 0.15rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.syntax-source-preview {
+    background: #FFFFFF;
+    border: 1px solid #FECACA;
+    border-radius: 6px;
+    padding: 0.65rem;
+    max-height: 160px;
+    overflow: auto;
+}
+
+.syntax-source-preview pre {
+    margin: 0;
+    font-size: 0.72rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: #374151;
+}
+
+.syntax-fix-hint {
+    margin: 0;
+    font-size: 0.73rem;
+    color: #7F1D1D;
+}
+
+/* Unrendered Card */
+.diagram-unrendered-card {
+    padding: 2rem 1.25rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    background: #FAF8F6;
+    flex: 1;
+}
+
+.unrendered-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #EDE9E5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.unrendered-title {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #383634;
+}
+
+.unrendered-explanation {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #7D7975;
+    max-width: 320px;
+    line-height: 1.45;
+}
+
+.unrendered-badge-note {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    color: #7D7975;
+    background: #F4F1EE;
+    border: 1px solid #E8E4E1;
+    padding: 0.3rem 0.65rem;
+    border-radius: 4px;
+    max-width: 360px;
+}
+
+.btn-attempt-gen {
+    margin-top: 0.4rem;
+    background: #FFFFFF;
+    border: 1px dashed #C2410C;
+    color: #C2410C;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.38rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-attempt-gen:hover {
+    background: #FFF7ED;
+    border-style: solid;
+}
+
+/* Key Design Observations */
+.diagram-observations-box {
+    margin-top: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.obs-icon {
+    font-size: 0.85rem;
+    margin-top: 1px;
+}
+
+.obs-body {
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: #334155;
+}
+
+.obs-label {
+    font-weight: 700;
+    color: #0F172A;
+    margin-right: 0.35rem;
+}
+
+/* Card Footer Controls */
+.diagram-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #EDE9E5;
+    flex-wrap: wrap;
+}
+
+.diagram-footer-actions-left,
+.diagram-footer-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+}
+
+.btn-card-control {
+    background: #FAF8F6;
+    border: 1px solid #D8D4D0;
+    color: #383634;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 0.32rem 0.65rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.18s ease;
+}
+
+.btn-card-control:hover {
+    background: #F4F1EE;
+    border-color: #B5B0AA;
+    color: #0D0D0C;
+}
+
+.btn-card-control.btn-diagram-regen {
+    background: #FFF7ED;
+    border-color: #FED7AA;
+    color: #C2410C;
+    font-weight: 700;
+}
+
+.btn-card-control.btn-diagram-regen:hover {
+    background: #FFEDD5;
+    border-color: #FDBA74;
+    color: #9A3412;
+}
+
+/* Collapsible Source Code Drawer */
+.diagram-source-drawer {
+    margin-top: 0.75rem;
+    background: #18181B;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #27272A;
+}
+
+.source-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.45rem 0.75rem;
+    background: #09090B;
+    border-bottom: 1px solid #27272A;
+}
+
+.drawer-chip {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #A1A1AA;
+    letter-spacing: 0.05em;
+}
+
+.btn-copy-src {
+    background: #27272A;
+    border: 1px solid #3F3F46;
+    color: #F4F4F5;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-copy-src:hover {
+    background: #3F3F46;
+}
+
+.source-code-pre {
+    margin: 0;
+    padding: 0.85rem;
+    max-height: 220px;
+    overflow: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.73rem;
+    line-height: 1.5;
+    color: #E4E4E7;
+}
+
+/* Modals */
+.diagram-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(13, 13, 12, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    animation: overlayFadeIn 0.2s ease-out forwards;
+}
+
+.diagram-modal-box {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 95vw;
+    height: 88vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.diagram-modal-box.regen-modal-box {
+    max-width: 580px;
+    height: auto;
+    max-height: 90vh;
+}
+
+.diagram-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #FAF8F6;
+    border-bottom: 1px solid #EDE9E5;
+}
+
+.modal-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.expand-modal-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0D0D0C;
+}
+
+.modal-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.zoom-toolbar {
+    display: flex;
+    align-items: center;
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.btn-zoom {
+    background: transparent;
+    border: none;
+    color: #383634;
+    font-size: 0.95rem;
+    font-weight: 700;
+    width: 32px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.btn-zoom:hover {
+    background: #F4F1EE;
+}
+
+.btn-zoom-reset {
+    font-size: 0.72rem;
+    width: 36px;
+    border-left: 1px solid #EDE9E5;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.zoom-level-text {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #5C5956;
+    padding: 0 0.5rem;
+    border-left: 1px solid #EDE9E5;
+    border-right: 1px solid #EDE9E5;
+}
+
+.modal-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #7D7975;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    transition: color 0.15s;
+}
+
+.modal-close-btn:hover {
+    color: #0D0D0C;
+}
+
+.diagram-modal-viewport {
+    flex: 1;
+    overflow: auto;
+    padding: 2rem;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.diagram-modal-canvas {
+    transform-origin: center center;
+    transition: transform 0.15s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.diagram-modal-canvas svg {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.diagram-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: #FAF8F6;
+    border-top: 1px solid #EDE9E5;
+}
+
+.modal-footer-hint {
+    font-size: 0.76rem;
+    color: #7D7975;
+}
+
+.btn-close-modal-text {
+    background: #FAF8F6;
+    border: 1px solid #D8D4D0;
+    color: #383634;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-close-modal-text:hover {
+    background: #F4F1EE;
+}
+
+.regen-modal-body {
+    padding: 1.5rem;
+}
+
+.regen-dialog-desc {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #5C5956;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   INLINE FLOWCHART CARDS (MERMAID, ASCII TOPOLOGY & SPEC CODE)
+   ============================================================ */
+.flowchart-card,
+.spec-code-card {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1.25rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.flowchart-card-header,
+.spec-code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    background: #FAF8F6;
+    border-bottom: 1px solid #EDE9E5;
+    gap: 0.75rem;
+}
+
+.flowchart-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+}
+
+.flowchart-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0284C7;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.18);
+    flex-shrink: 0;
+}
+
+.flowchart-pulse-dot.ascii-dot,
+.flowchart-pulse-dot.blueprint-dot {
+    background: #6366F1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.18);
+}
+
+.flowchart-title,
+.spec-code-lang {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #0D0D0C;
+    text-transform: uppercase;
+}
+
+.flowchart-badge {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.64rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+.mermaid-badge {
+    background: #F0F9FF;
+    color: #0369A1;
+    border: 1px solid #BAE6FD;
+}
+
+.ascii-badge,
+.blueprint-badge {
+    background: #EEF2FF;
+    color: #4338CA;
+    border: 1px solid #C7D2FE;
+}
+
+.btn-flowchart-action {
+    background: #FFFFFF;
+    border: 1px solid #D8D4D0;
+    color: #383634;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-flowchart-action:hover {
+    background: #F4F1EE;
+    border-color: #0D0D0C;
+    color: #0D0D0C;
+}
+
+.mermaid-canvas-wrapper {
+    padding: 1.25rem;
+    background: #FFFFFF;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+}
+
+.mermaid-canvas-wrapper svg {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto;
+}
+
+.ascii-canvas-wrapper,
+.spec-code-wrapper {
+    background: #18181B;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+}
+
+.ascii-diagram-pre,
+.spec-code-pre {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #E4E4E7;
+    white-space: pre;
+}
+
+.ascii-diagram-pre {
+    color: #A5F3FC;
+}
+
+
 {% endblock %}
 
 {% block content %}
@@ -1906,6 +2879,9 @@
                         }
                     }
 
+                    if (typeof renderInlineMermaidCards === 'function') {
+                        renderInlineMermaidCards(richBody);
+                    }
                     if (richBody) richBody.scrollTop = 0;
                 }
 
@@ -1928,10 +2904,201 @@
                     }
                 }
                 </script>
+            {% elif design_data %}
+                <!-- Split-Pane System Design Specification & Diagrams Viewer for DESIGN Stage -->
+                <div class="req-workspace-container design-workspace-container">
+                    <!-- Sidebar Explorer: Sections & Document Index -->
+                    <div class="req-sidebar">
+                        <div class="req-sidebar-header">
+                            <span>DESIGN SPEC ({{ design_data.sections|length }})</span>
+                            <span class="req-sidebar-badge">ARCH SPEC</span>
+                        </div>
+                        <ul class="req-sidebar-list">
+                            <li class="req-sidebar-item active" id="design-nav-all" onclick="showDesignSection('all')">
+                                <span class="req-item-icon">📑</span>
+                                <span class="req-item-label">All Sections (Full Document)</span>
+                                <span class="req-full-pill">FULL</span>
+                            </li>
+                            <li class="req-sidebar-item" id="design-nav-diagrams" onclick="showDesignSection('diagrams')">
+                                <span class="req-item-icon">📊</span>
+                                <span class="req-item-label">System Design Diagrams (5)</span>
+                                <span class="req-full-pill" style="background:#F0F9FF; color:#0369A1; border-color:#BAE6FD;">DIAGRAMS</span>
+                            </li>
+                            {% for sec in design_data.sections %}
+                                <li class="req-sidebar-item" id="design-nav-{{ forloop.counter0 }}" onclick="showDesignSection({{ forloop.counter0 }})">
+                                    <span class="req-item-icon">{{ sec.icon }}</span>
+                                    <span class="req-item-label">{{ sec.full_title }}</span>
+                                    {% if sec.has_table %}
+                                        <span class="req-table-pill" title="Contains structured table">TBL</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Main Content Pane -->
+                    <div class="req-content-pane req-main-panel">
+                        <!-- Content Top Header Bar -->
+                        <div class="req-header-bar">
+                            <div class="req-header-title-group">
+                                <span class="req-header-icon" id="designActiveIcon">🏛️</span>
+                                <div>
+                                    <h4 class="req-header-title" id="designActiveTitle">Comprehensive Software Architecture &amp; System Design Specification</h4>
+                                    <span class="req-header-meta" id="designActiveMeta">ARCHITECTURE // {{ design_data.sections|length }} SECTIONS // 5 DIAGRAMS // CONTINUOUS VIEW</span>
+                                </div>
+                            </div>
+                            <div class="req-header-actions">
+                                <div class="view-mode-toggle">
+                                    <button type="button" class="view-mode-btn active" id="btnDesignRichView" onclick="setDesignViewMode('rich')">
+                                        <span>Formatted Spec &amp; Diagrams</span>
+                                    </button>
+                                    <button type="button" class="view-mode-btn" id="btnDesignRawView" onclick="setDesignViewMode('raw')">
+                                        <span>Raw Markdown</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rich Formatted View Body -->
+                        <div class="req-content-body" id="designRichBody">
+                            <!-- Full Document Pane (Default active) -->
+                            <div id="design-pane-all" class="req-section-pane" style="display:block;">
+                                {% for sec in design_data.sections %}
+                                    <div class="req-section-card" id="design-full-sec-{{ forloop.counter0 }}">
+                                        <div class="req-section-header">
+                                            <span class="req-section-header-icon">{{ sec.icon }}</span>
+                                            <div>
+                                                <div class="req-section-header-title">{{ sec.full_title }}</div>
+                                                <div class="req-section-header-meta">{{ sec.tag }} &bull; {{ sec.summary }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="req-section-markdown">
+                                            {{ sec.html_content|safe }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Dedicated Diagrams Pane (Single Render Instance) -->
+                            <div id="design-pane-diagrams" class="req-section-pane" style="display:block;">
+                                {% include "workflow/components/design_diagrams_block.html" %}
+                            </div>
+
+                            <!-- Individual Section Panes -->
+                            {% for sec in design_data.sections %}
+                                <div id="design-pane-{{ forloop.counter0 }}" class="req-section-pane" style="display:none;">
+                                    <div class="req-section-card" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                                        <div class="req-section-header">
+                                            <span class="req-section-header-icon">{{ sec.icon }}</span>
+                                            <div>
+                                                <div class="req-section-header-title">{{ sec.full_title }}</div>
+                                                <div class="req-section-header-meta">{{ sec.tag }} &bull; {{ sec.summary }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="req-section-markdown">
+                                            {{ sec.html_content|safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Raw Markdown Fallback Body -->
+                        <div class="req-raw-body" id="designRawBody" style="display:none;">
+                            <textarea readonly class="req-raw-textarea" id="artifactTextContent">{{ active_artifact.content }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                function showDesignSection(index) {
+                    const navItems = document.querySelectorAll('.design-workspace-container .req-sidebar-item');
+                    navItems.forEach(function(item) { item.classList.remove('active'); });
+
+                    const panes = document.querySelectorAll('.design-workspace-container .req-section-pane');
+                    panes.forEach(function(p) { p.style.display = 'none'; });
+
+                    const richBody = document.getElementById('designRichBody');
+
+                    if (index === 'all') {
+                        const navAll = document.getElementById('design-nav-all');
+                        if (navAll) navAll.classList.add('active');
+                        const paneAll = document.getElementById('design-pane-all');
+                        if (paneAll) paneAll.style.display = 'block';
+                        const paneDiag = document.getElementById('design-pane-diagrams');
+                        if (paneDiag) paneDiag.style.display = 'block';
+
+                        const titleEl = document.getElementById('designActiveTitle');
+                        if (titleEl) titleEl.textContent = 'Comprehensive Software Architecture & System Design Specification';
+                        const metaEl = document.getElementById('designActiveMeta');
+                        if (metaEl) metaEl.textContent = 'ARCHITECTURE // CONTINUOUS SPECIFICATION & DIAGRAMS VIEW';
+                        const iconEl = document.getElementById('designActiveIcon');
+                        if (iconEl) iconEl.textContent = '🏛️';
+                    } else if (index === 'diagrams') {
+                        const navDiag = document.getElementById('design-nav-diagrams');
+                        if (navDiag) navDiag.classList.add('active');
+                        const paneDiag = document.getElementById('design-pane-diagrams');
+                        if (paneDiag) paneDiag.style.display = 'block';
+
+                        const titleEl = document.getElementById('designActiveTitle');
+                        if (titleEl) titleEl.textContent = 'System Design Diagrams Workspace';
+                        const metaEl = document.getElementById('designActiveMeta');
+                        if (metaEl) metaEl.textContent = '5 ARCHITECTURAL DIAGRAMS // 3 ESSENTIAL // 2 RECOMMENDED';
+                        const iconEl = document.getElementById('designActiveIcon');
+                        if (iconEl) iconEl.textContent = '📊';
+                    } else {
+                        const targetNav = document.getElementById('design-nav-' + index);
+                        if (targetNav) targetNav.classList.add('active');
+                        const targetPane = document.getElementById('design-pane-' + index);
+                        if (targetPane) targetPane.style.display = 'block';
+
+                        const secTitles = [{% for sec in design_data.sections %}"{{ sec.full_title|escapejs }}",{% endfor %}];
+                        const secTags = [{% for sec in design_data.sections %}"{{ sec.tag|escapejs }}",{% endfor %}];
+                        const secIcons = [{% for sec in design_data.sections %}"{{ sec.icon|escapejs }}",{% endfor %}];
+                        const secHasTables = [{% for sec in design_data.sections %}{{ sec.has_table|yesno:"true,false" }},{% endfor %}];
+
+                        if (secTitles[index]) {
+                            const titleEl = document.getElementById('designActiveTitle');
+                            if (titleEl) titleEl.textContent = secTitles[index];
+                            const metaEl = document.getElementById('designActiveMeta');
+                            const tblNote = secHasTables[index] ? 'STRUCTURED TABLE VIEW' : 'DESIGN SPECIFICATION MODULE';
+                            if (metaEl) metaEl.textContent = (secIcons[index] || '🏛️') + ' ' + (secTags[index] || 'ARCH') + ' // ' + tblNote + ' // HITL AUDITED';
+                            const iconEl = document.getElementById('designActiveIcon');
+                            if (iconEl) iconEl.textContent = secIcons[index] || '🏛️';
+                        }
+                    }
+
+                    if (typeof renderInlineMermaidCards === 'function') {
+                        renderInlineMermaidCards(richBody);
+                    }
+                    if (richBody) richBody.scrollTop = 0;
+                }
+
+                function setDesignViewMode(mode) {
+                    const richBody = document.getElementById('designRichBody');
+                    const rawBody = document.getElementById('designRawBody');
+                    const btnRich = document.getElementById('btnDesignRichView');
+                    const btnRaw = document.getElementById('btnDesignRawView');
+
+                    if (mode === 'raw') {
+                        if (richBody) richBody.style.display = 'none';
+                        if (rawBody) rawBody.style.display = 'block';
+                        if (btnRich) btnRich.classList.remove('active');
+                        if (btnRaw) btnRaw.classList.add('active');
+                    } else {
+                        if (rawBody) rawBody.style.display = 'none';
+                        if (richBody) richBody.style.display = 'block';
+                        if (btnRaw) btnRaw.classList.remove('active');
+                        if (btnRich) btnRich.classList.add('active');
+                    }
+                }
+                </script>
             {% else %}
                 <div class="artifact-text-viewer" id="artifactTextContent">{{ active_artifact.content }}</div>
             {% endif %}
         </div>
+
+        {% if design_data %}{% include "workflow/components/diagram_modals.html" %}{% endif %}
 
         <!-- Jev AI Validation & Decision Support Panel -->
         <div class="jev-panel">
@@ -2361,6 +3528,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
 let genTimerInterval = null;
 let genStepTimeout1 = null;
@@ -2623,6 +3791,341 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// ============================================================
+// MERMAID.JS INITIALIZATION & SAFE ISOLATED RENDERING
+// ============================================================
+let mermaidInitialized = false;
+function ensureMermaidInitialized() {
+    if (!mermaidInitialized && typeof mermaid !== 'undefined') {
+        mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'strict',
+            theme: 'default',
+            flowchart: { useMaxWidth: true, htmlLabels: false },
+            er: { useMaxWidth: true },
+            sequence: { useMaxWidth: true, showSequenceNumbers: true }
+        });
+        mermaidInitialized = true;
+    }
+}
+ensureMermaidInitialized();
+
+function sanitizeMermaidCode(code) {
+    if (!code) return "";
+    let cleaned = code.replace(/\u2011/g, '-').replace(/\u2013/g, '-').replace(/\u2014/g, '--').replace(/\u2212/g, '-');
+    cleaned = cleaned.replace(/[\u201c\u201d]/g, '"').replace(/[\u2018\u2019]/g, "'");
+
+    const firstLine = (cleaned.trim().split('\n')[0] || '').trim().toLowerCase();
+    if (!firstLine.startsWith('flowchart') && !firstLine.startsWith('graph')) {
+        return cleaned;
+    }
+
+    // Fix Stadium ID([label]) containing special chars
+    cleaned = cleaned.replace(/(\b[A-Za-z0-9_-]+)\(\[([^\]\n]+?)\]\)/g, function(match, id, label) {
+        const trimmed = label.trim();
+        if (trimmed.startsWith('"') && trimmed.endsWith('"')) return match;
+        if (/[\(\)\{\}\[\]:;,=+*?]/.test(trimmed)) {
+            return id + '(["' + trimmed.replace(/"/g, "'") + '"])';
+        }
+        return match;
+    });
+
+    // Fix Cylinder ID[(label)] containing special chars
+    cleaned = cleaned.replace(/(\b[A-Za-z0-9_-]+)\[\(([^\n]+?)\)\]/g, function(match, id, label) {
+        const trimmed = label.trim();
+        if (trimmed.startsWith('"') && trimmed.endsWith('"')) return match;
+        if (/[\(\)\{\}\[\]:;,=+*?]/.test(trimmed)) {
+            return id + '[("' + trimmed.replace(/"/g, "'") + '")]';
+        }
+        return match;
+    });
+
+    // Fix Rectangle ID[label] (skipping cylinder [(...)], subroutine [[...]], parallelogram [/.../], already quoted ["..."])
+    cleaned = cleaned.replace(/(\b[A-Za-z0-9_-]+)\[(?![\(\[\/\\"])([^\]\n]*?[\(\)\{\}:;=+*?][^\]\n]*?)\]/g, function(match, id, label) {
+        const trimmed = label.trim();
+        if (trimmed.startsWith('"') && trimmed.endsWith('"')) return match;
+        return id + '["' + trimmed.replace(/"/g, "'") + '"]';
+    });
+
+    // Fix Subgraph titles containing unquoted parens: subgraph My Title (v1)
+    cleaned = cleaned.replace(/^([ \t]*)subgraph[ \t]+([^\n]+)$/gm, function(match, indent, title) {
+        const trimmed = title.trim();
+        if (trimmed.includes('[') || trimmed.startsWith('"')) return match;
+        if (/[\(\)\{\}:;=+*?]/.test(trimmed)) {
+            return indent + 'subgraph "' + trimmed.replace(/"/g, "'") + '"';
+        }
+        return match;
+    });
+
+    // Fix Edge labels containing parentheses or brackets inside |...|
+    cleaned = cleaned.replace(/\|([^|\n]+)\|/g, function(match, label) {
+        const trimmed = label.trim();
+        if (trimmed.startsWith('"') && trimmed.endsWith('"')) return match;
+        if (/[\(\)\{\}\[\]:;=]/.test(trimmed)) {
+            return '|"' + trimmed.replace(/"/g, "'") + '"|';
+        }
+        return match;
+    });
+
+    return cleaned;
+}
+
+async function renderSingleDiagramSafely(type) {
+    ensureMermaidInitialized();
+    const container = document.getElementById('container-' + type);
+    const rawEl = document.getElementById('raw-src-' + type);
+    if (!container || !rawEl) return;
+    
+    let code = rawEl.value.trim();
+    if (!code) return;
+    code = sanitizeMermaidCode(code);
+    
+    if (typeof mermaid === 'undefined') {
+        container.innerHTML = `
+            <div style="padding:1.5rem; text-align:center; color:#7D7975; font-size:0.8rem; font-family:ui-monospace,monospace;">
+                <p>Mermaid library CDN is loading or offline.</p>
+                <p>Click <strong>View Mermaid Source</strong> below to inspect raw code.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    try {
+        const uniqueId = 'svg-' + type + '-' + Math.random().toString(36).substring(2, 9);
+        const { svg } = await mermaid.render(uniqueId, code);
+        container.innerHTML = svg;
+    } catch (err) {
+        console.error("Mermaid render error for " + type + ":", err);
+        container.innerHTML = `
+            <div class="diagram-syntax-fallback">
+                <div class="syntax-error-header">
+                    <span class="syntax-err-icon">⚠️</span>
+                    <div>
+                        <strong>Mermaid Visual Rendering Exception</strong>
+                        <div class="syntax-err-details">${err.message || err}</div>
+                    </div>
+                </div>
+                <p class="syntax-fix-hint">Other diagrams continue rendering independently.</p>
+            </div>
+        `;
+    }
+}
+
+async function renderInlineMermaidCards(rootContainer) {
+    ensureMermaidInitialized();
+    const scope = rootContainer || document;
+    const cards = scope.querySelectorAll('.flowchart-card.mermaid-card');
+    if (!cards || cards.length === 0) return;
+
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        // Only render cards that are currently visible in the layout (offsetParent !== null)
+        if (card.offsetParent === null) continue;
+        if (card.getAttribute('data-rendered') === 'true') continue;
+
+        const rawEl = card.querySelector('textarea.raw-diagram-code');
+        const wrapper = card.querySelector('.mermaid-canvas-wrapper');
+        if (!rawEl || !wrapper) continue;
+
+        let code = rawEl.value.trim();
+        if (!code) continue;
+        code = sanitizeMermaidCode(code);
+
+        if (typeof mermaid === 'undefined') continue;
+
+        try {
+            const uniqueId = 'inline-mermaid-' + Math.random().toString(36).substring(2, 10);
+            const { svg } = await mermaid.render(uniqueId, code);
+            wrapper.innerHTML = svg;
+            card.setAttribute('data-rendered', 'true');
+        } catch (err) {
+            console.error("Inline Mermaid render error:", err);
+            wrapper.innerHTML = `
+                <div class="diagram-syntax-fallback" style="width:100%;">
+                    <div class="syntax-error-header">
+                        <span class="syntax-err-icon">⚠️</span>
+                        <div>
+                            <strong>Flowchart Visual Exception</strong>
+                            <div class="syntax-err-details">${err.message || err}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            card.setAttribute('data-rendered', 'error');
+        }
+    }
+}
+
+function copyDiagramSource(btn) {
+    if (!btn) return;
+    const card = btn.closest('.flowchart-card, .spec-code-card');
+    if (!card) return;
+    const rawEl = card.querySelector('textarea.raw-diagram-code');
+    if (!rawEl) return;
+
+    navigator.clipboard.writeText(rawEl.value).then(function() {
+        const origText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        btn.style.borderColor = '#059669';
+        btn.style.color = '#059669';
+        setTimeout(function() {
+            btn.textContent = origText;
+            btn.style.borderColor = '';
+            btn.style.color = '';
+        }, 2000);
+    });
+}
+
+function initAllDesignDiagrams() {
+    const types = ['system_architecture', 'use_case', 'erd', 'class_diagram', 'sequence_diagram'];
+    types.forEach(function(t) {
+        renderSingleDiagramSafely(t);
+    });
+    renderInlineMermaidCards(document);
+}
+
+function toggleDiagramSource(type) {
+    const drawer = document.getElementById('drawer-' + type);
+    const btn = document.getElementById('btn-toggle-src-' + type);
+    if (!drawer) return;
+    if (drawer.style.display === 'none' || !drawer.style.display) {
+        drawer.style.display = 'block';
+        if (btn) btn.classList.add('active');
+    } else {
+        drawer.style.display = 'none';
+        if (btn) btn.classList.remove('active');
+    }
+}
+
+function copyMermaidSource(textareaId, btn) {
+    const el = document.getElementById(textareaId);
+    if (!el) return;
+    navigator.clipboard.writeText(el.value).then(function() {
+        const origText = btn.innerHTML;
+        btn.innerHTML = '<span>✓ Copied!</span>';
+        setTimeout(function() { btn.innerHTML = origText; }, 2000);
+    });
+}
+
+// Diagram Fullscreen Modal Pan/Zoom Controls
+let currentZoomLevel = 1.0;
+
+function openDiagramFullscreen(type, title, category) {
+    const container = document.getElementById('container-' + type);
+    const modal = document.getElementById('diagramExpandModal');
+    const modalTitle = document.getElementById('expandModalTitle');
+    const modalTag = document.getElementById('expandModalCategoryTag');
+    const canvas = document.getElementById('expandModalCanvas');
+    
+    if (!modal || !canvas) return;
+    
+    if (modalTitle) modalTitle.textContent = title;
+    if (modalTag) modalTag.textContent = (category || 'DIAGRAM').toUpperCase() + ' DIAGRAM';
+    
+    canvas.innerHTML = '';
+    currentZoomLevel = 1.0;
+    updateZoomDisplay();
+    
+    if (container) {
+        const svg = container.querySelector('svg');
+        if (svg) {
+            const clonedSvg = svg.cloneNode(true);
+            clonedSvg.style.maxWidth = 'none';
+            clonedSvg.style.width = '100%';
+            clonedSvg.style.height = 'auto';
+            canvas.appendChild(clonedSvg);
+        } else {
+            const rawEl = document.getElementById('raw-src-' + type);
+            if (rawEl) {
+                canvas.innerHTML = `<pre class="source-code-pre"><code>${rawEl.value}</code></pre>`;
+            }
+        }
+    }
+    modal.style.display = 'flex';
+}
+
+function closeDiagramFullscreen() {
+    const modal = document.getElementById('diagramExpandModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function zoomDiagram(delta) {
+    currentZoomLevel = Math.max(0.4, Math.min(3.0, currentZoomLevel + delta));
+    applyZoom();
+}
+
+function resetDiagramZoom() {
+    currentZoomLevel = 1.0;
+    applyZoom();
+}
+
+function applyZoom() {
+    const canvas = document.getElementById('expandModalCanvas');
+    if (canvas) {
+        canvas.style.transform = `scale(${currentZoomLevel})`;
+    }
+    updateZoomDisplay();
+}
+
+function updateZoomDisplay() {
+    const disp = document.getElementById('zoomLevelDisplay');
+    if (disp) {
+        disp.textContent = Math.round(currentZoomLevel * 100) + '%';
+    }
+}
+
+function handleModalOverlayClick(e, modalId) {
+    if (e.target && e.target.id === modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.style.display = 'none';
+    }
+}
+
+// Diagram Individual Regeneration Controls
+let activeRegenDiagramType = '';
+let activeRegenDiagramTitle = '';
+
+function openDiagramRegenModal(type, title) {
+    activeRegenDiagramType = type;
+    activeRegenDiagramTitle = title;
+    
+    const modal = document.getElementById('diagramRegenModal');
+    const form = document.getElementById('individualDiagramRegenForm');
+    const targetName = document.getElementById('regenTargetDiagramName');
+    const modalTitle = document.getElementById('regenModalTitle');
+    const feedbackInput = document.getElementById('diagramRegenFeedback');
+    
+    if (modalTitle) modalTitle.textContent = 'Regenerate ' + title;
+    if (targetName) targetName.textContent = title;
+    if (feedbackInput) feedbackInput.value = '';
+    
+    if (form) {
+        form.action = `/workflow/artifacts/{{ active_artifact.pk }}/diagrams/${type}/regenerate/`;
+    }
+    
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeDiagramRegenModal() {
+    const modal = document.getElementById('diagramRegenModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function handleSingleDiagramSubmit() {
+    closeDiagramRegenModal();
+    showAIGenerationOverlay(
+        'Regenerating ' + (activeRegenDiagramTitle || 'Diagram'),
+        'Groq AI agent is synthesizing ' + (activeRegenDiagramTitle || 'diagram') + ' adhering strictly to approved requirements. Jev validation matrix will run before committing version v+1.'
+    );
+    return true;
+}
+
+// Auto-render diagrams on load
+document.addEventListener('DOMContentLoaded', function() {
+    initAllDesignDiagrams();
+});
+
+
 // Attach listener to initial generation form
 document.addEventListener('DOMContentLoaded', function() {
     const initialGenForm = document.getElementById('initialGenForm');
@@ -2636,5 +4139,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
 {% endblock %}

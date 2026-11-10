@@ -1,0 +1,90 @@
+<!-- ============================================================
+     DIAGRAM EXPAND FULLSCREEN MODAL
+     ============================================================ -->
+<div class="diagram-modal-overlay" id="diagramExpandModal" style="display:none;" onclick="handleModalOverlayClick(event, 'diagramExpandModal')">
+    <div class="diagram-modal-box">
+        <div class="diagram-modal-header">
+            <div class="modal-header-left">
+                <span class="gen-chip-tag" style="background:#F0F9FF; color:#0369A1; border-color:#BAE6FD;">
+                    <span class="gen-pulse-dot" style="background:#0284C7;"></span>
+                    <span id="expandModalCategoryTag">ESSENTIAL DIAGRAM</span>
+                </span>
+                <h3 class="expand-modal-title" id="expandModalTitle">System Architecture Diagram</h3>
+            </div>
+            <div class="modal-header-controls">
+                <div class="zoom-toolbar">
+                    <button type="button" class="btn-zoom" onclick="zoomDiagram(-0.15)" title="Zoom Out">&minus;</button>
+                    <span class="zoom-level-text" id="zoomLevelDisplay">100%</span>
+                    <button type="button" class="btn-zoom" onclick="zoomDiagram(0.15)" title="Zoom In">&plus;</button>
+                    <button type="button" class="btn-zoom btn-zoom-reset" onclick="resetDiagramZoom()" title="Reset Zoom">1:1</button>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closeDiagramFullscreen()" aria-label="Close modal">&times;</button>
+            </div>
+        </div>
+        <div class="diagram-modal-viewport" id="diagramModalViewport">
+            <div class="diagram-modal-canvas" id="expandModalCanvas">
+                <!-- SVG cloned dynamically -->
+            </div>
+        </div>
+        <div class="diagram-modal-footer">
+            <span class="modal-footer-hint">Use mouse wheel or zoom controls to scale diagram canvas. Drag to inspect intricate connections.</span>
+            <button type="button" class="btn-close-modal-text" onclick="closeDiagramFullscreen()">Close Canvas</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     INDIVIDUAL DIAGRAM REGENERATION MODAL
+     Appends new v+1 version replacing exclusively this diagram
+     ============================================================ -->
+<div class="diagram-modal-overlay" id="diagramRegenModal" style="display:none;" onclick="handleModalOverlayClick(event, 'diagramRegenModal')">
+    <div class="diagram-modal-box regen-modal-box">
+        <div class="diagram-modal-header">
+            <div class="modal-header-left">
+                <span class="gen-chip-tag" style="background:#FFF7ED; color:#C2410C; border-color:#FED7AA;">
+                    <span class="gen-pulse-dot"></span>
+                    <span>INDIVIDUAL DIAGRAM REVISION // STAGE v+1</span>
+                </span>
+                <h3 class="expand-modal-title" id="regenModalTitle">Regenerate Diagram</h3>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closeDiagramRegenModal()" aria-label="Close modal">&times;</button>
+        </div>
+        
+        <form method="POST" id="individualDiagramRegenForm" action="" onsubmit="return handleSingleDiagramSubmit();">
+            {% csrf_token %}
+            <div class="regen-modal-body">
+                <p class="regen-dialog-desc">
+                    You are requesting specialized regeneration for <strong id="regenTargetDiagramName">this diagram</strong>. 
+                    The Design Agent will call Groq to synthesize an updated definition adhering strictly to approved requirements, 
+                    validate it through Jev, and commit a new <strong>v+1 design artifact</strong> preserving all other sections.
+                </p>
+
+                <div class="form-group" style="margin-top: 1.25rem;">
+                    <label for="diagramRegenFeedback" class="form-label" style="font-weight:700; color:#0D0D0C; font-size:0.88rem; display:block; margin-bottom:0.4rem;">
+                        Reviewer Directives / Guidance for this Diagram (Optional):
+                    </label>
+                    <textarea 
+                        id="diagramRegenFeedback" 
+                        name="feedback" 
+                        rows="4" 
+                        class="form-control" 
+                        style="width:100%; border:1px solid #D8D4D0; border-radius:8px; padding:0.75rem; font-size:0.88rem; font-family:inherit; resize:vertical;" 
+                        placeholder="e.g., Emphasize token validation in sequence, include external Payment Gateway in architecture, clarify User-Order cardinality in ERD..."
+                    ></textarea>
+                    <span style="font-size:0.75rem; color:#7D7975; display:block; margin-top:0.35rem;">
+                        Leave blank to perform a clean re-synthesis without additional custom constraints.
+                    </span>
+                </div>
+            </div>
+
+            <div class="diagram-modal-footer" style="display:flex; justify-content:flex-end; gap:0.75rem;">
+                <button type="button" class="btn-cancel-generation" style="margin:0; border-color:#D8D4D0; color:#5C5956; background:#F4F1EE;" onclick="closeDiagramRegenModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-card-control btn-diagram-regen" style="padding:0.6rem 1.25rem; font-size:0.86rem; font-weight:700; background:#E8590C; color:#FFFFFF; border:none; border-radius:8px; cursor:pointer;">
+                    <span>⚡ Confirm &amp; Regenerate Diagram</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

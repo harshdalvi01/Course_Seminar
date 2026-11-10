@@ -93,6 +93,11 @@ def stage_detail_view(request, project_id, stage):
         from .utils import parse_requirements_doc
         requirements_data = parse_requirements_doc(active_artifact.content)
         
+    design_data = None
+    if stage == 'DESIGN' and active_artifact:
+        from .utils import parse_design_doc
+        design_data = parse_design_doc(active_artifact.content)
+        
     completion_summary = None
     if project.status == 'COMPLETED' or (stage == 'DEPLOYMENT' and latest_artifact and latest_artifact.is_approved):
         summary_artifacts = []
@@ -119,6 +124,7 @@ def stage_detail_view(request, project_id, stage):
         'review_form': review_form,
         'code_files': code_files,
         'requirements_data': requirements_data,
+        'design_data': design_data,
         'completion_summary': completion_summary,
         'pipeline_info': pipeline_info,
         'next_stage': next_stage,
@@ -169,6 +175,28 @@ def artifact_review_view(request, artifact_id):
                 hitl_service.regenerate_artifact(artifact, request.user, feedback)
                 messages.success(request, 'Artifact regenerated successfully.')
                 
+        except HITLServiceError as e:
+            messages.error(request, str(e))
+        except Exception as e:
+            messages.error(request, f"System Error: {str(e)}")
+            
+    return redirect('stage_detail', project_id=artifact.project.pk, stage=artifact.stage)
+
+@login_required
+def regenerate_diagram_view(request, artifact_id, diagram_type):
+    artifact = get_object_or_404(Artifact, pk=artifact_id, project__owner=request.user)
+    
+    if artifact.stage != 'DESIGN':
+        messages.error(request, "Diagram regeneration is only permitted for the Design stage.")
+        return redirect('stage_detail', project_id=artifact.project.pk, stage=artifact.stage)
+        
+    if request.method == 'POST':
+        feedback = request.POST.get('feedback', '')
+        try:
+            hitl_service.regenerate_diagram(artifact, diagram_type, request.user, feedback)
+            from ai_services.agents import DIAGRAM_CONFIGS
+            title = DIAGRAM_CONFIGS.get(diagram_type, {}).get('title', diagram_type)
+            messages.success(request, f"{title} regenerated successfully. Created new design version.")
         except HITLServiceError as e:
             messages.error(request, str(e))
         except Exception as e:
