@@ -1,0 +1,109 @@
+<!-- ============================================================
+     CONSOLIDATED TESTING REPORT VIEWER (GENERATED TEST CASES)
+     Static AI Analysis — Zero Execution Safety Boundary
+     ============================================================ -->
+<div class="testing-report-wrapper" id="testingReportContainer">
+    <!-- Top Control Strip & Scope Disclaimer -->
+    <div class="testing-top-strip">
+        <div class="testing-disclaimer-pill">
+            <span class="disclaimer-dot"></span>
+            <span>STATIC AI ANALYSIS REPORT // NO CODE OR TESTS EXECUTED // STATUS: NOT EXECUTED</span>
+        </div>
+        {% if testing_data.is_structured %}
+            <div class="view-mode-toggle">
+                <button type="button" class="view-mode-btn active" id="btnTestRichView" onclick="setTestingViewMode('rich')">
+                    <span>Formatted Report</span>
+                </button>
+                <button type="button" class="view-mode-btn" id="btnTestRawView" onclick="setTestingViewMode('raw')">
+                    <span>Raw JSON</span>
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if testing_data.parse_error %}
+        <!-- Malformed JSON Error State -->
+        <div class="testing-error-box">
+            <div class="testing-err-title">⚠️ Testing Report Validation Error</div>
+            <div class="testing-err-msg">{{ testing_data.parse_error }}</div>
+            <pre class="testing-raw-pre">{{ testing_data.raw_content }}</pre>
+        </div>
+
+    {% elif testing_data.is_legacy_markdown %}
+        <!-- Graceful Fallback for Legacy Markdown Testing Artifacts -->
+        <div class="testing-legacy-banner">
+            <span>ℹ️ Legacy Markdown Report Detected — Displayed in formatted text mode. Click <strong>Regenerate</strong> to produce structured Generated Test Cases.</span>
+        </div>
+        <div class="req-section-markdown" style="padding: 1.25rem; background: #FFFFFF; border: 1px solid #D8D4D0; border-radius: 8px;">
+            {{ testing_data.legacy_html|safe }}
+        </div>
+
+    {% elif testing_data.is_structured %}
+        <div id="testingRichBody" class="testing-rich-body">
+            <!-- GENERATED TEST CASES -->
+            <div class="testing-section-panel">
+                <div class="testing-panel-header" onclick="toggleTestingSection('sec-test-cases', this)">
+                    <div class="panel-header-left">
+                        <span class="section-num-chip">TC</span>
+                        <h4 class="panel-header-title">Generated Test Cases ({{ testing_data.generated_test_cases|length }})</h4>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.75rem;" onclick="event.stopPropagation();">
+                        <div class="tc-filter-group">
+                            <button type="button" class="tc-filter-btn active" onclick="filterTestCases('all', this)">All ({{ testing_data.generated_test_cases|length }})</button>
+                            <button type="button" class="tc-filter-btn" onclick="filterTestCases('Positive', this)">Positive ({{ testing_data.testing_summary.positive_count }})</button>
+                            <button type="button" class="tc-filter-btn" onclick="filterTestCases('Negative', this)">Negative ({{ testing_data.testing_summary.negative_count }})</button>
+                        </div>
+                        <span class="panel-collapse-icon" style="cursor:pointer;" onclick="toggleTestingSection('sec-test-cases', this.closest('.testing-panel-header'))">▾</span>
+                    </div>
+                </div>
+                <div class="testing-panel-body" id="sec-test-cases">
+                    <div class="req-table-wrapper">
+                        <table class="req-table testing-cases-table" id="testingCasesTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 85px;">ID</th>
+                                    <th>Test Scenario &amp; Requirement</th>
+                                    <th>Expected Result</th>
+                                    <th style="width: 95px;">Priority</th>
+                                    <th style="width: 125px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tc in testing_data.generated_test_cases %}
+                                    <tr class="tc-row" data-scenario-type="{{ tc.scenario_type }}">
+                                        <td>
+                                            <span class="req-id-chip">{{ tc.id }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="tc-scenario-text">{{ tc.scenario }}</div>
+                                            <div class="tc-meta-row">
+                                                <span class="tc-type-pill {% if tc.is_negative %}pill-neg{% else %}pill-pos{% endif %}">
+                                                    {{ tc.scenario_type }}
+                                                </span>
+                                                <span class="tc-req-ref">Req: {{ tc.requirement_ref }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="tc-expected-cell">{{ tc.expected_result }}</td>
+                                        <td>
+                                            <span class="req-priority-badge {% if tc.priority == 'High' %}priority-high{% elif tc.priority == 'Low' %}priority-low{% else %}priority-medium{% endif %}">
+                                                {{ tc.priority }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-not-executed-pill">○ {{ tc.status }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Raw JSON Fallback Body -->
+        <div class="req-raw-body" id="testingRawBody" style="display:none; border-radius:8px;">
+            <textarea readonly class="req-raw-textarea" id="artifactTextContent">{{ active_artifact.content }}</textarea>
+        </div>
+    {% endif %}
+</div>

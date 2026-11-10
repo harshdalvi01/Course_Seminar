@@ -222,7 +222,40 @@ class HITLServiceTests(TestCase):
         self.assertEqual(self.project.current_stage, 'TESTING')
         
         # 2. Mock generation
-        mock_generate.return_value = "# Test Strategy\nStrategy content"
+        import json as _json
+        mock_generate.return_value = _json.dumps({
+            "testing_summary": {
+                "total_test_cases": 2,
+                "requirement_coverage_percentage": 100.0,
+                "covered_requirements": ["FR-01"],
+                "uncovered_requirements": [],
+                "total_requirements_count": 1,
+                "potential_issues_count": 0,
+                "summary_note": "Static analysis only."
+            },
+            "generated_test_cases": [
+                {
+                    "id": "TC-01",
+                    "scenario": "Verify positive path",
+                    "scenario_type": "Positive",
+                    "requirement_ref": "FR-01",
+                    "expected_result": "Succeeds cleanly",
+                    "priority": "High",
+                    "status": "Not Executed"
+                },
+                {
+                    "id": "TC-02",
+                    "scenario": "Verify invalid payload handling",
+                    "scenario_type": "Negative",
+                    "requirement_ref": "FR-01",
+                    "expected_result": "Returns validation error",
+                    "priority": "Medium",
+                    "status": "Not Executed"
+                }
+            ],
+            "potential_issues": [],
+            "recommendations": []
+        })
         mock_validate.return_value = {'valid': True, 'requires_human_review': True}
         
         # 3. Generate TESTING
@@ -278,18 +311,34 @@ class HITLServiceTests(TestCase):
         self.assertEqual(self.project.status, 'ACTIVE')
         
         # 2. Mock Deployment generation and Jev validation
-        deployment_output = (
-            "# 1. Deployment Strategy\nRolling static container.\n\n"
-            "# 2. Environment Requirements\nNode 20.\n\n"
-            "# 3. Required Services\nNginx.\n\n"
-            "# 4. Configuration Requirements\nPORT=80.\n\n"
-            "# 5. Database Considerations\nIndexedDB.\n\n"
-            "# 6. Security Checklist\nTLS 1.3 enforced.\n\n"
-            "# 7. CI/CD Recommendations\nGitHub Actions.\n\n"
-            "# 8. Monitoring Considerations\nUptimeRobot.\n\n"
-            "# 9. Rollback Strategy\nRevert commit.\n\n"
-            "# 10. Deployment Readiness Assessment\nReady for Go-Live."
-        )
+        import json as _json
+        deployment_output = _json.dumps({
+            "deployment_recommendation": {
+                "hosting_platform": "Render (Managed Web Service)",
+                "database_recommendation": "Render PostgreSQL",
+                "config_requirements": ["Python 3.11", "HTTPS enforced"],
+                "explanation": "Suitable managed PaaS for Python prototypes."
+            },
+            "deployment_readiness": [
+                {"check": "Dependencies", "status": "Needs Review", "explanation": "Confirm requirements.txt."},
+                {"check": "Environment Variables", "status": "Needs Review", "explanation": "Configure SECRET_KEY."},
+                {"check": "Security", "status": "Needs Review", "explanation": "Ensure DEBUG=False."},
+                {"check": "Database", "status": "Ready", "explanation": "SQLite or PostgreSQL configured."},
+                {"check": "Static Files", "status": "Needs Review", "explanation": "Configure static serving."}
+            ],
+            "deployment_instructions": {
+                "steps": [
+                    "1. Prepare production configuration.",
+                    "2. Configure environment variables.",
+                    "3. Set up database.",
+                    "4. Install dependencies.",
+                    "5. Configure static files.",
+                    "6. Deploy manually from host dashboard.",
+                    "7. Verify application works."
+                ],
+                "verification_checklist": ["Open live URL in browser."]
+            }
+        })
         mock_generate.return_value = deployment_output
         mock_validate.return_value = {
             'valid': True,
@@ -537,3 +586,341 @@ flowchart LR
         
         # Check that artifact version 2 was created
         self.assertEqual(Artifact.objects.filter(project=self.project, stage='DESIGN').count(), 2)
+
+
+class ConsolidatedTestingReportTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='qa_tester', password='password123')
+        self.project = Project.objects.create(
+            owner=self.user,
+            name='QA Verification Project',
+            description='A task manager web app with authentication.',
+            current_stage='TESTING'
+        )
+        # Approved Requirements
+        self.req_art = Artifact.objects.create(
+            project=self.project, stage='REQUIREMENTS', version=1,
+            content='# Functional Requirements\nFR-01: Login\nFR-02: Create Task\nFR-03: Delete Task',
+            created_by=self.user, is_approved=True
+        )
+        # Unapproved newer Requirements v2 should be ignored
+        self.req_unapproved = Artifact.objects.create(
+            project=self.project, stage='REQUIREMENTS', version=2,
+            content='UNAPPROVED DRAFT REQUIREMENT DO NOT USE',
+            created_by=self.user, is_approved=False
+        )
+        # Approved Design
+        self.design_art = Artifact.objects.create(
+            project=self.project, stage='DESIGN', version=1,
+            content='# 1. System Architecture\nDjango backend with SQLite.',
+            created_by=self.user, is_approved=True
+        )
+        # Approved Code
+        self.code_art = Artifact.objects.create(
+            project=self.project, stage='CODE', version=1,
+            content='[{"path": "app/views.py", "purpose": "Views", "content": "def create_task(request): pass"}]',
+            created_by=self.user, is_approved=True
+        )
+
+    def _valid_sample_json(self, force_passed=False):
+        import json
+        return json.dumps({
+            "testing_summary": {
+                "total_test_cases": 3,
+                "requirement_coverage_percentage": 99.0,  # deliberately inaccurate to test deterministic recalculation (2/3 = 66.7%)
+                "covered_requirements": ["FR-01: Login", "FR-02: Create Task"],
+                "uncovered_requirements": ["FR-03: Delete Task"],
+                "total_requirements_count": 3,
+                "potential_issues_count": 1,
+                "summary_note": "Static analysis complete. Unexecuted."
+            },
+            "generated_test_cases": [
+                {
+                    "id": "TC-01",
+                    "scenario": "User logs in with valid credentials",
+                    "scenario_type": "Positive",
+                    "requirement_ref": "FR-01",
+                    "expected_result": "Redirects to task dashboard",
+                    "priority": "High",
+                    "status": "Passed" if force_passed else "Not Executed"
+                },
+                {
+                    "id": "TC-02",
+                    "scenario": "User logs in with invalid password",
+                    "scenario_type": "Negative",
+                    "requirement_ref": "FR-01",
+                    "expected_result": "Displays invalid login error",
+                    "priority": "High",
+                    "status": "Not Executed"
+                },
+                {
+                    "id": "TC-03",
+                    "scenario": "Create task with valid title",
+                    "scenario_type": "Positive",
+                    "requirement_ref": "FR-02",
+                    "expected_result": "Task saved to database",
+                    "priority": "Medium",
+                    "status": "Not Executed"
+                }
+            ],
+            "potential_issues": [
+                {
+                    "id": "ISS-01",
+                    "description": "Missing login_required check on create_task view",
+                    "severity": "High",
+                    "affected_component": "app/views.py",
+                    "explanation": "The create_task handler does not enforce authentication.",
+                    "analysis_type": "AI Static Analysis (Unverified at Runtime)"
+                }
+            ],
+            "recommendations": [
+                {
+                    "title": "Enforce View Authentication",
+                    "action": "Decorate create_task with @login_required.",
+                    "related_ref": "ISS-01"
+                },
+                {
+                    "title": "Add Delete Task Test Coverage",
+                    "action": "Add negative and positive cases for FR-03.",
+                    "related_ref": "FR-03"
+                }
+            ]
+        })
+
+    @patch('ai_services.agents.groq_service.generate')
+    @patch('ai_services.agents.jev_service.validate_artifact')
+    def test_testing_agent_uses_only_approved_context_and_enforces_safety(self, mock_validate, mock_generate):
+        mock_generate.return_value = self._valid_sample_json(force_passed=True)
+        mock_validate.return_value = {
+            'valid': True, 'confidence': 0.91, 'issues': [], 'warnings': [], 'requires_human_review': True
+        }
+
+        art = hitl_service.generate_initial_artifact(self.project, 'TESTING', self.user)
+
+        # Verify context included approved v1 and excluded unapproved v2
+        ctx = mock_generate.call_args[1]['context']
+        self.assertIn("FR-01: Login", ctx)
+        self.assertIn("app/views.py", ctx)
+        self.assertNotIn("UNAPPROVED DRAFT REQUIREMENT DO NOT USE", ctx)
+
+        # Verify Jev received all 5 Testing consistency rules
+        rules = mock_validate.call_args[1]['rules']
+        self.assertTrue(any("four report sections" in r.lower() for r in rules))
+        self.assertTrue(any("not executed" in r.lower() for r in rules))
+        self.assertTrue(any("internally consistent" in r.lower() for r in rules))
+
+        # Parse saved artifact & verify safety constraints + deterministic math
+        import json
+        saved = json.loads(art.content)
+        for tc in saved['generated_test_cases']:
+            self.assertEqual(tc['status'], 'Not Executed')  # Even though Groq mock said 'Passed', overridden!
+
+        # Math recalculation: 2/3 covered = 66.7%
+        self.assertEqual(saved['testing_summary']['requirement_coverage_percentage'], 66.7)
+        self.assertEqual(saved['testing_summary']['total_test_cases'], 3)
+        self.assertEqual(saved['testing_summary']['potential_issues_count'], 1)
+
+    @patch('ai_services.agents.groq_service.generate')
+    def test_malformed_json_response_fails_gracefully_without_saving(self, mock_generate):
+        mock_generate.return_value = "Here is my response: {invalid json truncated..."
+
+        with self.assertRaises(HITLServiceError) as cm:
+            hitl_service.generate_initial_artifact(self.project, 'TESTING', self.user)
+
+        self.assertIn("Malformed JSON", str(cm.exception))
+        self.assertEqual(Artifact.objects.filter(project=self.project, stage='TESTING').count(), 0)
+
+    def test_parse_testing_report_and_stage_ui_rendering(self):
+        from workflow.utils import parse_testing_report
+        valid_art = Artifact.objects.create(
+            project=self.project, stage='TESTING', version=1,
+            content=self._valid_sample_json(),
+            created_by=self.user, is_approved=False,
+            validation_meta={'valid': True, 'confidence': 0.90, 'issues': [], 'warnings': []}
+        )
+
+        self.client.force_login(self.user)
+        res = self.client.get(reverse('stage_detail', kwargs={'project_id': self.project.pk, 'stage': 'TESTING'}))
+        self.assertEqual(res.status_code, 200)
+        self.assertNotContains(res, '<h4 class="panel-header-title">Testing Summary</h4>')
+        self.assertContains(res, "Generated Test Cases")
+        self.assertNotContains(res, '<h4 class="panel-header-title">Potential Issues')
+        self.assertNotContains(res, '<h4 class="panel-header-title">Recommendations')
+        self.assertContains(res, "Not Executed")
+        self.assertContains(res, "TC-01")
+
+        # Verify malformed edit error state
+        malformed_parsed = parse_testing_report("{incomplete")
+        self.assertFalse(malformed_parsed['is_structured'])
+        self.assertIsNotNone(malformed_parsed['parse_error'])
+
+    @patch('ai_services.agents.groq_service.generate')
+    @patch('ai_services.agents.jev_service.validate_artifact')
+    def test_hitl_lifecycle_and_deployment_gating(self, mock_validate, mock_generate):
+        mock_generate.return_value = self._valid_sample_json()
+        mock_validate.return_value = {'valid': True, 'confidence': 0.94, 'issues': [], 'warnings': [], 'requires_human_review': True}
+
+        v1 = hitl_service.generate_initial_artifact(self.project, 'TESTING', self.user)
+
+        # Reject v1 without feedback fails
+        with self.assertRaises(HITLServiceError):
+            hitl_service.reject_artifact(v1, self.user, "")
+
+        # Reject with feedback logs review and does NOT advance stage
+        hitl_service.reject_artifact(v1, self.user, "Needs more negative tests.")
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.current_stage, 'TESTING')
+
+        # Deployment cannot run before Testing is approved
+        with self.assertRaises(HITLServiceError):
+            hitl_service.generate_initial_artifact(self.project, 'DEPLOYMENT', self.user)
+
+        # Edit creates v2
+        v2 = hitl_service.edit_artifact(v1, self.user, self._valid_sample_json())
+        self.assertEqual(v2.version, 2)
+        self.assertEqual(v2.source_type, 'HUMAN')
+
+        # Regenerate creates v3
+        v3 = hitl_service.regenerate_artifact(v2, self.user, "Include SQL injection test scenario.")
+        self.assertEqual(v3.version, 3)
+
+        # Approve v3 -> advances to DEPLOYMENT
+        hitl_service.approve_artifact(v3, self.user, "Consolidated Testing Report Approved.")
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.current_stage, 'DEPLOYMENT')
+
+        # DeploymentAgent uses ONLY approved v3 TESTING artifact
+        from ai_services.agents import DeploymentAgent
+        dep_ctx = DeploymentAgent().build_context(self.project)
+        self.assertIn("TC-01", dep_ctx)
+
+
+class SimplifiedDeploymentReportTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='release_tester', password='password123')
+        self.project = Project.objects.create(
+            owner=self.user,
+            name='Task App Release',
+            description='Lightweight Django task tracking prototype.',
+            current_stage='DEPLOYMENT'
+        )
+        Artifact.objects.create(
+            project=self.project, stage='REQUIREMENTS', version=1,
+            content='Approved Requirements v1', created_by=self.user, is_approved=True
+        )
+        Artifact.objects.create(
+            project=self.project, stage='REQUIREMENTS', version=2,
+            content='UNAPPROVED DRAFT REQ DO NOT INCLUDE', created_by=self.user, is_approved=False
+        )
+        Artifact.objects.create(
+            project=self.project, stage='DESIGN', version=1,
+            content='Approved Design Architecture v1', created_by=self.user, is_approved=True
+        )
+        # Code files WITHOUT requirements.txt to test dependency evidence guard
+        Artifact.objects.create(
+            project=self.project, stage='CODE', version=1,
+            content='[{"path": "app/views.py", "purpose": "Views", "content": "def index(r): pass"}]',
+            created_by=self.user, is_approved=True
+        )
+        Artifact.objects.create(
+            project=self.project, stage='TESTING', version=1,
+            content='{"generated_test_cases": [{"id": "TC-01", "scenario": "Test", "expected_result": "OK", "priority": "High", "status": "Not Executed"}]}',
+            created_by=self.user, is_approved=True
+        )
+
+    def _valid_dep_json(self, deps_status="Ready"):
+        import json
+        return json.dumps({
+            "deployment_recommendation": {
+                "hosting_platform": "Render (Web Service)",
+                "database_recommendation": "Render PostgreSQL",
+                "config_requirements": ["Python 3.11+", "gunicorn", "HTTPS"],
+                "explanation": "Simple PaaS host well-suited for Django web applications."
+            },
+            "deployment_readiness": [
+                {"check": "Dependencies", "status": deps_status, "explanation": "Dependencies check."},
+                {"check": "Environment Variables", "status": "Needs Review", "explanation": "Set SECRET_KEY and DATABASE_URL."},
+                {"check": "Security", "status": "Missing", "explanation": "DEBUG=False not verified."},
+                {"check": "Database", "status": "Ready", "explanation": "PostgreSQL supported via ORM."},
+                {"check": "Static Files", "status": "Needs Review", "explanation": "Run collectstatic."}
+            ],
+            "deployment_instructions": {
+                "steps": [
+                    "1. Prepare production settings (DEBUG=False).",
+                    "2. Configure environment variables in Render dashboard.",
+                    "3. Provision PostgreSQL database.",
+                    "4. Install dependencies.",
+                    "5. Configure static files.",
+                    "6. Deploy manually from Git branch.",
+                    "7. Verify application works in browser."
+                ],
+                "verification_checklist": [
+                    "Confirm HTTPS URL opens cleanly.",
+                    "Check core pages render with CSS assets."
+                ]
+            }
+        })
+
+    @patch('ai_services.agents.groq_service.generate')
+    @patch('ai_services.agents.jev_service.validate_artifact')
+    def test_deployment_agent_evidence_guard_and_jev_validation(self, mock_validate, mock_generate):
+        mock_generate.return_value = self._valid_dep_json(deps_status="Ready")
+        mock_validate.return_value = {'valid': True, 'confidence': 0.92, 'issues': [], 'warnings': [], 'requires_human_review': True}
+
+        dep_art = hitl_service.generate_initial_artifact(self.project, 'DEPLOYMENT', self.user)
+
+        # Verify context includes approved v1 & excludes unapproved v2
+        ctx = mock_generate.call_args[1]['context']
+        self.assertIn("Approved Requirements v1", ctx)
+        self.assertNotIn("UNAPPROVED DRAFT REQ DO NOT INCLUDE", ctx)
+        self.assertIn("app/views.py", ctx)
+        self.assertIn("TC-01", ctx)
+
+        # Verify dependency evidence check downgraded false 'Ready' to 'Missing' since no requirements.txt exists
+        import json
+        saved = json.loads(dep_art.content)
+        dep_chk = next(c for c in saved['deployment_readiness'] if c['check'] == 'Dependencies')
+        self.assertEqual(dep_chk['status'], 'Missing')
+        self.assertEqual(len(saved['deployment_readiness']), 5)
+
+        # Verify Jev rules validated all 3 sections and readiness checks
+        rules = mock_validate.call_args[1]['rules']
+        self.assertTrue(any("three sections" in r.lower() for r in rules))
+        self.assertTrue(any("five deployment readiness checks" in r.lower() for r in rules))
+
+    @patch('ai_services.agents.groq_service.generate')
+    def test_malformed_deployment_json_fails_gracefully(self, mock_generate):
+        mock_generate.return_value = "{broken json without closing"
+        with self.assertRaises(HITLServiceError) as cm:
+            hitl_service.generate_initial_artifact(self.project, 'DEPLOYMENT', self.user)
+        self.assertIn("Malformed JSON", str(cm.exception))
+        self.assertEqual(Artifact.objects.filter(project=self.project, stage='DEPLOYMENT').count(), 0)
+
+    def test_deployment_ui_renders_three_sections_and_hitl_completion(self):
+        art_v1 = Artifact.objects.create(
+            project=self.project, stage='DEPLOYMENT', version=1,
+            content=self._valid_dep_json(deps_status="Missing"),
+            created_by=self.user, is_approved=False,
+            validation_meta={'valid': True, 'confidence': 0.91, 'issues': [], 'warnings': []}
+        )
+
+        self.client.force_login(self.user)
+        res = self.client.get(reverse('stage_detail', kwargs={'project_id': self.project.pk, 'stage': 'DEPLOYMENT'}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Deployment Recommendation")
+        self.assertContains(res, "Deployment Readiness")
+        self.assertContains(res, "Deployment Instructions")
+        self.assertContains(res, "Render (Web Service)")
+        self.assertContains(res, "Render PostgreSQL")
+        self.assertContains(res, "Dependencies")
+        self.assertContains(res, "Static Files")
+        self.assertContains(res, "Post-Deployment Verification Checklist")
+
+        # Edit creates v2, Approve marks project COMPLETED
+        v2 = hitl_service.edit_artifact(art_v1, self.user, self._valid_dep_json(deps_status="Needs Review"))
+        self.assertEqual(v2.version, 2)
+        hitl_service.approve_artifact(v2, self.user, "Ready for manual release.")
+
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.current_stage, 'COMPLETED')
+        self.assertEqual(self.project.status, 'COMPLETED')

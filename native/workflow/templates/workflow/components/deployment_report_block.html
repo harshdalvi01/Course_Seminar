@@ -1,0 +1,165 @@
+<!-- ============================================================
+     SIMPLIFIED DEPLOYMENT REPORT VIEWER (3-SECTION REVIEW)
+     Manual Deployment Guide — No Automated Infrastructure Provisioning
+     ============================================================ -->
+<div class="testing-report-wrapper" id="deploymentReportContainer">
+    <!-- Top Control Strip & Scope Notice -->
+    <div class="testing-top-strip">
+        <div class="testing-disclaimer-pill">
+            <span class="disclaimer-dot"></span>
+            <span>MANUAL DEPLOYMENT GUIDE ONLY // NO INFRASTRUCTURE PROVISIONED // DEVELOPER EXECUTES STEPS</span>
+        </div>
+        {% if deployment_data.is_structured %}
+            <div class="view-mode-toggle">
+                <button type="button" class="view-mode-btn active" id="btnDepRichView" onclick="setDeploymentViewMode('rich')">
+                    <span>Formatted Report</span>
+                </button>
+                <button type="button" class="view-mode-btn" id="btnDepRawView" onclick="setDeploymentViewMode('raw')">
+                    <span>Raw JSON</span>
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if deployment_data.parse_error %}
+        <!-- Malformed JSON Error State -->
+        <div class="testing-error-box">
+            <div class="testing-err-title">⚠️ Deployment Report Validation Error</div>
+            <div class="testing-err-msg">{{ deployment_data.parse_error }}</div>
+            <pre class="testing-raw-pre">{{ deployment_data.raw_content }}</pre>
+        </div>
+
+    {% elif deployment_data.is_legacy_markdown %}
+        <!-- Graceful Fallback for Legacy Markdown Deployment Artifacts -->
+        <div class="testing-legacy-banner">
+            <span>ℹ️ Legacy Markdown Report Detected — Displayed in formatted text mode. Click <strong>Regenerate</strong> to produce the simplified 3-section Deployment Report.</span>
+        </div>
+        <div class="req-section-markdown" style="padding: 1.25rem; background: #FFFFFF; border: 1px solid #D8D4D0; border-radius: 8px;">
+            {{ deployment_data.legacy_html|safe }}
+        </div>
+
+    {% elif deployment_data.is_structured %}
+        <div id="deploymentRichBody" class="testing-rich-body">
+            <!-- SECTION A: DEPLOYMENT RECOMMENDATION -->
+            <div class="testing-section-panel">
+                <div class="testing-panel-header" onclick="toggleTestingSection('sec-dep-rec', this)">
+                    <div class="panel-header-left">
+                        <span class="section-num-chip">A</span>
+                        <h4 class="panel-header-title">Deployment Recommendation</h4>
+                    </div>
+                    <span class="panel-collapse-icon">▾</span>
+                </div>
+                <div class="testing-panel-body" id="sec-dep-rec">
+                    <div class="dep-rec-grid">
+                        <div class="testing-metric-card">
+                            <span class="metric-label">RECOMMENDED HOSTING PLATFORM</span>
+                            <div class="dep-platform-value">{{ deployment_data.recommendation.hosting_platform }}</div>
+                        </div>
+                        <div class="testing-metric-card">
+                            <span class="metric-label">DATABASE HOSTING RECOMMENDATION</span>
+                            <div class="dep-platform-value">{{ deployment_data.recommendation.database_recommendation }}</div>
+                        </div>
+                    </div>
+
+                    {% if deployment_data.recommendation.explanation %}
+                        <p class="testing-summary-note" style="margin-top: 1rem;">
+                            {{ deployment_data.recommendation.explanation }}
+                        </p>
+                    {% endif %}
+
+                    {% if deployment_data.recommendation.config_requirements %}
+                        <div class="dep-config-row">
+                            <span class="dep-config-label">Configuration Requirements:</span>
+                            {% for cfg in deployment_data.recommendation.config_requirements %}
+                                <span class="component-chip">{{ cfg }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SECTION B: DEPLOYMENT READINESS -->
+            <div class="testing-section-panel">
+                <div class="testing-panel-header" onclick="toggleTestingSection('sec-dep-ready', this)">
+                    <div class="panel-header-left">
+                        <span class="section-num-chip">B</span>
+                        <h4 class="panel-header-title">Deployment Readiness ({{ deployment_data.readiness|length }} Static Checks)</h4>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.65rem;" onclick="event.stopPropagation();">
+                        <span class="dep-count-pill">
+                            {{ deployment_data.readiness_counts.Ready }} Ready &bull; {{ deployment_data.readiness_counts.Missing }} Missing
+                        </span>
+                        <span class="panel-collapse-icon" style="cursor:pointer;" onclick="toggleTestingSection('sec-dep-ready', this.closest('.testing-panel-header'))">▾</span>
+                    </div>
+                </div>
+                <div class="testing-panel-body" id="sec-dep-ready">
+                    <div class="req-table-wrapper">
+                        <table class="req-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 190px;">Check Area</th>
+                                    <th style="width: 150px;">Status</th>
+                                    <th>Evidence &amp; Explanation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for chk in deployment_data.readiness %}
+                                    <tr>
+                                        <td>
+                                            <strong style="color: #0D0D0C; font-size: 0.85rem;">{{ chk.check }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="dep-status-pill {{ chk.badge_class }}">
+                                                <span>{{ chk.status_icon }}</span>
+                                                <span>{{ chk.status }}</span>
+                                            </span>
+                                        </td>
+                                        <td class="tc-expected-cell">{{ chk.explanation }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION C: DEPLOYMENT INSTRUCTIONS -->
+            <div class="testing-section-panel">
+                <div class="testing-panel-header" onclick="toggleTestingSection('sec-dep-instr', this)">
+                    <div class="panel-header-left">
+                        <span class="section-num-chip">C</span>
+                        <h4 class="panel-header-title">Deployment Instructions</h4>
+                    </div>
+                    <span class="panel-collapse-icon">▾</span>
+                </div>
+                <div class="testing-panel-body" id="sec-dep-instr">
+                    <h5 class="dep-sub-heading">Ordered Manual Deployment Steps</h5>
+                    <ol class="dep-steps-list">
+                        {% for step in deployment_data.instructions.steps %}
+                            <li class="dep-step-item">{{ step }}</li>
+                        {% endfor %}
+                    </ol>
+
+                    {% if deployment_data.instructions.verification_checklist %}
+                        <div class="dep-checklist-box">
+                            <h5 class="dep-sub-heading" style="margin-top:0;">Post-Deployment Verification Checklist</h5>
+                            <ul class="dep-checklist">
+                                {% for item in deployment_data.instructions.verification_checklist %}
+                                    <li class="dep-checklist-item">
+                                        <input type="checkbox" class="dep-check-input">
+                                        <span>{{ item }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Raw JSON Fallback Body -->
+        <div class="req-raw-body" id="deploymentRawBody" style="display:none; border-radius:8px;">
+            <textarea readonly class="req-raw-textarea" id="artifactTextContent">{{ active_artifact.content }}</textarea>
+        </div>
+    {% endif %}
+</div>

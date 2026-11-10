@@ -98,6 +98,16 @@ def stage_detail_view(request, project_id, stage):
         from .utils import parse_design_doc
         design_data = parse_design_doc(active_artifact.content)
         
+    testing_data = None
+    if stage == 'TESTING' and active_artifact:
+        from .utils import parse_testing_report
+        testing_data = parse_testing_report(active_artifact.content)
+        
+    deployment_data = None
+    if stage == 'DEPLOYMENT' and active_artifact:
+        from .utils import parse_deployment_report
+        deployment_data = parse_deployment_report(active_artifact.content)
+        
     completion_summary = None
     if project.status == 'COMPLETED' or (stage == 'DEPLOYMENT' and latest_artifact and latest_artifact.is_approved):
         summary_artifacts = []
@@ -125,6 +135,8 @@ def stage_detail_view(request, project_id, stage):
         'code_files': code_files,
         'requirements_data': requirements_data,
         'design_data': design_data,
+        'testing_data': testing_data,
+        'deployment_data': deployment_data,
         'completion_summary': completion_summary,
         'pipeline_info': pipeline_info,
         'next_stage': next_stage,
